@@ -14,15 +14,69 @@ Estoy trabajando en la **migración de MiGente En Línea** desde ASP.NET Web For
 
 ### Ubicación de Archivos
 ```
-C:\Users\ray\OneDrive\Documents\ProyectoMigente\MiGenteEnLinea.Clean\
-├── src/Core/MiGenteEnLinea.Domain/           # Aquí van las entidades refactorizadas
-├── src/Core/MiGenteEnLinea.Application/      # Use Cases, DTOs, Validators
-├── src/Infrastructure/MiGenteEnLinea.Infrastructure/
-│   └── Persistence/
-│       ├── Entities/Generated/               # Entidades scaffolded (36 archivos)
-│       ├── Contexts/MiGenteDbContext.cs      # DbContext generado
-│       └── Configurations/                   # Aquí van las Fluent API configs
-└── src/Presentation/MiGenteEnLinea.API/
+ProyectoMigente/ (WORKSPACE ROOT)
+├── .git/                                         # Git repository
+├── .github/                                      # GitHub configuration
+├── MiGenteEnLinea-Workspace.code-workspace       # VS Code workspace config
+│
+├── Codigo Fuente Mi Gente/                       # 🔷 LEGACY PROJECT
+│   ├── MiGente_Front/
+│   │   └── Data/                                 # Entidades EF6 (Database-First)
+│   │       ├── Credenciales.cs                   # ⚠️ Passwords en texto plano
+│   │       ├── Ofertantes.cs                     # Empleadores (legacy name)
+│   │       └── Contratistas.cs
+│   └── ...
+│
+└── MiGenteEnLinea.Clean/                         # 🚀 CLEAN ARCHITECTURE PROJECT
+    ├── MiGenteEnLinea.Clean.sln
+    ├── src/
+    │   ├── Core/
+    │   │   ├── MiGenteEnLinea.Domain/            # ✅ Aquí van las entidades refactorizadas
+    │   │   │   ├── Entities/                     # Entidades DDD refactorizadas
+    │   │   │   │   ├── Authentication/
+    │   │   │   │   │   └── Credencial.cs         # ✅ A crear (refactorizada)
+    │   │   │   │   ├── Empleadores/
+    │   │   │   │   │   └── Empleador.cs          # ✅ A crear (refactorizada)
+    │   │   │   │   └── Contratistas/
+    │   │   │   │       └── Contratista.cs        # ✅ A crear (refactorizada)
+    │   │   │   ├── ValueObjects/                 # Value Objects inmutables
+    │   │   │   ├── Common/                       # Clases base (AuditableEntity, etc.)
+    │   │   │   ├── Events/                       # Domain Events
+    │   │   │   └── Interfaces/                   # Interfaces del dominio
+    │   │   │
+    │   │   └── MiGenteEnLinea.Application/       # Use Cases, DTOs, Validators
+    │   │       ├── Features/
+    │   │       │   ├── Authentication/
+    │   │       │   ├── Empleadores/
+    │   │       │   └── Contratistas/
+    │   │       └── Common/
+    │   │
+    │   ├── Infrastructure/
+    │   │   └── MiGenteEnLinea.Infrastructure/
+    │   │       ├── Persistence/
+    │   │       │   ├── Contexts/
+    │   │       │   │   └── MiGenteDbContext.cs   # DbContext generado
+    │   │       │   ├── Entities/Generated/       # 36 entidades scaffolded
+    │   │       │   │   ├── Credenciale.cs        # ⚠️ Scaffolded (a refactorizar)
+    │   │       │   │   ├── Ofertante.cs          # ⚠️ Scaffolded (a refactorizar)
+    │   │       │   │   └── Contratista.cs        # ⚠️ Scaffolded (a refactorizar)
+    │   │       │   ├── Configurations/           # ✅ Aquí van las Fluent API configs
+    │   │       │   │   └── CredencialConfiguration.cs  # ✅ A crear
+    │   │       │   ├── Interceptors/             # Interceptors de EF Core
+    │   │       │   │   └── AuditableEntityInterceptor.cs  # ✅ A crear
+    │   │       │   └── Repositories/             # Implementación de repositorios
+    │   │       │
+    │   │       ├── Identity/                     # Servicios de identidad
+    │   │       │   └── Services/
+    │   │       │       └── BCryptPasswordHasher.cs  # ✅ A crear
+    │   │       │
+    │   │       └── Services/                     # Servicios externos
+    │   │
+    │   └── Presentation/
+    │       └── MiGenteEnLinea.API/               # API REST
+    │           └── Controllers/
+    │
+    └── tests/                                     # Tests (futura implementación)
 ```
 
 ---

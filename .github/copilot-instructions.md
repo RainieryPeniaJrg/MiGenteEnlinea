@@ -11,7 +11,7 @@
 **DO:** Only critical bug fixes and security patches
 
 ### 🚀 PROJECT 2: Clean Architecture (Active Development)
-**Location:** `../MiGenteEnLinea.Clean/`
+**Location:** `MiGenteEnLinea.Clean/`
 **Purpose:** New modern implementation being built
 **DO:** All new development, DDD refactoring, testing
 **DO:** Reference legacy code for business logic understanding
@@ -23,7 +23,14 @@
 This is a **multi-root VS Code workspace** combining both projects:
 
 ```
-MiGenteEnLinea-Workspace/
+ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
+├── .git/                                # ✅ Git repository
+├── .github/                             # ✅ GitHub configuration
+├── .gitignore                           # ✅ Workspace gitignore
+├── README.md                            # ✅ Main documentation
+├── WORKSPACE_README.md                  # ✅ Workspace guide
+├── MiGenteEnLinea-Workspace.code-workspace  # ✅ VS Code config
+│
 ├── 🔷 Codigo Fuente Mi Gente/          # LEGACY PROJECT
 │   ├── MiGente.sln                      # .NET Framework 4.7.2
 │   ├── MiGente_Front/                   # ASP.NET Web Forms
@@ -32,8 +39,7 @@ MiGenteEnLinea-Workspace/
 │   │   ├── Empleador/                   # Employer module
 │   │   └── Contratista/                 # Contractor module
 │   ├── docs/                            # Migration documentation
-│   ├── scripts/                         # Automation scripts
-│   └── .github/                         # GitHub config, templates
+│   └── scripts/                         # Automation scripts
 │
 └── 🚀 MiGenteEnLinea.Clean/            # CLEAN ARCHITECTURE PROJECT
     ├── MiGenteEnLinea.Clean.sln         # .NET 8.0

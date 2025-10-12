@@ -34,8 +34,11 @@ Copia y pega este comando completo en **GitHub Copilot Chat**:
 @workspace Lee el archivo DDD_MIGRATION_PROMPT.md completo y úsalo como guía paso a paso.
 
 CONTEXTO:
+- Workspace ROOT: C:\Users\ray\OneDrive\Documents\ProyectoMigente\
+- Proyecto Legacy: Codigo Fuente Mi Gente/
+- Proyecto Clean: MiGenteEnLinea.Clean/
 - Ya existe la solución creada con setup-codefirst-migration.ps1
-- 36 entidades ya están scaffolded en Infrastructure/Persistence/Entities/Generated/
+- 36 entidades ya están scaffolded en MiGenteEnLinea.Clean/src/Infrastructure/Persistence/Entities/Generated/
 - Database: db_a9f8ff_migente en SQL Server (localhost,1433)
 - NO crear tests aún (fase posterior)
 - Enfoque: Migración Code-First + Lógica de negocio con DDD + Controllers
@@ -44,8 +47,12 @@ TAREA:
 Ejecuta la Tarea 1: Refactorizar Entidad Credencial
 
 Sigue TODOS los pasos en orden:
-1. Crear clases base en Domain/Common/ (AuditableEntity, SoftDeletableEntity, AggregateRoot, ValueObject)
-2. Copiar Generated/Credenciale.cs a Domain/Entities/Authentication/Credencial.cs
+1. Crear clases base en MiGenteEnLinea.Clean/src/Core/MiGenteEnLinea.Domain/Common/
+   (AuditableEntity, SoftDeletableEntity, AggregateRoot, ValueObject)
+   
+2. Copiar Infrastructure/Persistence/Entities/Generated/Credenciale.cs 
+   a Domain/Entities/Authentication/Credencial.cs
+   
 3. Refactorizar Credencial con patrón DDD:
    - Heredar de AuditableEntity
    - Encapsular propiedades (setters privados)
@@ -54,14 +61,18 @@ Sigue TODOS los pasos en orden:
    - Domain methods: Activar(), Desactivar(), ActualizarPasswordHash(), RegistrarAcceso()
    - Renombrar Password → PasswordHash
    - Agregar FechaActivacion, UltimoAcceso
+   
 4. Crear CredencialConfiguration.cs en Infrastructure/Persistence/Configurations/
    - Mapear a tabla Credenciales existente
    - Mantener nombres de columnas legacy (id, userID, email, password, activo)
    - Índices únicos en UserId y Email
+   
 5. Implementar BCrypt Password Hasher:
    - IPasswordHasher en Domain/Interfaces/
-   - BCryptPasswordHasher en Infrastructure/Services/
+   - BCryptPasswordHasher en Infrastructure/Identity/Services/
+   
 6. Crear AuditableEntityInterceptor en Infrastructure/Persistence/Interceptors/
+
 7. Actualizar DbContext con configuración y interceptor
 
 Después de completar Credencial, continuar con Empleador y Contratista usando el mismo patrón.
@@ -71,6 +82,7 @@ IMPORTANTE:
 - NO crear tests unitarios ni de integración (fase posterior)
 - Enfócate en la lógica de negocio y arquitectura limpia
 - Mantener compatibilidad con nombres de tabla/columna legacy
+- TODOS los paths son relativos a: C:\Users\ray\OneDrive\Documents\ProyectoMigente\
 ```
 
 ---
