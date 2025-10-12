@@ -9,6 +9,9 @@ using MiGenteEnLinea.Domain.Entities.Calificaciones;
 using MiGenteEnLinea.Domain.Entities.Nominas;
 using MiGenteEnLinea.Domain.Entities.Empleados;
 using MiGenteEnLinea.Domain.Entities.Pagos;
+using MiGenteEnLinea.Domain.Entities.Catalogos;
+using MiGenteEnLinea.Domain.Entities.Contrataciones;
+using MiGenteEnLinea.Domain.Entities.Seguridad;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -34,9 +37,17 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces legacy Contratista)
     public virtual DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; set; }
 
-    public virtual DbSet<ContratistasFoto> ContratistasFotos { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<ContratistasFoto> ContratistasFotosLegacy { get; set; }
 
-    public virtual DbSet<ContratistasServicio> ContratistasServicios { get; set; }
+    // DDD Refactored entity (replaces ContratistasFoto)
+    public virtual DbSet<ContratistaFoto> ContratistasFotos { get; set; }
+
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<ContratistasServicio> ContratistasServiciosLegacy { get; set; }
+
+    // DDD Refactored entity (replaces ContratistasServicio)
+    public virtual DbSet<ContratistaServicio> ContratistasServicios { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Credenciale> Credenciales { get; set; }
@@ -56,7 +67,11 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces Ofertante)
     public virtual DbSet<Empleador> Empleadores { get; set; }
 
-    public virtual DbSet<DetalleContratacione> DetalleContrataciones { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<DetalleContratacione> DetalleContratacionesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces DetalleContratacione)
+    public virtual DbSet<DetalleContratacion> DetalleContrataciones { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Empleado> EmpleadosLegacy { get; set; }
@@ -101,11 +116,23 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces legacy PaymentGateway)
     public virtual DbSet<Domain.Entities.Pagos.PaymentGateway> PaymentGateways { get; set; }
 
-    public virtual DbSet<Perfile> Perfiles { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Perfile> PerfilesLegacy { get; set; }
 
-    public virtual DbSet<PerfilesInfo> PerfilesInfos { get; set; }
+    // DDD Refactored entity (replaces legacy Perfile)
+    public virtual DbSet<Domain.Entities.Seguridad.Perfile> Perfiles { get; set; }
 
-    public virtual DbSet<Permiso> Permisos { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.PerfilesInfo> PerfilesInfosLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy PerfilesInfo)
+    public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get; set; }
+
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Permiso> PermisosLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy Permiso)
+    public virtual DbSet<Domain.Entities.Seguridad.Permiso> Permisos { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<PlanesContratista> PlanesContratistasLegacy { get; set; }
@@ -121,9 +148,17 @@ public partial class MiGenteDbContext : DbContext
 
     public virtual DbSet<Provincia> Provincias { get; set; }
 
-    public virtual DbSet<Sectore> Sectores { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Sectore> SectoresLegacy { get; set; }
 
-    public virtual DbSet<Servicio> Servicios { get; set; }
+    // DDD Refactored entity (replaces Sectore)
+    public virtual DbSet<Sector> Sectores { get; set; }
+
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Servicio> ServiciosLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy Servicio)
+    public virtual DbSet<Domain.Entities.Catalogos.Servicio> Servicios { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Suscripcione> SuscripcionesLegacy { get; set; }
@@ -186,10 +221,11 @@ public partial class MiGenteDbContext : DbContext
         //     entity.HasKey(e => e.Id).HasName("PK_Deducciones");
         // });
 
-        modelBuilder.Entity<DetalleContratacione>(entity =>
-        {
-            entity.HasOne(d => d.Contratacion).WithMany(p => p.DetalleContrataciones).HasConstraintName("FK_DetalleContrataciones_EmpleadosTemporales");
-        });
+        // Legacy DetalleContratacione mapping (commented out - using refactored DetalleContratacion version)
+        // modelBuilder.Entity<DetalleContratacione>(entity =>
+        // {
+        //     entity.HasOne(d => d.Contratacion).WithMany(p => p.DetalleContrataciones).HasConstraintName("FK_DetalleContrataciones_EmpleadosTemporales");
+        // });
 
         // Legacy EmpleadorRecibosDetalle mapping (commented out - using refactored ReciboDetalle version)
         // modelBuilder.Entity<EmpleadorRecibosDetalle>(entity =>
@@ -219,15 +255,17 @@ public partial class MiGenteDbContext : DbContext
         //     entity.HasKey(e => e.OfertanteId).HasName("PK__Ofertant__B6039B8F8B329CD8");
         // });
 
-        modelBuilder.Entity<Perfile>(entity =>
-        {
-            entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(getdate())");
-        });
+        // Legacy Perfile mapping (commented out - using refactored Perfile version)
+        // modelBuilder.Entity<Perfile>(entity =>
+        // {
+        //     entity.Property(e => e.FechaCreacion).HasDefaultValueSql("(getdate())");
+        // });
 
-        modelBuilder.Entity<PerfilesInfo>(entity =>
-        {
-            entity.HasOne(d => d.Perfil).WithMany(p => p.PerfilesInfos).HasConstraintName("FK_perfilesInfo_Perfiles");
-        });
+        // Legacy PerfilesInfo mapping (commented out - using refactored PerfilesInfo version)
+        // modelBuilder.Entity<PerfilesInfo>(entity =>
+        // {
+        //     entity.HasOne(d => d.Perfil).WithMany(p => p.PerfilesInfos).HasConstraintName("FK_perfilesInfo_Perfiles");
+        // });
 
         // Legacy PlanesContratista mapping (commented out - using refactored PlanContratista version)
         // modelBuilder.Entity<PlanesContratista>(entity =>
