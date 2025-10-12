@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
 using MiGenteEnLinea.Domain.Entities.Authentication;
+using MiGenteEnLinea.Domain.Entities.Empleadores;
+using MiGenteEnLinea.Domain.Entities.Contratistas;
+using MiGenteEnLinea.Domain.Entities.Suscripciones;
+using MiGenteEnLinea.Domain.Entities.Calificaciones;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -13,11 +17,19 @@ public partial class MiGenteDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Calificacione> Calificaciones { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Calificacione> CalificacionesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces Calificacione)
+    public virtual DbSet<Calificacion> Calificaciones { get; set; }
 
     public virtual DbSet<ConfigCorreo> ConfigCorreos { get; set; }
 
-    public virtual DbSet<Contratista> Contratistas { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Contratista> ContratistasLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy Contratista)
+    public virtual DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; set; }
 
     public virtual DbSet<ContratistasFoto> ContratistasFotos { get; set; }
 
@@ -30,6 +42,12 @@ public partial class MiGenteDbContext : DbContext
     public virtual DbSet<Credencial> CredencialesRefactored { get; set; }
 
     public virtual DbSet<DeduccionesTss> DeduccionesTsses { get; set; }
+
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Ofertante> OfertantesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces Ofertante)
+    public virtual DbSet<Empleador> Empleadores { get; set; }
 
     public virtual DbSet<DetalleContratacione> DetalleContrataciones { get; set; }
 
@@ -47,7 +65,8 @@ public partial class MiGenteDbContext : DbContext
 
     public virtual DbSet<EmpleadosTemporale> EmpleadosTemporales { get; set; }
 
-    public virtual DbSet<Ofertante> Ofertantes { get; set; }
+    // Commented out - using Empleadores instead (DDD refactored)
+    // public virtual DbSet<Ofertante> Ofertantes { get; set; }
 
     public virtual DbSet<PaymentGateway> PaymentGateways { get; set; }
 
@@ -67,7 +86,11 @@ public partial class MiGenteDbContext : DbContext
 
     public virtual DbSet<Servicio> Servicios { get; set; }
 
-    public virtual DbSet<Suscripcione> Suscripciones { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Suscripcione> SuscripcionesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces Suscripcione)
+    public virtual DbSet<Suscripcion> Suscripciones { get; set; }
 
     public virtual DbSet<Vcalificacione> Vcalificaciones { get; set; }
 
@@ -94,6 +117,9 @@ public partial class MiGenteDbContext : DbContext
         // Apply all configurations from assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MiGenteDbContext).Assembly);
 
+        // Legacy Contratista relationships (commented out - using refactored version)
+        // The refactored Contratista configuration handles these relationships
+        /*
         modelBuilder.Entity<ContratistasFoto>(entity =>
         {
             entity.HasOne(d => d.Contratista).WithMany(p => p.ContratistasFotos).HasConstraintName("FK_Contratistas_Fotos_Contratistas");
@@ -103,6 +129,7 @@ public partial class MiGenteDbContext : DbContext
         {
             entity.HasOne(d => d.Contratista).WithMany(p => p.ContratistasServicios).HasConstraintName("FK_Contratistas_Servicios_Contratistas");
         });
+        */
 
         // Legacy Credenciale mapping (commented out - using refactored version)
         // modelBuilder.Entity<Credenciale>(entity =>
@@ -140,10 +167,11 @@ public partial class MiGenteDbContext : DbContext
             entity.HasOne(d => d.Contratacion).WithMany(p => p.EmpleadorRecibosHeaderContrataciones).HasConstraintName("FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales");
         });
 
-        modelBuilder.Entity<Ofertante>(entity =>
-        {
-            entity.HasKey(e => e.OfertanteId).HasName("PK__Ofertant__B6039B8F8B329CD8");
-        });
+        // Legacy Ofertante mapping (commented out - using refactored Empleador version)
+        // modelBuilder.Entity<Ofertante>(entity =>
+        // {
+        //     entity.HasKey(e => e.OfertanteId).HasName("PK__Ofertant__B6039B8F8B329CD8");
+        // });
 
         modelBuilder.Entity<Perfile>(entity =>
         {
