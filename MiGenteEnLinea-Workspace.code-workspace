@@ -1,7 +1,11 @@
 {
   "folders": [
     {
-      "name": "🔷 MiGente Legacy (Web Forms)",
+      "name": "� Documentación y Prompts",
+      "path": "."
+    },
+    {
+      "name": "�🔷 MiGente Legacy (Web Forms)",
       "path": "Codigo Fuente Mi Gente"
     },
     {
@@ -22,7 +26,7 @@
       "**/obj": true,
       "**/node_modules": true
     },
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
