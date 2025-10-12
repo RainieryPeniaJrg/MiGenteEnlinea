@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B43372A5-BC82-4F1B-9C3F-574287C18CF8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{36BF41D2-BC8A-446B-902A-77422137B4D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiGenteEnLinea.Domain", "src\Core\MiGenteEnLinea.Domain\MiGenteEnLinea.Domain.csproj", "{23A19C46-8F41-4680-9D9A-8A390471E36A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiGenteEnLinea.Application", "src\Core\MiGenteEnLinea.Application\MiGenteEnLinea.Application.csproj", "{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{C223739E-136D-4226-AF3C-A958A5C8CE78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiGenteEnLinea.Infrastructure", "src\Infrastructure\MiGenteEnLinea.Infrastructure\MiGenteEnLinea.Infrastructure.csproj", "{C3413990-288F-42CE-A211-B7197CC688B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{149C2454-E204-4DF1-8768-5CDEFD97736F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiGenteEnLinea.API", "src\Presentation\MiGenteEnLinea.API\MiGenteEnLinea.API.csproj", "{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23A19C46-8F41-4680-9D9A-8A390471E36A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23A19C46-8F41-4680-9D9A-8A390471E36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23A19C46-8F41-4680-9D9A-8A390471E36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23A19C46-8F41-4680-9D9A-8A390471E36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3413990-288F-42CE-A211-B7197CC688B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3413990-288F-42CE-A211-B7197CC688B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3413990-288F-42CE-A211-B7197CC688B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3413990-288F-42CE-A211-B7197CC688B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{36BF41D2-BC8A-446B-902A-77422137B4D3} = {B43372A5-BC82-4F1B-9C3F-574287C18CF8}
+		{23A19C46-8F41-4680-9D9A-8A390471E36A} = {36BF41D2-BC8A-446B-902A-77422137B4D3}
+		{1AC6EE3B-BCF7-4F4A-A342-6A2B259E851A} = {36BF41D2-BC8A-446B-902A-77422137B4D3}
+		{C223739E-136D-4226-AF3C-A958A5C8CE78} = {B43372A5-BC82-4F1B-9C3F-574287C18CF8}
+		{C3413990-288F-42CE-A211-B7197CC688B7} = {C223739E-136D-4226-AF3C-A958A5C8CE78}
+		{149C2454-E204-4DF1-8768-5CDEFD97736F} = {B43372A5-BC82-4F1B-9C3F-574287C18CF8}
+		{4BD97220-8FD0-4BFC-A4FD-D26AA0401E68} = {149C2454-E204-4DF1-8768-5CDEFD97736F}
+	EndGlobalSection
+EndGlobal

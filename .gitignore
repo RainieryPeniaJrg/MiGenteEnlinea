@@ -1,11 +1,13 @@
-# .NET Core / .NET Framework
-*.user
-*.suo
-*.cache
-*.dll
-*.exe
-*.pdb
-*.log
+# ========================================
+# MiGente En Línea - Workspace .gitignore
+# ========================================
+# Este .gitignore cubre AMBOS proyectos:
+# - Codigo Fuente Mi Gente/ (Legacy Web Forms)
+# - MiGenteEnLinea.Clean/ (Clean Architecture)
+
+# ========================================
+# .NET Framework (Legacy Project)
+# ========================================
 
 # Build results
 [Dd]ebug/
@@ -23,80 +25,168 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# Visual Studio cache/options directory
+# Visual Studio cache/options
 .vs/
 .vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Web publish
+*.Publish.xml
+*.pubxml
+*.publishproj
+PublishScripts/
 
 # NuGet Packages
 *.nupkg
+*.snupkg
 **/packages/*
 !**/packages/build/
 *.nuget.props
 *.nuget.targets
-project.lock.json
-project.fragment.lock.json
-artifacts/
 
-# Web Config (contiene credenciales sensibles)
-Web.config
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Web.config transforms (keep examples)
 Web.Debug.config
 Web.Release.config
+# But keep the example file
+!Web.config.example
 
-# Publish profiles (pueden contener credenciales)
-**/Properties/PublishProfiles/*.pubxml
-**/Properties/PublishProfiles/*.pubxml.user
-**/Properties/ServiceDependencies/
+# ========================================
+# .NET Core / .NET 8 (Clean Architecture)
+# ========================================
 
-# Entity Framework
-*.edmx.sql
-*.edmx.diagram.layout
-
-# DevExpress license
-**/Properties/licenses.licx
-
-# macOS
-.DS_Store
-__MACOSX/
-*.DS_Store
-
-# Windows
-Thumbs.db
-Desktop.ini
+# Build results
+**/bin/
+**/obj/
 
 # User-specific files
-*.user
 *.rsuser
 *.suo
+*.user
 *.userosscache
 *.sln.docstates
 
-# ReSharper
-_ReSharper*/
-*.[Rr]e[Ss]harper
-*.DotSettings.user
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# User secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+secrets.json
+
+# Test Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# ========================================
+# Database
+# ========================================
 
 # SQL Server files
 *.mdf
 *.ldf
 *.ndf
 
-# Backup & report files
-_UpgradeReport_Files/
-Backup*/
-UpgradeLog*.XML
-UpgradeLog*.htm
-ServiceFabricBackup/
-*.rptproj.bak
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
 
-# External dependencies not in repo
-**/ClassLibrary*.dll
+# ========================================
+# Logs & Temporary Files
+# ========================================
 
-# Temporary files
+*.log
 *.tmp
 *.temp
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================================
+# Node.js (if using npm for frontend)
+# ========================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================================
+# Sensitive Information
+# ========================================
+
+# Configuration files with credentials
+**/appsettings.Production.json
+**/connectionstrings.config
+*.pfx
+*.p12
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Secrets
+secrets/
+*.secret
+
+# ========================================
+# DevExpress (Legacy Project)
+# ========================================
+
+# DevExpress license files (if any)
+dx.lic
+
+# ========================================
+# Documentation Build Output
+# ========================================
+
+# DocFX
+_site/
+
+# ========================================
+# Backup Files
+# ========================================
+
 *.bak
-*.swp
-*~.nib
-local.properties
+*.backup
+*_backup.*
+
+# ========================================
+# Migration Scripts Output
+# ========================================
+
+# Keep scripts, ignore output logs
+scripts/logs/
+scripts/output/
+
+# ========================================
+# Workspace-Specific
+# ========================================
+
+# Workspace user settings
+*.code-workspace.user
+
+# TODO: Consider adding specific ignores per project
+# Legacy project specific ignores in: Codigo Fuente Mi Gente/.gitignore
+# Clean project specific ignores in: MiGenteEnLinea.Clean/.gitignore

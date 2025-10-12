@@ -1,897 +1,493 @@
-# 🏢 MiGente En Línea
+# 🏢 MiGente En Línea - Sistema de Gestión de Relaciones Laborales
 
-<div align="center">
-
-![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.7.2-512BD4?style=for-the-badge&logo=dotnet)
-![ASP.NET](https://img.shields.io/badge/ASP.NET-Web%20Forms-5C2D91?style=for-the-badge&logo=dotnet)
-![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge)
-
-**Plataforma integral para la gestión de relaciones laborales en República Dominicana**
-
-[Características](#-características-principales) • [Instalación](#-instalación) • [Arquitectura](#-arquitectura-técnica) • [Documentación](#-documentación) • [Licencia](#-licencia)
-
-</div>
+[![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.7.2-blue)](https://dotnet.microsoft.com/)
+[![.NET Core](https://img.shields.io/badge/.NET%20Core-8.0-purple)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+[![Security Audit](https://img.shields.io/badge/Security-In%20Remediation-yellow)](SECURITY.md)
+[![Migration Status](https://img.shields.io/badge/Migration-In%20Progress-orange)](docs/MIGRATION_DATABASE_FIRST_TO_CODE_FIRST.md)
 
 ---
 
-## 📋 Índice
+## 📋 Descripción
 
-- [Descripción General](#-descripción-general)
-- [Características Principales](#-características-principales)
-- [Arquitectura Técnica](#-arquitectura-técnica)
-- [Requisitos del Sistema](#-requisitos-del-sistema)
-- [Instalación](#-instalación)
-- [Configuración](#-configuración)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Flujos de Trabajo Críticos](#-flujos-de-trabajo-críticos)
-- [Roles de Usuario](#-roles-de-usuario)
-- [Integraciones](#-integraciones)
-- [Seguridad](#-seguridad)
-- [Desarrollo](#-desarrollo)
-- [Despliegue](#-despliegue)
-- [Contribución](#-contribución)
-- [Licencia](#-licencia)
-- [Contacto](#-contacto)
+**MiGente En Línea** es una plataforma integral para la gestión de relaciones laborales en la República Dominicana. Conecta **Empleadores** y **Contratistas** (proveedores de servicios) mediante un sistema de suscripciones con procesamiento de pagos integrado.
+
+### ⚡ Características Principales
+
+- 👥 **Gestión de Empleadores y Contratistas** - Perfiles completos con validación de documentos
+- 💼 **Administración de Empleados** - Contratos, nómina, deducciones TSS
+- 💰 **Sistema de Suscripciones** - Planes diferenciados con pagos recurrentes
+- 🔐 **Autenticación Segura** - Sistema de usuarios con roles y permisos
+- 📄 **Generación de Documentos** - Contratos, recibos de pago, certificaciones en PDF
+- 💳 **Procesamiento de Pagos** - Integración con Cardnet (República Dominicana)
+- ⭐ **Sistema de Calificaciones** - Reviews y ratings para contratistas
+- 🤖 **Asistente Legal Virtual** - Integración con OpenAI para consultas legales
 
 ---
 
-## 🎯 Descripción General
+## 🚨 Estado Actual: Migración Dual-Project
 
-**MiGente En Línea** es una aplicación web empresarial construida con ASP.NET Web Forms que facilita la gestión integral de relaciones laborales en República Dominicana. La plataforma conecta **Empleadores** con **Contratistas/Proveedores de Servicios**, permitiendo:
+Este workspace contiene **DOS proyectos ejecutándose simultáneamente** durante la migración:
 
-- ✅ Gestión completa de nómina y empleados
-- 📄 Generación automática de contratos y recibos de pago
-- 💳 Procesamiento de pagos de suscripciones vía Cardnet
-- 🤖 Asistente legal virtual con IA (OpenAI)
-- 📊 Cumplimiento con normativas dominicanas (TSS, padrón nacional)
-- ⭐ Sistema de calificaciones para contratistas
+### 🔷 Proyecto Legacy (Modo Mantenimiento)
+**Ubicación:** `Codigo Fuente Mi Gente/`
 
----
+- **Framework:** ASP.NET Web Forms (.NET Framework 4.7.2)
+- **ORM:** Entity Framework 6 (Database-First con EDMX)
+- **Base de Datos:** `db_a9f8ff_migente` en SQL Server
+- **Estado:** Sistema en producción siendo reemplazado
+- **Desarrollo:** Solo correcciones críticas de bugs y parches de seguridad
 
-## ✨ Características Principales
+**⚠️ ADVERTENCIA:** Múltiples vulnerabilidades de seguridad identificadas en auditoría de septiembre 2025.
 
-### Para Empleadores
-- 👥 **Gestión de Empleados**: Registro completo de colaboradores (fijos y temporales)
-- 💰 **Sistema de Nómina**: Cálculo automático de salarios, deducciones TSS y prestaciones
-- 📑 **Generación de Documentos**: Contratos, recibos de pago, descargas automáticas en PDF
-- 🔍 **Búsqueda de Contratistas**: Explorar perfiles de proveedores de servicios
-- ⭐ **Sistema de Calificación**: Evaluar el desempeño de contratistas
-- 📧 **Notificaciones por Email**: Confirmaciones, recordatorios y documentos
+### 🚀 Proyecto Clean Architecture (Desarrollo Activo)
+**Ubicación:** `../MiGenteEnLinea.Clean/`
 
-### Para Contratistas
-- 🎨 **Perfil Profesional**: Exhibir servicios, experiencia y portafolio
-- 📸 **Galería de Trabajos**: Mostrar proyectos realizados
-- 💬 **Gestión de Calificaciones**: Ver y responder reseñas de empleadores
-- 💳 **Planes de Suscripción**: Acceso flexible según necesidades
-
-### Generales
-- 🔐 **Autenticación Segura**: Forms Authentication con validación por email
-- 💳 **Pagos Integrados**: Procesamiento con Cardnet (gateway dominicano)
-- 🤖 **Abogado Virtual**: Asistencia legal automatizada con IA
-- 📱 **Diseño Responsivo**: Compatible con dispositivos móviles
-- 🇩🇴 **Contexto Local**: Adaptado a leyes y regulaciones dominicanas
+- **Framework:** ASP.NET Core 8.0 Web API
+- **Arquitectura:** Clean Architecture (Onion Pattern) con DDD
+- **ORM:** Entity Framework Core 8 (Code-First)
+- **Base de Datos:** `db_a9f8ff_migente` (misma base de datos, migración gradual)
+- **Estado:** En construcción activa
+- **Desarrollo:** Todo el desarrollo nuevo y refactorización DDD
 
 ---
 
-## 🏗️ Arquitectura Técnica
-
-### Stack Tecnológico
+## 🏗️ Arquitectura del Workspace
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    PRESENTACIÓN                             │
-│  ASP.NET Web Forms + DevExpress v23.1 + Bootstrap          │
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                   LÓGICA DE NEGOCIO                         │
-│  Services Layer (C#) + SOAP Web Services (.asmx)           │
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                  ACCESO A DATOS                             │
-│         Entity Framework 6 (Database-First)                 │
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                     BASE DE DATOS                           │
-│              SQL Server - migenteV2                         │
-└─────────────────────────────────────────────────────────────┘
+MiGenteEnLinea-Workspace/
+│
+├── 📂 Codigo Fuente Mi Gente/           # 🔷 LEGACY PROJECT
+│   ├── MiGente.sln                       # Solución .NET Framework 4.7.2
+│   ├── MiGente_Front/                    # Aplicación ASP.NET Web Forms
+│   │   ├── Data/                         # Entity Framework 6 (Database-First)
+│   │   ├── Services/                     # Lógica de negocio (Services layer)
+│   │   ├── Empleador/                    # Módulo de empleadores
+│   │   ├── Contratista/                  # Módulo de contratistas
+│   │   ├── Login.aspx                    # Punto de entrada
+│   │   └── Web.config                    # Configuración IIS
+│   ├── docs/                             # Documentación de migración
+│   ├── scripts/                          # Scripts de automatización
+│   ├── .github/                          # Templates y configuración GitHub
+│   ├── SECURITY.md                       # Política de seguridad
+│   ├── CONTRIBUTING.md                   # Guía de contribución
+│   └── README.md                         # Este archivo
+│
+├── 📂 MiGenteEnLinea.Clean/             # 🚀 CLEAN ARCHITECTURE PROJECT
+│   ├── MiGenteEnLinea.Clean.sln          # Solución .NET 8.0
+│   ├── src/
+│   │   ├── Core/
+│   │   │   ├── MiGenteEnLinea.Domain/              # Capa de Dominio
+│   │   │   │   ├── Entities/                       # Entidades DDD (Rich Models)
+│   │   │   │   ├── ValueObjects/                   # Objetos de valor inmutables
+│   │   │   │   ├── Events/                         # Domain Events
+│   │   │   │   └── Common/                         # Clases base (AuditableEntity, etc.)
+│   │   │   │
+│   │   │   └── MiGenteEnLinea.Application/         # Capa de Aplicación
+│   │   │       ├── Features/                       # Use Cases (CQRS)
+│   │   │       │   ├── Authentication/             # Autenticación
+│   │   │       │   ├── Empleadores/                # Empleadores
+│   │   │       │   └── Contratistas/               # Contratistas
+│   │   │       ├── Common/                         # Interfaces, DTOs
+│   │   │       └── Behaviors/                      # Pipelines MediatR
+│   │   │
+│   │   ├── Infrastructure/
+│   │   │   └── MiGenteEnLinea.Infrastructure/      # Capa de Infraestructura
+│   │   │       ├── Persistence/
+│   │   │       │   ├── Contexts/                   # DbContext EF Core
+│   │   │       │   ├── Entities/Generated/         # 36 entidades scaffolded
+│   │   │       │   ├── Configurations/             # Fluent API
+│   │   │       │   └── Migrations/                 # Migraciones EF Core
+│   │   │       ├── Identity/                       # JWT, Password Hashing
+│   │   │       └── Services/                       # Email, Payments, PDF
+│   │   │
+│   │   └── Presentation/
+│   │       └── MiGenteEnLinea.API/                 # API REST
+│   │           ├── Controllers/                    # Endpoints REST
+│   │           ├── Middleware/                     # Middleware custom
+│   │           └── Program.cs                      # Punto de entrada
+│   │
+│   ├── tests/                                      # Proyectos de tests
+│   │   ├── MiGenteEnLinea.Domain.Tests/
+│   │   ├── MiGenteEnLinea.Application.Tests/
+│   │   └── MiGenteEnLinea.Infrastructure.Tests/
+│   │
+│   ├── MIGRATION_SUCCESS_REPORT.md                 # Reporte de migración
+│   └── README.md                                   # Documentación del proyecto Clean
+│
+├── MiGenteEnLinea-Workspace.code-workspace         # Configuración del workspace
+├── WORKSPACE_README.md                             # Guía de uso del workspace
+└── DDD_MIGRATION_PROMPT.md                         # Prompt para migración DDD
+
 ```
 
-### Componentes Clave
-
-| Componente | Tecnología | Propósito |
-|------------|-----------|-----------|
-| **Framework** | .NET Framework 4.7.2 | Base de la aplicación |
-| **UI Controls** | DevExpress v23.1 | Grids, formularios, gráficos avanzados |
-| **ORM** | Entity Framework 6 | Mapeo objeto-relacional |
-| **PDF Generator** | iText 8.0.5 | Contratos, recibos, reportes |
-| **Payment Gateway** | Cardnet API | Procesamiento de pagos |
-| **AI Assistant** | OpenAI API | Chatbot legal |
-| **HTTP Client** | RestSharp 112.1.0 | Consumo de APIs externas |
-| **JSON** | Newtonsoft.Json 13.0.3 | Serialización de datos |
-
 ---
 
-## 💻 Requisitos del Sistema
+## 🚀 Inicio Rápido
 
-### Software Requerido
+### Prerrequisitos
 
-- **Sistema Operativo**: Windows 10/11 o Windows Server 2016+
-- **IDE**: Visual Studio 2017 o superior
-- **.NET Framework**: 4.7.2 SDK
-- **Base de Datos**: SQL Server 2016 o superior
-- **Servidor Web**: IIS 10.0+ (producción) o IIS Express (desarrollo)
+#### Para Proyecto Legacy:
+- Visual Studio 2019/2022
+- .NET Framework 4.7.2 SDK
+- IIS Express
+- SQL Server 2017+
+- DevExpress v23.1 (licencia comercial requerida)
 
-### Licencias Comerciales
+#### Para Proyecto Clean:
+- Visual Studio 2022 / VS Code
+- .NET 8.0 SDK
+- SQL Server 2017+
+- Entity Framework Core CLI tools
 
-⚠️ **Importante**: Este proyecto requiere licencias válidas de:
-- **DevExpress ASP.NET Controls** (v23.1)
-- Contactar a [DevExpress](https://www.devexpress.com/) para adquirir licencia
-
-### Hardware Mínimo
-
-- **Procesador**: Intel Core i5 o equivalente
-- **RAM**: 8 GB (16 GB recomendado)
-- **Disco**: 10 GB libres (SSD recomendado)
-
----
-
-## 🚀 Instalación
-
-### 1. Clonar el Repositorio
+### 1️⃣ Clonar el Repositorio
 
 ```bash
 git clone https://github.com/RainieryPeniaJrg/MiGenteEnlinea.git
 cd MiGenteEnlinea
 ```
 
-### 2. Configurar Base de Datos
+### 2️⃣ Configurar Base de Datos
 
-```sql
--- 1. Crear base de datos en SQL Server
-CREATE DATABASE migenteV2;
-GO
+La base de datos `db_a9f8ff_migente` debe existir y estar accesible. Verificar conexión en:
 
--- 2. Ejecutar scripts de migración (ubicados en /Database)
--- (Los scripts deben ser provistos por el equipo de desarrollo)
-```
-
-### 3. Restaurar Paquetes NuGet
-
-```bash
-# Desde la raíz del proyecto
-nuget restore MiGente.sln
-```
-
-O desde Visual Studio:
-- Click derecho en Solution → **Restore NuGet Packages**
-
-### 4. Configurar Archivo Web.config
-
-```bash
-# Copiar plantilla de configuración
-cd MiGente_Front
-copy Web.config.example Web.config
-```
-
-Editar `Web.config` y configurar:
-
+**Legacy:** `Codigo Fuente Mi Gente/MiGente_Front/Web.config`
 ```xml
-<!-- Conexión a base de datos -->
 <connectionStrings>
-  <add name="migenteEntities" 
-       connectionString="...;data source=TU_SERVIDOR;initial catalog=migenteV2;user id=TU_USUARIO;password=TU_PASSWORD;..." />
+  <add name="migenteEntities"
+       connectionString="...data source=localhost,1433;
+       initial catalog=db_a9f8ff_migente;
+       user id=sa;password=YOUR_PASSWORD;..." />
 </connectionStrings>
-
-<!-- API Keys de Cardnet -->
-<appSettings>
-  <add key="CardnetMerchantId" value="TU_MERCHANT_ID"/>
-  <add key="CardnetApiKey" value="TU_API_KEY"/>
-</appSettings>
 ```
 
-### 5. Compilar el Proyecto
-
-```bash
-# Desde línea de comandos
-msbuild MiGente.sln /p:Configuration=Debug
-
-# O desde Visual Studio
-# Presionar F6 o Build → Build Solution
-```
-
-### 6. Ejecutar en Desarrollo
-
-```bash
-# Visual Studio
-# Presionar F5 o Debug → Start Debugging
-```
-
-La aplicación se abrirá en: `https://localhost:44358/`
-
----
-
-## ⚙️ Configuración
-
-### Variables de Entorno Críticas
-
-#### 1. Conexión a Base de Datos (`Web.config`)
-
-```xml
-<add name="migenteEntities" 
-     connectionString="metadata=res://*/Data.DataModel.csdl|res://*/Data.DataModel.ssdl|res://*/Data.DataModel.msl;
-     provider=System.Data.SqlClient;
-     provider connection string='
-       data source=.;              <!-- Servidor SQL -->
-       initial catalog=migenteV2;  <!-- Nombre DB -->
-       user id=sa;                 <!-- Usuario -->
-       password=1234;              <!-- Contraseña -->
-       multipleactiveresultsets=True;
-       App=EntityFramework'" 
-     providerName="System.Data.EntityClient"/>
-```
-
-#### 2. Cardnet Payment Gateway
-
-```xml
-<add key="CardnetMerchantId" value="349000001"/>
-<add key="CardnetApiKey" value="TU_API_KEY_AQUI"/>
-<add key="CardnetApiUrlSales" value="https://ecommerce.cardnet.com.do/api/payment/transactions/sales"/>
-<add key="CardnetApiUrlIdempotency" value="https://ecommerce.cardnet.com.do/api/payment/idenpotency-keys"/>
-```
-
-#### 3. Configuración de Email (SMTP)
-
-Ubicado en tabla `Config_Correo` de la base de datos:
-
-```sql
-INSERT INTO Config_Correo (smtp_server, smtp_port, username, password, enable_ssl)
-VALUES ('smtp.gmail.com', 587, 'tu-email@gmail.com', 'tu-password', 1);
-```
-
-#### 4. OpenAI API (Abogado Virtual)
-
-Tabla `OpenAi_Config`:
-
-```sql
-INSERT INTO OpenAi_Config (api_key, model, max_tokens)
-VALUES ('sk-...', 'gpt-3.5-turbo', 2000);
-```
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-MiGente_Front/
-├── 📄 Login.aspx                    # Punto de entrada / Autenticación
-├── 📄 Registrar.aspx                # Registro de nuevos usuarios
-├── 📄 comunidad.aspx                # Dashboard principal
-├── 📄 abogadoVirtual.aspx           # Chatbot legal con IA
-│
-├── 📂 Contratista/                  # Módulo de Contratistas
-│   ├── index_contratista.aspx       # Dashboard de contratista
-│   ├── AdquirirPlanContratista.aspx # Compra de suscripciones
-│   └── MisCalificaciones.aspx       # Gestión de reseñas
-│
-├── 📂 Empleador/                    # Módulo de Empleadores
-│   ├── colaboradores.aspx           # Gestión de empleados
-│   ├── nomina.aspx                  # Sistema de nómina
-│   ├── fichaEmpleado.aspx           # Detalles de empleado
-│   ├── Checkout.aspx                # Proceso de pago
-│   ├── MiPerfilEmpleador.aspx       # Perfil de empresa
-│   └── Impresion/                   # Templates de PDF
-│       ├── ContratoPersonaFisica.html
-│       ├── ReciboPagoPersonaFisica_Empleador1.html
-│       └── PrintViewer.aspx         # Visor de documentos
-│
-├── 📂 Data/                         # Entity Framework
-│   ├── DataModel.edmx               # Modelo de datos (EDMX)
-│   ├── Credenciales.cs              # Entidad de usuarios
-│   ├── Empleados.cs                 # Entidad de empleados
-│   ├── Suscripciones.cs             # Entidad de planes
-│   └── [Más entidades...]
-│
-├── 📂 Services/                     # Lógica de negocio
-│   ├── LoginService.cs              # Autenticación
-│   ├── EmailService.cs              # Envío de correos
-│   ├── PaymentService.cs            # Integración Cardnet
-│   ├── BotServices.cs               # OpenAI integration
-│   └── *.asmx                       # Web Services SOAP
-│
-├── 📂 UserControls/                 # Componentes reutilizables
-│   ├── FormularioEmpleado.ascx      # Form de registro empleado
-│   ├── FormularioContratacion.ascx  # Form de contratación
-│   └── abogadoBot.ascx              # Widget del chatbot
-│
-├── 📂 HtmlTemplates/                # Contenido estático
-│   ├── TerminosMiGente.html         # Términos y condiciones
-│   ├── AutorizacionEmpleadores.html # Consentimientos legales
-│   └── AutorizacionProveedores.html
-│
-├── 📂 MailTemplates/                # Templates de email
-│   ├── confirmacionRegistro.html    # Email de bienvenida
-│   ├── recuperarPass.html           # Recuperación de contraseña
-│   └── checkout.html                # Confirmación de pago
-│
-├── 📂 assets/                       # Recursos frontend
-│   ├── css/                         # Estilos personalizados
-│   ├── js/                          # JavaScript
-│   ├── img/                         # Imágenes
-│   └── vendor/                      # Librerías de terceros
-│       ├── bootstrap/
-│       ├── tinymce/                 # Editor WYSIWYG
-│       └── apexcharts/              # Gráficos
-│
-├── 📂 Properties/
-│   └── PublishProfiles/             # Perfiles de despliegue
-│
-├── 📄 Web.config                    # Configuración principal (GITIGNORED)
-├── 📄 Web.config.example            # Plantilla de configuración
-├── 📄 packages.config               # Dependencias NuGet
-├── 📄 NumeroEnLetras.cs             # Utilidad (números a texto)
-│
-├── 🎨 Platform.Master               # Master page pública
-├── 🎨 Comunity1.Master              # Master page Empleadores
-└── 🎨 ContratistaM.Master           # Master page Contratistas
-```
-
----
-
-## 🔄 Flujos de Trabajo Críticos
-
-### 1. Registro y Activación de Usuario
-
-```mermaid
-graph LR
-    A[Usuario accede a Registrar.aspx] --> B[Completa formulario]
-    B --> C{Valida datos}
-    C -->|Válido| D[Crea registro en Credenciales]
-    C -->|Inválido| B
-    D --> E[Envía email de activación]
-    E --> F[Usuario hace clic en enlace]
-    F --> G[Activa cuenta: Activo = true]
-    G --> H[Redirige a Login]
-```
-
-### 2. Proceso de Autenticación
-
-```csharp
-// Login.aspx.cs
-LoginService service = new LoginService();
-var result = service.login(username, password);
-
-if (result == 2) {  // Login exitoso
-    // Crear cookie con datos de sesión
-    HttpCookie loginCookie = new HttpCookie("login");
-    loginCookie["userID"] = usuario.ID.ToString();
-    loginCookie["nombre"] = usuario.Nombre;
-    loginCookie["tipo"] = usuario.Tipo;  // 1=Empleador, 2=Contratista
-    loginCookie["planID"] = usuario.PlanID.ToString();
-    
-    Response.Cookies.Add(loginCookie);
-    
-    // Redirigir según tipo de usuario
-    if (tipo == "1") {
-        Response.Redirect("~/comunidad.aspx");
-    } else {
-        Response.Redirect("~/Contratista/index_contratista.aspx");
-    }
-}
-```
-
-### 3. Gestión de Suscripciones
-
-```mermaid
-sequenceDiagram
-    participant U as Usuario
-    participant W as Web App
-    participant C as Cardnet API
-    participant DB as Database
-
-    U->>W: Selecciona plan
-    W->>W: Genera token de idempotencia
-    W->>C: POST /transactions/sales
-    C-->>W: Respuesta de pago
-    alt Pago exitoso
-        W->>DB: Actualiza Suscripciones
-        W->>DB: Inserta Ventas
-        W->>U: Email de confirmación
-        W-->>U: Acceso a plataforma
-    else Pago rechazado
-        W-->>U: Mensaje de error
-    end
-```
-
-### 4. Generación de Nómina
-
-1. **Empleador crea empleados** en `Empleados` tabla
-2. **Sistema calcula deducciones TSS** usando tabla `Deducciones_TSS`
-3. **Genera registros de nómina**:
-   - `Empleador_Recibos_Header`: Encabezado de lote
-   - `Empleador_Recibos_Detalle`: Detalle por empleado
-4. **Convierte números a letras** con `NumeroEnLetras.cs`
-5. **Genera PDF** usando iText con template HTML
-6. **Envía por email** a empleados
-
----
-
-## 👥 Roles de Usuario
-
-### Empleador (tipo = "1")
-
-**Permisos:**
-- ✅ Crear/editar/eliminar empleados
-- ✅ Generar nómina y recibos de pago
-- ✅ Buscar y contratar contratistas
-- ✅ Calificar servicios de contratistas
-- ✅ Descargar contratos en PDF
-- ✅ Ver historial de contrataciones
-
-**Master Page:** `Comunity1.Master`
-
-**Validación de acceso:**
-```csharp
-// Comunity1.Master.cs
-HttpCookie myCookie = Request.Cookies["login"];
-if (myCookie["tipo"] != "1") {
-    Response.Redirect("~/Login.aspx");
-}
-
-// Verificar plan activo
-if (myCookie["planID"] == "0" || 
-    DateTime.Parse(myCookie["vencimientoPlan"]) < DateTime.Now) {
-    Response.Redirect("~/Empleador/AdquirirPlanEmpleador.aspx");
-}
-```
-
-### Contratista (tipo = "2")
-
-**Permisos:**
-- ✅ Crear/editar perfil profesional
-- ✅ Subir fotos de trabajos
-- ✅ Ver calificaciones recibidas
-- ✅ Responder a reseñas
-- ✅ Gestionar disponibilidad de servicios
-
-**Master Page:** `ContratistaM.Master`
-
-**Validación de acceso:**
-```csharp
-// ContratistaM.Master.cs
-HttpCookie myCookie = Request.Cookies["login"];
-if (myCookie["tipo"] == "1") {  // Si es empleador
-    Response.Redirect("~/Login.aspx");
-}
-
-// Verificar plan activo
-if (myCookie["planID"] == "0" || 
-    DateTime.Parse(myCookie["vencimientoPlan"]) < DateTime.Now) {
-    Response.Redirect("~/Contratista/AdquirirPlanContratista.aspx");
-}
-```
-
----
-
-## 🔌 Integraciones
-
-### 1. Cardnet Payment Gateway
-
-**Endpoint de Producción:**
-```
-https://ecommerce.cardnet.com.do/api/payment/transactions/sales
-```
-
-**Ejemplo de Request:**
-```csharp
-// PaymentService.cs
-var client = new RestClient("https://ecommerce.cardnet.com.do");
-var request = new RestRequest("/api/payment/transactions/sales", Method.Post);
-
-request.AddHeader("Content-Type", "application/json");
-request.AddHeader("Authorization", $"Bearer {apiKey}");
-
-var body = new {
-    merchantId = "349000001",
-    amount = 2500.00,
-    currency = "DOP",
-    cardNumber = "4111111111111111",
-    expiryMonth = "12",
-    expiryYear = "2025",
-    cvv = "123",
-    idempotencyKey = Guid.NewGuid().ToString()
-};
-
-request.AddJsonBody(body);
-var response = client.Execute(request);
-```
-
-### 2. OpenAI API (Abogado Virtual)
-
-**Modelo:** GPT-3.5 Turbo
-
-**Implementación:**
-```csharp
-// BotServices.cs
-public async Task<string> GetLegalAdvice(string userQuestion) {
-    var config = db.OpenAi_Config.FirstOrDefault();
-    
-    var client = new RestClient("https://api.openai.com/v1");
-    var request = new RestRequest("/chat/completions", Method.Post);
-    
-    request.AddHeader("Authorization", $"Bearer {config.api_key}");
-    request.AddJsonBody(new {
-        model = "gpt-3.5-turbo",
-        messages = new[] {
-            new { role = "system", content = "Eres un abogado laboral experto en República Dominicana." },
-            new { role = "user", content = userQuestion }
-        },
-        max_tokens = 2000
-    });
-    
-    var response = await client.ExecuteAsync(request);
-    // Procesar respuesta...
-}
-```
-
-### 3. Email Service (SMTP)
-
-**Configuración:**
-```csharp
-// EmailService.cs
-SmtpClient client = new SmtpClient("smtp.gmail.com", 587) {
-    Credentials = new NetworkCredential("noreply@migente.com", "password"),
-    EnableSsl = true
-};
-
-MailMessage message = new MailMessage {
-    From = new MailAddress("noreply@migente.com", "MiGente En Línea"),
-    Subject = "Bienvenido a MiGente",
-    Body = htmlBody,
-    IsBodyHtml = true
-};
-
-message.To.Add(userEmail);
-client.Send(message);
-```
-
----
-
-## 🔒 Seguridad
-
-### ⚠️ Vulnerabilidades Conocidas
-
-Este proyecto tiene algunas prácticas de seguridad que **DEBEN mejorarse** antes de producción:
-
-1. **Contraseñas en texto plano**
-   - ❌ Las contraseñas se almacenan sin hash
-   - ✅ Implementar: BCrypt o PBKDF2
-
-2. **Credenciales hardcoded**
-   - ❌ `Web.config` tiene credenciales en código
-   - ✅ Usar: Azure Key Vault o variables de entorno
-
-3. **No hay protección CSRF**
-   - ❌ Formularios sin tokens anti-CSRF
-   - ✅ Implementar: AntiForgeryToken de ASP.NET
-
-4. **Cookies sin encriptar**
-   - ❌ Cookie `login` almacena datos sensibles sin encriptar
-   - ✅ Implementar: Encriptación de cookies
-
-5. **SQL Injection**
-   - ✅ Entity Framework mitiga esto parcialmente
-   - ⚠️ Revisar stored procedures personalizados
-
-### Mejoras Recomendadas
-
-```csharp
-// Ejemplo: Implementar hash de contraseñas
-using BCrypt.Net;
-
-public bool ValidatePassword(string password, string hashedPassword) {
-    return BCrypt.Verify(password, hashedPassword);
-}
-
-public string HashPassword(string password) {
-    return BCrypt.HashPassword(password, workFactor: 12);
-}
-```
-
----
-
-## 🛠️ Desarrollo
-
-### Convenciones de Código
-
-#### Nombres de Archivos
-- **Páginas ASPX**: PascalCase (ej: `MiPerfilEmpleador.aspx`)
-- **Master Pages**: PascalCase con `.Master` (ej: `Comunity1.Master`)
-- **User Controls**: PascalCase con `.ascx` (ej: `FormularioEmpleado.ascx`)
-- **Servicios**: PascalCase con `Service` (ej: `LoginService.cs`)
-
-#### Patrón de Código-Behind
-
-```csharp
-namespace MiGente_Front
+**Clean:** `MiGenteEnLinea.Clean/src/Presentation/MiGenteEnLinea.API/appsettings.json`
+```json
 {
-    public partial class NombrePagina : System.Web.UI.Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (!IsPostBack) {
-                // Inicialización solo en primer carga
-                CargarDatos();
-            }
-        }
-        
-        private void CargarDatos() {
-            // Lógica de negocio
-        }
-        
-        protected void btnGuardar_Click(object sender, EventArgs e) {
-            // Manejo de eventos
-        }
-    }
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1433;Database=db_a9f8ff_migente;User Id=sa;Password=YOUR_PASSWORD;TrustServerCertificate=True"
+  }
 }
 ```
 
-#### SweetAlert para Mensajes
+### 3️⃣ Ejecutar Proyecto Legacy
 
-```csharp
-string script = @"<script>
-    Swal.fire({
-        title: 'Éxito',
-        text: 'Operación completada',
-        icon: 'success',
-        confirmButtonText: 'Aceptar'
-    });
-</script>";
-ClientScript.RegisterStartupScript(GetType(), "SweetAlert", script);
+#### Desde Visual Studio:
+1. Abrir `MiGente.sln`
+2. Presionar `F5` para ejecutar
+3. Navegador abrirá en `https://localhost:44358/Login.aspx`
+
+#### Desde VS Code (con workspace):
+1. Abrir `MiGenteEnLinea-Workspace.code-workspace`
+2. `F5` → Seleccionar "🔷 Launch Legacy Web Forms (IIS Express)"
+
+### 4️⃣ Ejecutar Proyecto Clean
+
+```bash
+cd MiGenteEnLinea.Clean/src/Presentation/MiGenteEnLinea.API
+dotnet run
 ```
 
-### Testing
+O desde VS Code:
+1. Abrir `MiGenteEnLinea-Workspace.code-workspace`
+2. `F5` → Seleccionar "🚀 Launch Clean API"
+3. Swagger UI abrirá en `https://localhost:5001/swagger`
 
-⚠️ **Actualmente no hay pruebas automatizadas**
+### 5️⃣ Ejecutar Ambos Simultáneamente
 
-**Checklist de Testing Manual:**
+Desde VS Code con el workspace:
+- `F5` → Seleccionar "🔥 Launch Both Projects"
 
-1. **Autenticación**
-   - [ ] Login con credenciales válidas
-   - [ ] Login con credenciales inválidas
-   - [ ] Recuperación de contraseña
-   - [ ] Activación de cuenta por email
-
-2. **Empleadores**
-   - [ ] Crear empleado nuevo
-   - [ ] Generar nómina
-   - [ ] Descargar PDF de recibo
-   - [ ] Contratar contratista
-
-3. **Contratistas**
-   - [ ] Actualizar perfil
-   - [ ] Subir fotos de trabajos
-   - [ ] Ver calificaciones
-
-4. **Pagos**
-   - [ ] Comprar suscripción (usar tarjeta de prueba Cardnet)
-   - [ ] Verificar actualización de plan en base de datos
+Esto ejecutará:
+- Legacy Web Forms en `https://localhost:44358`
+- Clean API en `https://localhost:5001`
 
 ---
 
-## 🚀 Despliegue
+## 📚 Documentación
 
-### Despliegue en IIS (Producción)
+### Documentación General
+- [📖 Guía de Uso del Workspace](WORKSPACE_README.md) - Cómo trabajar con ambos proyectos
+- [🔒 Política de Seguridad](Codigo%20Fuente%20Mi%20Gente/SECURITY.md) - Vulnerabilidades y remediación
+- [🤝 Guía de Contribución](Codigo%20Fuente%20Mi%20Gente/CONTRIBUTING.md) - Estándares de código
+- [📜 Código de Conducta](Codigo%20Fuente%20Mi%20Gente/CODE_OF_CONDUCT.md)
 
-#### 1. Publicar desde Visual Studio
+### Documentación Técnica
+- [🏗️ Guía de Migración Database-First a Code-First](Codigo%20Fuente%20Mi%20Gente/docs/MIGRATION_DATABASE_FIRST_TO_CODE_FIRST.md)
+- [✅ Reporte de Migración Exitosa](MiGenteEnLinea.Clean/MIGRATION_SUCCESS_REPORT.md)
+- [🎯 Prompt de Migración DDD](DDD_MIGRATION_PROMPT.md) - Guía para refactorización con DDD
+- [📋 Instrucciones para GitHub Copilot](Codigo%20Fuente%20Mi%20Gente/.github/copilot-instructions.md)
 
-```
-1. Click derecho en proyecto MiGente_Front
-2. Seleccionar "Publish"
-3. Elegir perfil "migente - Web Deploy"
-4. Configurar parámetros:
-   - Server: tu-servidor.com
-   - Site name: Default Web Site/migente
-   - Username/Password: credenciales IIS
-5. Click "Publish"
-```
+### Documentación de API
+- Swagger UI: `https://localhost:5001/swagger` (cuando Clean API esté corriendo)
 
-#### 2. Configurar IIS
+---
 
-```powershell
-# Crear Application Pool
-New-WebAppPool -Name "MiGenteAppPool"
-Set-ItemProperty IIS:\AppPools\MiGenteAppPool -Name managedRuntimeVersion -Value "v4.0"
-Set-ItemProperty IIS:\AppPools\MiGenteAppPool -Name managedPipelineMode -Value "Integrated"
+## 🧪 Testing
 
-# Crear Website
-New-WebSite -Name "MiGenteEnLinea" `
-            -Port 443 `
-            -PhysicalPath "C:\inetpub\wwwroot\migente" `
-            -ApplicationPool "MiGenteAppPool"
-
-# Asignar certificado SSL
-# (requiere certificado válido)
-```
-
-#### 3. Configurar Permisos
-
-```powershell
-# Dar permisos al Application Pool
-$acl = Get-Acl "C:\inetpub\wwwroot\migente"
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("IIS AppPool\MiGenteAppPool", "ReadAndExecute", "ContainerInherit, ObjectInherit", "None", "Allow")
-$acl.SetAccessRule($rule)
-Set-Acl "C:\inetpub\wwwroot\migente" $acl
-```
-
-### Despliegue en Azure App Service
+### Proyecto Clean Architecture
 
 ```bash
-# 1. Crear App Service
-az webapp create \
-  --resource-group MiGenteRG \
-  --plan MiGentePlan \
-  --name migente-webapp \
-  --runtime "ASPNET|V4.7"
+# Ejecutar todos los tests
+cd MiGenteEnLinea.Clean
+dotnet test
 
-# 2. Configurar Connection Strings
-az webapp config connection-string set \
-  --resource-group MiGenteRG \
-  --name migente-webapp \
-  --connection-string-type SQLAzure \
-  --settings migenteEntities="Server=tcp:..."
+# Tests con cobertura
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
-# 3. Deploy
-az webapp deploy \
-  --resource-group MiGenteRG \
-  --name migente-webapp \
-  --src-path ./publish.zip
+# Tests de una capa específica
+dotnet test tests/MiGenteEnLinea.Domain.Tests/
 ```
 
-### Checklist Pre-Producción
+### Proyecto Legacy
+⚠️ El proyecto legacy no tiene tests automatizados. Testing manual requerido.
 
-- [ ] Cambiar `customErrors mode` a `RemoteOnly` en Web.config
-- [ ] Configurar certificado SSL válido
-- [ ] Actualizar connection strings a servidor de producción
-- [ ] Configurar API keys reales de Cardnet
-- [ ] Habilitar logging a archivo
-- [ ] Configurar backups automáticos de base de datos
-- [ ] Probar recuperación ante desastres
-- [ ] Configurar monitoreo (Application Insights)
+---
+
+## 🔐 Seguridad
+
+### ⚠️ Vulnerabilidades Conocidas (Legacy)
+
+**15 vulnerabilidades críticas identificadas en auditoría de septiembre 2025:**
+
+#### 🔴 CRÍTICO (Remediación Inmediata)
+1. **SQL Injection** - Concatenación de strings SQL
+2. **Passwords en Texto Plano** - Almacenados sin hash en DB
+3. **Falta de Autenticación** - Endpoints críticos sin protección
+4. **Divulgación de Información** - Stack traces expuestos a clientes
+5. **Credenciales Hardcodeadas** - En `Web.config`
+
+#### 🟡 ALTO (Este Sprint)
+6. **CORS Permisivo** - Política allow-all en producción
+7. **Sin Rate Limiting** - Ataques de fuerza bruta posibles
+8. **Validación de Inputs Faltante** - Sin framework sistemático
+9. **Sin Logging de Auditoría** - Eventos de seguridad no registrados
+10. **Gestión de Sesiones Insegura** - Configuración de cookies débil
+
+Ver detalles completos en [SECURITY.md](Codigo%20Fuente%20Mi%20Gente/SECURITY.md)
+
+### ✅ Mejoras de Seguridad (Clean Architecture)
+
+- ✅ Passwords hasheados con BCrypt (work factor 12)
+- ✅ JWT authentication con refresh tokens
+- ✅ Validación de inputs con FluentValidation
+- ✅ Rate limiting en endpoints críticos
+- ✅ Logging estructurado con Serilog
+- ✅ Manejo global de excepciones sin exponer detalles
+- ✅ Secrets en User Secrets / Azure Key Vault
+- ✅ CORS configurado por ambiente
+- ✅ Auditoría automática con interceptors
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Proyecto Legacy 🔷
+
+| Categoría | Tecnología | Versión |
+|-----------|-----------|---------|
+| **Framework** | ASP.NET Web Forms | .NET 4.7.2 |
+| **ORM** | Entity Framework | 6.4.4 |
+| **Base de Datos** | SQL Server | 2017+ |
+| **UI Components** | DevExpress | 23.1 |
+| **PDF Generation** | iText | 8.0.5 |
+| **Payments** | Cardnet Gateway | - |
+| **AI** | OpenAI API | GPT-3.5 |
+| **HTTP Client** | RestSharp | 112.1.0 |
+
+### Proyecto Clean 🚀
+
+| Categoría | Tecnología | Versión |
+|-----------|-----------|---------|
+| **Framework** | ASP.NET Core | 8.0 |
+| **ORM** | Entity Framework Core | 8.0.0 |
+| **Base de Datos** | SQL Server | 2017+ |
+| **CQRS** | MediatR | 12.2.0 |
+| **Mapping** | AutoMapper | 12.0.1 |
+| **Validation** | FluentValidation | 11.9.0 |
+| **Password Hashing** | BCrypt.Net-Next | 4.0.3 |
+| **Logging** | Serilog | 8.0.0 |
+| **Authentication** | JWT Bearer | 8.0.0 |
+| **Rate Limiting** | AspNetCoreRateLimit | 5.0.0 |
+| **API Docs** | Swashbuckle (Swagger) | 6.5.0 |
+| **Testing** | xUnit + Moq + FluentAssertions | Latest |
+
+---
+
+## 📅 Timeline de Migración
+
+### ✅ Fase 1: Preparación (Semanas 1-2) - COMPLETADO
+- [x] Análisis de arquitectura legacy
+- [x] Identificación de vulnerabilidades de seguridad
+- [x] Creación de estructura Clean Architecture
+- [x] Scaffolding de 36 entidades desde DB
+- [x] Instalación de NuGet packages
+- [x] Configuración de workspace multi-root
+
+### 🔄 Fase 2: Refactorización DDD (Semanas 3-4) - EN PROGRESO
+- [ ] Refactorizar entidad Credencial (🔥 Prioridad 1)
+- [ ] Refactorizar entidades Empleador y Contratista
+- [ ] Implementar Value Objects (Email, Money, etc.)
+- [ ] Crear Fluent API configurations
+- [ ] Implementar BCrypt password hasher
+- [ ] Unit tests (cobertura > 80%)
+
+### ⏳ Fase 3: CQRS & Application Layer (Semanas 5-6)
+- [ ] Implementar Commands y Queries para Authentication
+- [ ] Implementar Commands y Queries para Empleadores
+- [ ] Implementar Commands y Queries para Contratistas
+- [ ] FluentValidation para todos los inputs
+- [ ] Integration tests
+
+### ⏳ Fase 4: API & Middleware (Semanas 7-8)
+- [ ] Crear controllers REST
+- [ ] Implementar global exception handler
+- [ ] Configurar rate limiting
+- [ ] Implementar request logging
+- [ ] Swagger documentation
+
+### ⏳ Fase 5: Testing & Deployment (Semanas 9-10)
+- [ ] Security testing (OWASP compliance)
+- [ ] Performance testing
+- [ ] Migration script para passwords
+- [ ] CI/CD pipeline
+- [ ] Deployment a staging
+
+### ⏳ Fase 6: Go-Live (Semana 11+)
+- [ ] Feature flags para gradual rollout
+- [ ] Monitoreo en producción
+- [ ] Deprecación gradual del legacy
+- [ ] Documentación completa
+
+**Estimación Total:** 11-12 semanas (~3 meses)
 
 ---
 
 ## 🤝 Contribución
 
-### Proceso de Contribución
+### Workflow de Desarrollo
 
-1. **Fork** el repositorio
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un **Pull Request**
+1. **Trabajar en ambos proyectos simultáneamente**
+   ```bash
+   code MiGenteEnLinea-Workspace.code-workspace
+   ```
 
-### Estándares de Código
+2. **Para bug fixes en Legacy:**
+   - Branch: `hotfix/nombre-descriptivo`
+   - Solo correcciones críticas
+   - No agregar features nuevos
 
-- Seguir convenciones C# estándar
-- Comentar código complejo
-- Usar nombres descriptivos para variables
-- Agregar XML docs a métodos públicos
-- Probar manualmente antes de PR
+3. **Para desarrollo nuevo en Clean:**
+   - Branch: `feature/nombre-descriptivo`
+   - Seguir principios DDD y Clean Architecture
+   - Incluir tests unitarios e integración
 
-### Reportar Bugs
+4. **Commit Message Convention:**
+   ```
+   type(scope): subject
 
-Usar el formato:
+   body (opcional)
 
-```markdown
-**Descripción del bug:**
-Descripción clara del problema
+   footer (opcional)
+   ```
 
-**Pasos para reproducir:**
-1. Ir a '...'
-2. Click en '....'
-3. Ver error
+   **Types:** `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `security`
 
-**Comportamiento esperado:**
-Lo que debería ocurrir
+   **Examples:**
+   ```
+   feat(clean/auth): implement BCrypt password hashing
+   fix(legacy): patch SQL injection in LoginService
+   security(clean): add rate limiting to auth endpoints
+   refactor(clean/domain): convert Credencial to rich domain model
+   ```
 
-**Screenshots:**
-Si aplica
-
-**Entorno:**
-- OS: [ej: Windows 11]
-- Browser: [ej: Chrome 118]
-- Version: [ej: 1.0.0]
-```
+Ver guía completa en [CONTRIBUTING.md](Codigo%20Fuente%20Mi%20Gente/CONTRIBUTING.md)
 
 ---
 
-## 📜 Licencia
+## 📞 Soporte
 
-Este proyecto está licenciado bajo la **GNU General Public License v3.0**.
+### Reportar Issues
 
-Esto significa que:
+- **Bugs en Legacy:** [Issue Template - Bug](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues/new?template=bug_report.md)
+- **Features en Clean:** [Issue Template - Feature](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues/new?template=feature_request.md)
+- **Vulnerabilidades:** [Issue Template - Security](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues/new?template=security_vulnerability.md)
 
-✅ **Puedes:**
-- Usar el software para cualquier propósito
-- Estudiar cómo funciona y modificarlo
-- Redistribuir copias
-- Distribuir versiones modificadas
+### Contacto
 
-⚠️ **Debes:**
-- Liberar el código fuente de cualquier versión modificada
-- Licenciar trabajos derivados bajo GPL v3
-- Mantener los avisos de copyright
-- Documentar cambios realizados
-
-❌ **No puedes:**
-- Sublicenciar bajo términos diferentes
-- Incorporar en software propietario sin liberar código
-
-Ver [LICENSE](LICENSE) para más detalles.
+- **Email:** [Tu email del proyecto]
+- **GitHub:** [@RainieryPeniaJrg](https://github.com/RainieryPeniaJrg)
 
 ---
 
-## 📞 Contacto
+## 📄 Licencia
 
-### Equipo de Desarrollo
-
-- **Repositorio**: [https://github.com/RainieryPeniaJrg/MiGenteEnlinea](https://github.com/RainieryPeniaJrg/MiGenteEnlinea)
-- **Issues**: [https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues)
-
-### Soporte
-
-Para preguntas sobre:
-- **Implementación técnica**: Abrir un Issue en GitHub
-- **Bugs**: Reportar en [Issues](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/issues)
-- **Features**: Proponer en [Discussions](https://github.com/RainieryPeniaJrg/MiGenteEnlinea/discussions)
+Este proyecto es propietario. Ver [LICENSE](LICENSE) para más detalles.
 
 ---
 
-## 📚 Recursos Adicionales
+## 🎯 Objetivos del Proyecto
 
-### Documentación Relacionada
+### Objetivos de Negocio
+- ✅ Reducir costos de infraestructura con arquitectura moderna
+- ✅ Mejorar experiencia de usuario con API REST
+- ✅ Facilitar integraciones con terceros
+- ✅ Cumplir con estándares de seguridad internacionales
 
-- [Documentación DevExpress ASP.NET](https://docs.devexpress.com/AspNet/404035/aspnet-webforms-mvc)
-- [Entity Framework 6 Docs](https://docs.microsoft.com/en-us/ef/ef6/)
-- [Cardnet API Docs](https://developers.cardnet.com.do/) *(requiere acceso)*
-- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
+### Objetivos Técnicos
+- ✅ Eliminar todas las vulnerabilidades de seguridad conocidas
+- ✅ Implementar arquitectura testeable (coverage > 80%)
+- ✅ Mejorar performance (reducir latencia en 50%)
+- ✅ Facilitar mantenimiento con Clean Architecture y DDD
 
-### Tutoriales
+### Objetivos de Equipo
+- ✅ Capacitar al equipo en Clean Architecture y DDD
+- ✅ Establecer estándares de código y testing
+- ✅ Implementar CI/CD pipeline
+- ✅ Documentación completa para nuevos desarrolladores
 
-- [ASP.NET Web Forms Tutorial](https://docs.microsoft.com/en-us/aspnet/web-forms/)
-- [iText 7/8 PDF Generation](https://kb.itextpdf.com/)
+---
+
+## ⭐ Estado del Proyecto
+
+- **Repositorio:** [MiGenteEnlinea](https://github.com/RainieryPeniaJrg/MiGenteEnlinea)
+- **Estado Legacy:** 🟡 Mantenimiento
+- **Estado Clean:** 🟢 Desarrollo Activo
+- **Cobertura de Tests:** 0% → Target: 80%
+- **Vulnerabilidades Conocidas:** 15 → Target: 0
+- **Progreso de Migración:** 15% → Target: 100%
+
+---
+
+## 📖 Recursos Adicionales
+
+### Aprendizaje
+- [Clean Architecture - Jason Taylor](https://github.com/jasontaylordev/CleanArchitecture)
+- [Domain-Driven Design Reference](https://www.domainlanguage.com/ddd/reference/)
+- [CQRS Pattern - Microsoft](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
+- [EF Core Best Practices](https://docs.microsoft.com/en-us/ef/core/performance/)
+
+### Herramientas
+- [VS Code Extensions Recomendadas](WORKSPACE_README.md#-extensiones-recomendadas-de-vs-code)
+- [dotnet-ef CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet)
+- [Swagger UI](https://localhost:5001/swagger)
 
 ---
 
 ## 📝 Changelog
 
-### [1.0.0] - 2025-10-12
+Ver [CHANGELOG.md](Codigo%20Fuente%20Mi%20Gente/CHANGELOG.md) para historial detallado de cambios.
 
-#### Añadido
-- Sistema completo de autenticación con roles
-- Gestión de empleados y nómina
-- Integración con Cardnet para pagos
-- Abogado virtual con OpenAI
-- Generación de PDFs para contratos y recibos
-- Sistema de calificaciones para contratistas
+---
 
-#### Características Iniciales
-- Módulo de Empleadores
-- Módulo de Contratistas
-- Master Pages responsivas
-- Templates de email
-- Validación de planes de suscripción
+**Última actualización:** 12 de octubre, 2025  
+**Mantenido por:** Equipo de Desarrollo MiGente  
+**GitHub:** [@RainieryPeniaJrg](https://github.com/RainieryPeniaJrg)
 
 ---
 
 <div align="center">
 
-**Hecho con ❤️ en República Dominicana 🇩🇴**
-
-⭐ **Si este proyecto te resultó útil, considera darle una estrella en GitHub!**
+**🚀 Construyendo el futuro de la gestión laboral en República Dominicana 🚀**
 
 </div>
