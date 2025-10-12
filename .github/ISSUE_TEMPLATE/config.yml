@@ -6,6 +6,6 @@ contact_links:
   - name: 💬 Discusiones
     url: https://github.com/RainieryPeniaJrg/MiGenteEnlinea/discussions
     about: Haz preguntas o inicia discusiones sobre el proyecto
-  - name: 🔒 Reporte de Seguridad Confidencial
-    url: mailto:rainierypenajrg@gmail.com
-    about: Para vulnerabilidades críticas, reporta de manera privada por email
+  - name: 🔒 Política de Seguridad
+    url: https://github.com/RainieryPeniaJrg/MiGenteEnlinea/blob/main/SECURITY.md
+    about: Revisa nuestra política de seguridad y cómo reportar vulnerabilidades
