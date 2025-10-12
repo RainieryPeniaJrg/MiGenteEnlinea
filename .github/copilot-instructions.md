@@ -1,20 +1,53 @@
 # MiGente En Línea - AI Coding Instructions
 
+> **📍 Workspace Location:** `C:\Users\ray\OneDrive\Documents\ProyectoMigente\`  
+> **🤖 AI Agent Mode:** GitHub Copilot (IDE Integration)  
+> **📚 Advanced Prompts:** See `/prompts/` folder for Claude Sonnet 4.5 and other agents
+
+---
+
 ## 🚨 CRITICAL: Dual-Project Workspace Context
 
 **⚠️ ACTIVE DEVELOPMENT**: This workspace contains TWO projects running simultaneously during migration:
 
 ### 🔷 PROJECT 1: Legacy Web Forms (Maintenance Mode)
-**Location:** `Codigo Fuente Mi Gente/`
-**Purpose:** Production system being phased out
-**DO NOT:** Add new features or major refactoring
+**Location:** `Codigo Fuente Mi Gente/`  
+**Purpose:** Production system being phased out  
+**DO NOT:** Add new features or major refactoring  
 **DO:** Only critical bug fixes and security patches
 
 ### 🚀 PROJECT 2: Clean Architecture (Active Development)
-**Location:** `MiGenteEnLinea.Clean/`
-**Purpose:** New modern implementation being built
-**DO:** All new development, DDD refactoring, testing
+**Location:** `MiGenteEnLinea.Clean/`  
+**Purpose:** New modern implementation being built  
+**DO:** All new development, DDD refactoring, testing  
 **DO:** Reference legacy code for business logic understanding
+
+---
+
+## 🤖 AI Agent Resources
+
+This workspace provides specialized prompts for different AI agents:
+
+### For GitHub Copilot (This File)
+- **Mode:** IDE Integration (autocomplete, chat)
+- **Purpose:** Quick suggestions, code completion, inline help
+- **Scope:** Small to medium tasks
+- **Location:** `.github/copilot-instructions.md` (auto-loaded by VS Code)
+
+### For Claude Sonnet 4.5 / External Agents
+- **Mode:** Autonomous Agent (batch execution)
+- **Purpose:** Large refactoring, multi-file changes, DDD migration
+- **Scope:** Complex architectural tasks
+- **Location:** `/prompts/AGENT_MODE_INSTRUCTIONS.md`
+- **Documentation:** `/prompts/README.md`
+
+**📖 Quick Reference:**
+```
+/prompts/
+├── README.md                        # Guide for using prompts
+├── AGENT_MODE_INSTRUCTIONS.md       # Claude Sonnet 4.5 autonomous mode
+└── ddd-migration-agent.md           # DDD migration workflow (coming soon)
+```
 
 ---
 
