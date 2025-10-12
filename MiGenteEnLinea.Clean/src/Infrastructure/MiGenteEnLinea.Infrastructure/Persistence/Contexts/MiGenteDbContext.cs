@@ -13,6 +13,7 @@ using MiGenteEnLinea.Domain.Entities.Catalogos;
 using MiGenteEnLinea.Domain.Entities.Contrataciones;
 using MiGenteEnLinea.Domain.Entities.Seguridad;
 using MiGenteEnLinea.Domain.Entities.Configuracion;
+using MiGenteEnLinea.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -183,29 +184,87 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces Suscripcione)
     public virtual DbSet<Suscripcion> Suscripciones { get; set; }
 
-    public virtual DbSet<Vcalificacione> Vcalificaciones { get; set; }
+    // ========================================
+    // DATABASE VIEWS (Read-Only Models)
+    // ========================================
+    // Views are read-only database views mapped to simplified read models.
+    // They do NOT support INSERT/UPDATE/DELETE operations.
+    // Located in Domain.ReadModels namespace.
 
-    public virtual DbSet<VcontratacionesTemporale> VcontratacionesTemporales { get; set; }
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vcalificacione> VcalificacionesLegacy { get; set; }
 
-    public virtual DbSet<Vcontratista> Vcontratistas { get; set; }
+    // Read Model for VCalificaciones view (replaces Vcalificacione)
+    public virtual DbSet<VistaCalificacion> VistasCalificacion { get; set; }
 
-    public virtual DbSet<Vempleado> Vempleados { get; set; }
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<VcontratacionesTemporale> VcontratacionesTemporalesLegacy { get; set; }
+
+    // Read Model for VContratacionesTemporales view (replaces VcontratacionesTemporale)
+    public virtual DbSet<VistaContratacionTemporal> VistasContratacionTemporal { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vcontratista> VcontratistasLegacy { get; set; }
+
+    // Read Model for VContratistas view (replaces Vcontratista)
+    public virtual DbSet<VistaContratista> VistasContratista { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vempleado> VempleadosLegacy { get; set; }
+
+    // Read Model for VEmpleados view (replaces Vempleado)
+    public virtual DbSet<VistaEmpleado> VistasEmpleado { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vpago> VpagosLegacy { get; set; }
+
+    // Read Model for VPagos view (replaces Vpago)
+    public virtual DbSet<VistaPago> VistasPago { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<VpagosContratacione> VpagosContratacionesLegacy { get; set; }
+
+    // Read Model for VPagosContrataciones view (replaces VpagosContratacione)
+    public virtual DbSet<VistaPagoContratacion> VistasPagoContratacion { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vperfile> VperfilesLegacy { get; set; }
+
+    // Read Model for VPerfiles view (replaces Vperfile)
+    public virtual DbSet<VistaPerfil> VistasPerfil { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<VpromedioCalificacion> VpromedioCalificacionLegacy { get; set; }
+
+    // Read Model for VPromedioCalificacion view (replaces VpromedioCalificacion)
+    public virtual DbSet<VistaPromedioCalificacion> VistasPromedioCalificacion { get; set; }
+
+    // Legacy scaffolded view (kept for reference)
+    // public virtual DbSet<Vsuscripcione> VsuscripcionesLegacy { get; set; }
+
+    // Read Model for VSuscripciones view (replaces Vsuscripcione)
+    public virtual DbSet<VistaSuscripcion> VistasSuscripcion { get; set; }
+
+    // ========================================
+    // END DATABASE VIEWS
+    // ========================================
+
+    // Legacy scaffolded views (kept for reference - replaced by VistasXxx DbSets above)
+    // public virtual DbSet<Vcalificacione> VcalificacionesLegacy { get; set; }
+    // public virtual DbSet<VcontratacionesTemporale> VcontratacionesTemporalesLegacy { get; set; }
+    // public virtual DbSet<Vcontratista> VcontratistasLegacy { get; set; }
+    // public virtual DbSet<Vempleado> VempleadosLegacy { get; set; }
+    // public virtual DbSet<Vpago> VpagosLegacy { get; set; }
+    // public virtual DbSet<VpagosContratacione> VpagosContratacionesLegacy { get; set; }
+    // public virtual DbSet<Vperfile> VperfilesLegacy { get; set; }
+    // public virtual DbSet<VpromedioCalificacion> VpromedioCalificacionLegacy { get; set; }
+    // public virtual DbSet<Vsuscripcione> VsuscripcionesLegacy { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Venta> VentasLegacy { get; set; }
 
     // DDD Refactored entity (replaces legacy Venta)
     public virtual DbSet<Domain.Entities.Pagos.Venta> Ventas { get; set; }
-
-    public virtual DbSet<Vpago> Vpagos { get; set; }
-
-    public virtual DbSet<VpagosContratacione> VpagosContrataciones { get; set; }
-
-    public virtual DbSet<Vperfile> Vperfiles { get; set; }
-
-    public virtual DbSet<VpromedioCalificacion> VpromedioCalificacions { get; set; }
-
-    public virtual DbSet<Vsuscripcione> Vsuscripciones { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -301,52 +360,53 @@ public partial class MiGenteDbContext : DbContext
         //     entity.Property(e => e.Nomina).HasDefaultValue(false);
         // });
 
-        modelBuilder.Entity<Vcalificacione>(entity =>
-        {
-            entity.ToView("VCalificaciones");
-        });
-
-        modelBuilder.Entity<VcontratacionesTemporale>(entity =>
-        {
-            entity.ToView("VContratacionesTemporales");
-        });
-
-        modelBuilder.Entity<Vcontratista>(entity =>
-        {
-            entity.ToView("VContratistas");
-        });
-
-        modelBuilder.Entity<Vempleado>(entity =>
-        {
-            entity.ToView("VEmpleados");
-
-            entity.Property(e => e.EmpleadoId).ValueGeneratedOnAdd();
-        });
-
-        modelBuilder.Entity<Vpago>(entity =>
-        {
-            entity.ToView("VPagos");
-        });
-
-        modelBuilder.Entity<VpagosContratacione>(entity =>
-        {
-            entity.ToView("VPagosContrataciones");
-        });
-
-        modelBuilder.Entity<Vperfile>(entity =>
-        {
-            entity.ToView("VPerfiles");
-        });
-
-        modelBuilder.Entity<VpromedioCalificacion>(entity =>
-        {
-            entity.ToView("VPromedioCalificacion");
-        });
-
-        modelBuilder.Entity<Vsuscripcione>(entity =>
-        {
-            entity.ToView("VSuscripciones");
-        });
+        // Legacy view mappings (commented out - replaced by configurations in ReadModels/ folder)
+        // These are now handled by IEntityTypeConfiguration classes applied via ApplyConfigurationsFromAssembly above.
+        // modelBuilder.Entity<Vcalificacione>(entity =>
+        // {
+        //     entity.ToView("VCalificaciones");
+        // });
+        //
+        // modelBuilder.Entity<VcontratacionesTemporale>(entity =>
+        // {
+        //     entity.ToView("VContratacionesTemporales");
+        // });
+        //
+        // modelBuilder.Entity<Vcontratista>(entity =>
+        // {
+        //     entity.ToView("VContratistas");
+        // });
+        //
+        // modelBuilder.Entity<Vempleado>(entity =>
+        // {
+        //     entity.ToView("VEmpleados");
+        //     entity.Property(e => e.EmpleadoId).ValueGeneratedOnAdd();
+        // });
+        //
+        // modelBuilder.Entity<Vpago>(entity =>
+        // {
+        //     entity.ToView("VPagos");
+        // });
+        //
+        // modelBuilder.Entity<VpagosContratacione>(entity =>
+        // {
+        //     entity.ToView("VPagosContrataciones");
+        // });
+        //
+        // modelBuilder.Entity<Vperfile>(entity =>
+        // {
+        //     entity.ToView("VPerfiles");
+        // });
+        //
+        // modelBuilder.Entity<VpromedioCalificacion>(entity =>
+        // {
+        //     entity.ToView("VPromedioCalificacion");
+        // });
+        //
+        // modelBuilder.Entity<Vsuscripcione>(entity =>
+        // {
+        //     entity.ToView("VSuscripciones");
+        // });
 
         OnModelCreatingPartial(modelBuilder);
     }
