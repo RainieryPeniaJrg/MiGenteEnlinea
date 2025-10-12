@@ -1,35 +1,105 @@
 # MiGente En Línea - AI Coding Instructions
 
-## 🚨 CRITICAL: Security Remediation in Progress
+## 🚨 CRITICAL: Dual-Project Workspace Context
 
-**⚠️ ACTIVE MIGRATION PROJECT**: This codebase is undergoing critical security remediation and architectural migration from ASP.NET Web Forms to Clean Architecture with ASP.NET Core Web API.
+**⚠️ ACTIVE DEVELOPMENT**: This workspace contains TWO projects running simultaneously during migration:
+
+### 🔷 PROJECT 1: Legacy Web Forms (Maintenance Mode)
+**Location:** `Codigo Fuente Mi Gente/`
+**Purpose:** Production system being phased out
+**DO NOT:** Add new features or major refactoring
+**DO:** Only critical bug fixes and security patches
+
+### 🚀 PROJECT 2: Clean Architecture (Active Development)
+**Location:** `../MiGenteEnLinea.Clean/`
+**Purpose:** New modern implementation being built
+**DO:** All new development, DDD refactoring, testing
+**DO:** Reference legacy code for business logic understanding
+
+---
+
+## 🏗️ Workspace Structure
+
+This is a **multi-root VS Code workspace** combining both projects:
+
+```
+MiGenteEnLinea-Workspace/
+├── 🔷 Codigo Fuente Mi Gente/          # LEGACY PROJECT
+│   ├── MiGente.sln                      # .NET Framework 4.7.2
+│   ├── MiGente_Front/                   # ASP.NET Web Forms
+│   │   ├── Data/                        # EF6 Database-First (EDMX)
+│   │   ├── Services/                    # Business logic
+│   │   ├── Empleador/                   # Employer module
+│   │   └── Contratista/                 # Contractor module
+│   ├── docs/                            # Migration documentation
+│   ├── scripts/                         # Automation scripts
+│   └── .github/                         # GitHub config, templates
+│
+└── 🚀 MiGenteEnLinea.Clean/            # CLEAN ARCHITECTURE PROJECT
+    ├── MiGenteEnLinea.Clean.sln         # .NET 8.0
+    ├── src/
+    │   ├── Core/
+    │   │   ├── MiGenteEnLinea.Domain/           # ✅ Active development
+    │   │   │   ├── Entities/                     # DDD entities
+    │   │   │   ├── ValueObjects/                 # DDD value objects
+    │   │   │   └── Common/                       # Base classes
+    │   │   └── MiGenteEnLinea.Application/      # ✅ Active development
+    │   │       ├── Features/                     # CQRS use cases
+    │   │       └── Common/                       # DTOs, interfaces
+    │   ├── Infrastructure/
+    │   │   └── MiGenteEnLinea.Infrastructure/   # ✅ Active development
+    │   │       ├── Persistence/
+    │   │       │   ├── Contexts/                 # DbContext
+    │   │       │   ├── Entities/Generated/       # 36 scaffolded entities
+    │   │       │   └── Configurations/           # Fluent API
+    │   │       └── Services/                     # External services
+    │   └── Presentation/
+    │       └── MiGenteEnLinea.API/              # ✅ Active development
+    │           └── Controllers/                  # REST API endpoints
+    └── tests/                                    # ✅ Active development
+```
+
+**⚠️ IMPORTANT NAVIGATION RULES:**
+- When asked about **"legacy"**, **"Web Forms"**, or **"old project"** → Work in `Codigo Fuente Mi Gente/`
+- When asked about **"clean"**, **"new project"**, or **"API"** → Work in `MiGenteEnLinea.Clean/`
+- When asked about **"migration"** or **"refactoring"** → Reference legacy, implement in clean
+- When asked about **"business logic"** → Check legacy first to understand, then implement properly in clean
+
+---
+
+## 🚨 CRITICAL: Security Remediation in Progress
 
 **🔒 SECURITY PRIORITY**: All AI agents must prioritize security fixes identified in September 2025 audit before implementing new features.
 
 ## Project Overview
 
-**MiGente En Línea** is an ASP.NET Web Forms application (.NET Framework 4.7.2) for managing employment relationships in the Dominican Republic. It connects **Empleadores** (employers) and **Contratistas** (contractors/service providers) with subscription-based access and integrated payment processing.
+**MiGente En Línea** is a platform for managing employment relationships in the Dominican Republic. It connects **Empleadores** (employers) and **Contratistas** (contractors/service providers) with subscription-based access and integrated payment processing.
 
-### Current State (Legacy - Being Phased Out)
+### 🔷 Legacy System (Current Production)
 - ASP.NET Web Forms (.NET Framework 4.7.2)
-- Database-First Entity Framework 6
+- Database-First Entity Framework 6 with EDMX
+- Forms Authentication with cookies
 - Multiple critical security vulnerabilities identified
 - Monolithic architecture without layer separation
+- Database: `db_a9f8ff_migente` on SQL Server
 
-### Target State (Migration Goal)
+### 🚀 Clean Architecture System (Under Development)
 - ASP.NET Core 8.0 Web API
 - Clean Architecture (Onion Architecture)
-- Code-First Entity Framework Core
+- Code-First Entity Framework Core 8
 - JWT Authentication with refresh tokens
+- Domain-Driven Design (DDD) with rich domain models
+- CQRS pattern with MediatR
 - Comprehensive security hardening
+- Same database: `db_a9f8ff_migente` (gradual migration)
 
-## Architecture & Technology Stack
+## 🔷 Legacy Architecture & Technology Stack
 
 ### Core Framework
 
 - **ASP.NET Web Forms** (.NET Framework 4.7.2)
 - **Entity Framework 6** for data access (Database-First approach with EDMX)
-- **SQL Server** database (`migenteV2`)
+- **SQL Server** database (`db_a9f8ff_migente`)
 - **IIS Express** for local development (port 44358 with SSL)
 
 ### Key Dependencies
@@ -48,6 +118,214 @@
   - `tipo = "1"`: Empleador (Employer) → redirects to `/comunidad.aspx`
   - `tipo = "2"`: Contratista (Contractor) → redirects to `/Contratista/index_contratista.aspx`
 - Cookie structure: `login` cookie contains `userID`, `nombre`, `tipo`, `planID`, `vencimientoPlan`, `email`
+
+---
+
+## 🚀 Clean Architecture & Technology Stack
+
+### Core Framework
+
+- **ASP.NET Core 8.0** Web API
+- **Entity Framework Core 8.0** for data access (Code-First approach)
+- **SQL Server** database (`db_a9f8ff_migente` - same as legacy)
+- **Kestrel** web server (ports: 5000 HTTP, 5001 HTTPS)
+
+### Architecture Layers
+
+#### 1. Domain Layer (`MiGenteEnLinea.Domain`)
+**Purpose:** Core business logic and entities (no dependencies)
+
+- **Entities/**: Rich domain models with business logic
+  - `Authentication/Credencial.cs` - User authentication entity
+  - `Empleadores/Empleador.cs` - Employer aggregate root
+  - `Contratistas/Contratista.cs` - Contractor aggregate root
+  - `Empleados/Empleado.cs` - Employee entity
+  - `Suscripciones/Suscripcion.cs` - Subscription entity
+- **ValueObjects/**: Immutable value objects (Email, Money, DateRange, etc.)
+- **Common/**: Base classes (`AuditableEntity`, `SoftDeletableEntity`, `AggregateRoot`)
+- **Events/**: Domain events for communication between aggregates
+- **Interfaces/**: Repository interfaces, domain services
+
+#### 2. Application Layer (`MiGenteEnLinea.Application`)
+**Purpose:** Use cases and application logic
+
+- **Features/**: Organized by feature (CQRS pattern)
+  - `Authentication/`
+    - `Commands/`: Register, Login, ChangePassword, ResetPassword
+    - `Queries/`: GetUser, ValidateToken
+    - `DTOs/`: UsuarioDto, CredencialDto
+    - `Validators/`: FluentValidation rules
+  - `Empleadores/`, `Contratistas/`, `Empleados/`, etc.
+- **Common/**: Shared application logic
+  - `Interfaces/`: IDateTime, IEmailService, IFileStorage
+  - `Behaviors/`: MediatR pipelines (Validation, Logging, Transaction)
+  - `Mappings/`: AutoMapper profiles
+  - `Exceptions/`: Application-specific exceptions
+
+**Dependencies:**
+- `MediatR 12.2.0` - CQRS implementation
+- `AutoMapper 12.0.1` - Object mapping
+- `FluentValidation 11.9.0` - Input validation
+
+#### 3. Infrastructure Layer (`MiGenteEnLinea.Infrastructure`)
+**Purpose:** External concerns and persistence
+
+- **Persistence/**
+  - `Contexts/MiGenteDbContext.cs` - EF Core DbContext
+  - `Entities/Generated/` - 36 scaffolded entities from legacy DB
+  - `Configurations/` - Fluent API configurations
+  - `Repositories/` - Repository implementations
+  - `Interceptors/` - Audit interceptor for automatic field updates
+  - `Migrations/` - EF Core migrations
+- **Identity/**
+  - `JwtTokenService.cs` - JWT token generation/validation
+  - `PasswordHasher.cs` - BCrypt password hashing
+  - `CurrentUserService.cs` - Get current authenticated user
+- **Services/**
+  - `EmailService.cs` - SMTP email sending
+  - `CardnetPaymentService.cs` - Payment gateway integration
+  - `PdfGenerationService.cs` - PDF generation with iText
+  - `StorageService.cs` - File storage (Azure Blob/Local)
+
+**Dependencies:**
+- `Microsoft.EntityFrameworkCore.SqlServer 8.0.0` - SQL Server provider
+- `BCrypt.Net-Next 4.0.3` - Password hashing
+- `Serilog.AspNetCore 8.0.0` - Structured logging
+- `Serilog.Sinks.MSSqlServer 6.5.0` - Log to database
+
+#### 4. Presentation Layer (`MiGenteEnLinea.API`)
+**Purpose:** REST API endpoints and HTTP concerns
+
+- **Controllers/**: REST API endpoints
+  - `AuthController.cs` - `/api/auth` (register, login, refresh)
+  - `EmpleadoresController.cs` - `/api/empleadores`
+  - `ContratistasController.cs` - `/api/contratistas`
+  - `EmpleadosController.cs` - `/api/empleados`
+  - `NominasController.cs` - `/api/nominas`
+  - `SuscripcionesController.cs` - `/api/suscripciones`
+- **Middleware/**
+  - `GlobalExceptionHandlerMiddleware.cs` - Centralized error handling
+  - `RequestLoggingMiddleware.cs` - Request/response logging
+  - `PerformanceMonitoringMiddleware.cs` - Performance tracking
+- **Filters/**
+  - `ValidateModelStateFilter.cs` - Automatic model validation
+  - `ApiKeyAuthFilter.cs` - API key authentication for external services
+- **Extensions/**
+  - `ServiceCollectionExtensions.cs` - DI registration
+  - `ApplicationBuilderExtensions.cs` - Middleware configuration
+
+**Dependencies:**
+- `Microsoft.AspNetCore.Authentication.JwtBearer 8.0.0` - JWT authentication
+- `AspNetCoreRateLimit 5.0.0` - Rate limiting
+- `Swashbuckle.AspNetCore 6.5.0` - Swagger/OpenAPI documentation
+
+### Authentication & Authorization
+
+#### JWT Token Structure
+```json
+{
+  "nameid": "123",
+  "unique_name": "user@example.com",
+  "email": "user@example.com",
+  "role": "Empleador",
+  "PlanID": "5",
+  "exp": 1726000000,
+  "iss": "MiGenteEnLinea.API",
+  "aud": "MiGenteEnLinea.Client"
+}
+```
+
+#### Authorization Policies
+- `RequireEmpleadorRole` - Only Empleadores
+- `RequireContratistaRole` - Only Contratistas
+- `RequireActivePlan` - Only users with active subscription
+- `RequireVerifiedEmail` - Only users with verified email
+
+#### Rate Limiting
+- `/api/auth/login` - 5 requests per minute per IP
+- `/api/auth/register` - 3 requests per hour per IP
+- All other endpoints - 10 requests per second per IP
+
+### Database Access Patterns
+
+#### Code-First with Fluent API
+```csharp
+// Entity configuration example
+public class CredencialConfiguration : IEntityTypeConfiguration<Credencial>
+{
+    public void Configure(EntityTypeBuilder<Credencial> builder)
+    {
+        builder.ToTable("Credenciales"); // Maps to existing table
+        
+        builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id).HasColumnName("id");
+        
+        builder.Property(c => c.Email)
+            .IsRequired()
+            .HasMaxLength(100)
+            .HasColumnName("email");
+            
+        builder.HasIndex(c => c.Email).IsUnique();
+    }
+}
+```
+
+#### Repository Pattern
+```csharp
+public interface IRepository<T> where T : class
+{
+    Task<T?> GetByIdAsync(int id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<T> AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(int id);
+}
+```
+
+#### CQRS with MediatR
+```csharp
+// Command
+public record RegistrarUsuarioCommand(string Email, string Password) : IRequest<int>;
+
+// Handler
+public class RegistrarUsuarioHandler : IRequestHandler<RegistrarUsuarioCommand, int>
+{
+    public async Task<int> Handle(RegistrarUsuarioCommand request, CancellationToken ct)
+    {
+        // Business logic
+    }
+}
+
+// Usage in controller
+[HttpPost("register")]
+public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand command)
+{
+    var userId = await _mediator.Send(command);
+    return Ok(new { userId });
+}
+```
+
+### Migration Status
+
+#### ✅ Completed
+- Clean Architecture solution structure created
+- 36 entities scaffolded from database
+- DbContext configured with connection string
+- Base classes created (AuditableEntity, SoftDeletableEntity)
+- NuGet packages installed (EF Core, MediatR, BCrypt, JWT, etc.)
+
+#### 🔄 In Progress
+- Refactoring scaffolded entities to rich domain models
+- Creating Fluent API configurations
+- Implementing BCrypt password hashing
+- Creating unit and integration tests
+
+#### ⏳ Pending
+- Implementing CQRS commands and queries
+- Creating REST API controllers
+- Migrating plain text passwords to BCrypt
+- Setting up CI/CD pipeline
+- Performance testing and optimization
 
 ## Project Structure
 
