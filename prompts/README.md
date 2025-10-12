@@ -8,12 +8,14 @@ Esta carpeta contiene prompts optimizados para diferentes AI agents que trabajan
 
 ```
 prompts/
-├── README.md                           # Este archivo
-├── AGENT_MODE_INSTRUCTIONS.md          # 🤖 Claude Sonnet 4.5 - Modo Agente Autónomo
-├── ddd-migration-agent.md              # 🔄 Migración DDD con autoridad de ejecución
+├── README.md                             # Este archivo
+├── AGENT_MODE_INSTRUCTIONS.md            # 🤖 Claude Sonnet 4.5 - Modo Agente Autónomo
+├── COMPLETE_ENTITY_MIGRATION_PLAN.md     # 🎯 Plan Maestro - 36 Entidades (5 done, 31 pending)
+├── DDD_MIGRATION_PROMPT.md               # � Guía completa de patrones DDD
+├── COPILOT_INSTRUCTIONS.md               # 📝 Instrucciones específicas de Copilot
+├── GITHUB_CONFIG_PROMPT.md               # ⚙️ Setup de CI/CD
 └── archived/
-    ├── ddd-migration-assistant.md      # Modo asistente (pide confirmación)
-    └── github-config-completed.md      # Completado ✅
+    └── [archivos completados]            # Documentación histórica
 ```
 
 ---
@@ -67,7 +69,49 @@ Solo reporta progreso cada 3 pasos completados.
 
 ## 🎯 Workflows Comunes
 
-### Workflow 1: Migrar Entidades con DDD (Batch)
+### Workflow 1: Migración Completa de Entidades (36 Total) 🆕
+
+**Agente:** Claude Sonnet 4.5 (Modo Agente)  
+**Prompt:** `COMPLETE_ENTITY_MIGRATION_PLAN.md`
+
+**Estado Actual:** 5/36 completadas (13.9%)
+- ✅ Credencial, Empleador, Contratista, Suscripcion, Calificacion
+- ⏳ 31 entidades pendientes organizadas en 6 LOTES
+
+**Comando para LOTE 1 (Empleados y Nómina - 6 entidades):**
+```
+@workspace Lee prompts/COMPLETE_ENTITY_MIGRATION_PLAN.md
+
+EJECUTAR: LOTE 1 completo (Empleados y Nómina)
+
+ENTIDADES (en orden):
+1. DeduccionTss
+2. Empleado
+3. EmpleadoNota
+4. EmpleadoTemporal
+5. ReciboDetalle
+6. ReciboHeader
+
+AUTORIZACIÓN: Modo autónomo completo. 
+Reporta progreso cada 2 entidades completadas.
+Sigue el patrón de TAREA_1_CREDENCIAL_COMPLETADA.md
+
+META: Al completar LOTE 1 → 11/36 entidades (30.6%)
+```
+
+**Comando para ver progreso general:**
+```
+@workspace Lee prompts/COMPLETE_ENTITY_MIGRATION_PLAN.md
+
+TAREA: Genera reporte de progreso actual
+- Entidades completadas vs pendientes
+- Próximo LOTE a ejecutar
+- Estimación de tiempo restante
+```
+
+---
+
+### Workflow 2: Migrar Entidades con DDD (Batch)
 
 **Agente:** Claude Sonnet 4.5 (Modo Agente)  
 **Prompt:** `AGENT_MODE_INSTRUCTIONS.md`
@@ -93,7 +137,7 @@ LÍMITES:
 
 ---
 
-### Workflow 2: Implementar Feature con CQRS
+### Workflow 3: Implementar Feature con CQRS
 
 **Agente:** Claude Sonnet 4.5 (Modo Agente)  
 **Prompt:** `AGENT_MODE_INSTRUCTIONS.md` + Feature specification
