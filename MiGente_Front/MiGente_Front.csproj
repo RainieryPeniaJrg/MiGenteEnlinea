@@ -1,0 +1,1346 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F882A99E-2979-47D6-8E6D-C255D69F8367}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MiGente_Front</RootNamespace>
+    <AssemblyName>MiGente_Front</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44358</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ClassLibrary CSharp">
+      <HintPath>..\..\Utility_Suite\Utility_POS\Utility_POS\bin\Debug\ClassLibrary CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Data.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Drawing.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Office.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Pdf.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.PivotGrid.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Printing.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.RichEdit.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Sparkline.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Web.Bootstrap.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Web.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGauges.v23.1.Core, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v23.1, Version=23.1.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.barcodes, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.barcodes.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.bouncy-castle-connector, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.bouncy-castle-connector.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.commons, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.commons.8.0.5\lib\net461\itext.commons.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.forms, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.forms.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.html2pdf, Version=5.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.pdfhtml.5.0.5\lib\net461\itext.html2pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.io, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.io.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.kernel, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.kernel.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.layout, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.layout.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.pdfa, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.pdfa.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.pdfua, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.pdfua.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.sign, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.sign.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.styledxmlparser, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.styledxmlparser.dll</HintPath>
+    </Reference>
+    <Reference Include="itext.svg, Version=8.0.5.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itext.8.0.5\lib\net461\itext.svg.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.DevOps.Comments.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.Azure.DevOps.Comments.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Pipelines.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.Azure.Pipelines.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.5.0.0\lib\net461\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.5.0.0\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Identity.Client, Version=4.54.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.54.1\lib\net461\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Identity.Client.Extensions.Msal, Version=2.23.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.Extensions.Msal.2.23.0\lib\net45\Microsoft.Identity.Client.Extensions.Msal.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=6.30.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.6.30.1\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=6.30.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.6.30.1\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=6.30.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.6.30.1\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=6.30.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.6.30.1\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Build.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Build.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build2.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Build2.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Core.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Core.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Dashboards.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Dashboards.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.DeleteTeamProject, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.DeleteTeamProject.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Diff, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Diff.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Discussion.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Discussion.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.19.225.1\lib\net472\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.Git.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Pipelines.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Pipelines.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Policy.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Policy.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.SharePointReporting.Integration, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.SharePointReporting.Integration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.SourceControl.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.SourceControl.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Test.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Test.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestImpact.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.TestImpact.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.TestManagement.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.TestManagement.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.TestManagement.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.VersionControl.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.VersionControl.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common.Integration, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.VersionControl.Common.Integration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Wiki.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Wiki.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Work.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.Work.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client.DataStoreLoader, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Client.DataStoreLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Proxy, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.Proxy.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.TeamFoundation.WorkItemTracking.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Client.Interactive, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.InteractiveClient.19.225.1\lib\net472\Microsoft.VisualStudio.Services.Client.Interactive.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Common, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.19.225.1\lib\net472\Microsoft.VisualStudio.Services.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.TestManagement.TestPlanning.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.VisualStudio.Services.TestManagement.TestPlanning.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.TestResults.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.19.225.1\lib\net472\Microsoft.VisualStudio.Services.TestResults.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.WebApi, Version=19.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Services.Client.19.225.1\lib\net472\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=112.1.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.112.1.0\lib\net471\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.30.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.6.30.1\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.4\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.7\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="abogadoVirtual.aspx" />
+    <Content Include="Activar.aspx" />
+    <Content Include="assets\css\animated.css" />
+    <Content Include="assets\css\style.css" />
+    <Content Include="assets\img\apple-touch-icon.png" />
+    <Content Include="assets\img\card.jpg" />
+    <Content Include="assets\img\favicon.png" />
+    <Content Include="assets\img\logo.png" />
+    <Content Include="assets\img\LogoUtility.png" />
+    <Content Include="assets\img\messages-1.jpg" />
+    <Content Include="assets\img\messages-2.jpg" />
+    <Content Include="assets\img\messages-3.jpg" />
+    <Content Include="assets\img\news-1.jpg" />
+    <Content Include="assets\img\news-2.jpg" />
+    <Content Include="assets\img\news-3.jpg" />
+    <Content Include="assets\img\news-4.jpg" />
+    <Content Include="assets\img\news-5.jpg" />
+    <Content Include="assets\img\product-1.jpg" />
+    <Content Include="assets\img\product-2.jpg" />
+    <Content Include="assets\img\product-3.jpg" />
+    <Content Include="assets\img\product-4.jpg" />
+    <Content Include="assets\img\product-5.jpg" />
+    <Content Include="assets\img\profile-img.jpg" />
+    <Content Include="assets\img\sin-perfil.jpg" />
+    <Content Include="assets\img\slides-1.jpg" />
+    <Content Include="assets\img\slides-2.jpg" />
+    <Content Include="assets\img\slides-3.jpg" />
+    <Content Include="assets\js\main.js" />
+    <Content Include="assets\js\registrar.js" />
+    <Content Include="assets\scss\Readme.txt" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.amd.js" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.common.js" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.css" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.esm.js" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.js" />
+    <Content Include="assets\vendor\apexcharts\apexcharts.min.js" />
+    <Content Include="assets\vendor\bootstrap-icons\bootstrap-icons.css" />
+    <Content Include="assets\vendor\bootstrap-icons\bootstrap-icons.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.rtl.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.rtl.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.rtl.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.rtl.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.rtl.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.rtl.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.rtl.css" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.rtl.min.css" />
+    <Content Include="assets\vendor\bootstrap\css\prb.txt" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.bundle.js" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.bundle.min.js" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.esm.js" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.esm.min.js" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.js" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.min.js" />
+    <Content Include="assets\vendor\boxicons\css\animations.css" />
+    <Content Include="assets\vendor\boxicons\css\boxicons.css" />
+    <Content Include="assets\vendor\boxicons\css\boxicons.min.css" />
+    <Content Include="assets\vendor\boxicons\css\transformations.css" />
+    <Content Include="assets\vendor\chart.js\chart.cjs" />
+    <Content Include="assets\vendor\chart.js\chart.js" />
+    <Content Include="assets\vendor\chart.js\chart.umd.js" />
+    <Content Include="assets\vendor\chart.js\chunks\helpers.segment.cjs" />
+    <Content Include="assets\vendor\chart.js\chunks\helpers.segment.js" />
+    <Content Include="assets\vendor\chart.js\helpers.cjs" />
+    <Content Include="assets\vendor\chart.js\helpers.js" />
+    <Content Include="assets\vendor\echarts\echarts.common.js" />
+    <Content Include="assets\vendor\echarts\echarts.common.min.js" />
+    <Content Include="assets\vendor\echarts\echarts.esm.js" />
+    <Content Include="assets\vendor\echarts\echarts.esm.min.js" />
+    <Content Include="assets\vendor\echarts\echarts.esm.min.mjs" />
+    <Content Include="assets\vendor\echarts\echarts.esm.mjs" />
+    <Content Include="assets\vendor\echarts\echarts.js" />
+    <Content Include="assets\vendor\echarts\echarts.min.js" />
+    <Content Include="assets\vendor\echarts\echarts.simple.js" />
+    <Content Include="assets\vendor\echarts\echarts.simple.min.js" />
+    <Content Include="assets\vendor\echarts\extension\bmap.js" />
+    <Content Include="assets\vendor\echarts\extension\bmap.min.js" />
+    <Content Include="assets\vendor\echarts\extension\dataTool.js" />
+    <Content Include="assets\vendor\echarts\extension\dataTool.min.js" />
+    <Content Include="assets\vendor\php-email-form\validate.js" />
+    <Content Include="assets\vendor\quill\quill.bubble.css" />
+    <Content Include="assets\vendor\quill\quill.core.css" />
+    <Content Include="assets\vendor\quill\quill.core.js" />
+    <Content Include="assets\vendor\quill\quill.core.js.LICENSE.txt" />
+    <Content Include="assets\vendor\quill\quill.js" />
+    <Content Include="assets\vendor\quill\quill.js.LICENSE.txt" />
+    <Content Include="assets\vendor\quill\quill.snow.css" />
+    <Content Include="assets\vendor\remixicon\remixicon.css" />
+    <Content Include="assets\vendor\simple-datatables\simple-datatables.js" />
+    <Content Include="assets\vendor\simple-datatables\style.css" />
+    <Content Include="assets\vendor\tinymce\icons\default\icons.js" />
+    <Content Include="assets\vendor\tinymce\icons\default\icons.min.js" />
+    <Content Include="assets\vendor\tinymce\icons\default\index.js" />
+    <Content Include="assets\vendor\tinymce\models\dom\index.js" />
+    <Content Include="assets\vendor\tinymce\models\dom\model.js" />
+    <Content Include="assets\vendor\tinymce\models\dom\model.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\accordion\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\accordion\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\accordion\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\advlist\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\advlist\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\advlist\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\anchor\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\anchor\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\anchor\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autolink\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autolink\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autolink\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autoresize\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autoresize\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autoresize\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autosave\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autosave\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\autosave\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\charmap\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\charmap\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\charmap\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\codesample\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\codesample\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\codesample\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\code\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\code\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\code\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\directionality\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\directionality\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\directionality\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\js\emojiimages.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\js\emojiimages.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\js\emojis.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\js\emojis.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\emoticons\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\fullscreen\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\fullscreen\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\fullscreen\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ar.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\bg_BG.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ca.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\cs.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\da.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\de.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\el.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\en.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\es.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\eu.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\fa.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\fi.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\fr_FR.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\he_IL.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\hi.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\hr.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\hu_HU.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\id.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\it.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ja.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\kk.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ko_KR.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ms.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\nb_NO.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\nl.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\pl.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\pt_BR.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\pt_PT.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ro.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\ru.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\sk.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\sl_SI.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\sv_SE.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\th_TH.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\tr.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\uk.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\vi.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\zh_CN.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\js\i18n\keynav\zh_TW.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\help\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\image\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\image\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\image\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\importcss\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\importcss\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\importcss\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\insertdatetime\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\insertdatetime\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\insertdatetime\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\link\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\link\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\link\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\lists\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\lists\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\lists\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\media\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\media\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\media\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\nonbreaking\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\nonbreaking\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\nonbreaking\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\pagebreak\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\pagebreak\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\pagebreak\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\preview\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\preview\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\preview\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\quickbars\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\quickbars\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\quickbars\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\save\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\save\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\save\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\searchreplace\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\searchreplace\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\searchreplace\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\table\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\table\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\table\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualblocks\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualblocks\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualblocks\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualchars\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualchars\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\visualchars\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\plugins\wordcount\index.js" />
+    <Content Include="assets\vendor\tinymce\plugins\wordcount\plugin.js" />
+    <Content Include="assets\vendor\tinymce\plugins\wordcount\plugin.min.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\dark\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\dark\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\dark\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\default\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\default\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\default\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\document\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\document\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\document\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5-dark\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5-dark\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5-dark\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\tinymce-5\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\writer\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\content\writer\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\content\writer\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.inline.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.inline.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.inline.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.shadowdom.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.shadowdom.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide-dark\skin.shadowdom.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.inline.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.inline.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.inline.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.shadowdom.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.shadowdom.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\oxide\skin.shadowdom.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.inline.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.inline.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.inline.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.shadowdom.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.shadowdom.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5-dark\skin.shadowdom.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.inline.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.inline.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.inline.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\content.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.min.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.shadowdom.css" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.shadowdom.js" />
+    <Content Include="assets\vendor\tinymce\skins\ui\tinymce-5\skin.shadowdom.min.css" />
+    <Content Include="assets\vendor\tinymce\themes\silver\index.js" />
+    <Content Include="assets\vendor\tinymce\themes\silver\theme.js" />
+    <Content Include="assets\vendor\tinymce\themes\silver\theme.min.js" />
+    <Content Include="assets\vendor\tinymce\tinymce.js" />
+    <Content Include="assets\vendor\tinymce\tinymce.min.js" />
+    <Content Include="Contratista\AdquirirPlanContratista.aspx" />
+    <Content Include="Contratista\index_contratista.aspx" />
+    <Content Include="Contratista\MisCalificaciones.aspx" />
+    <Content Include="Data\DataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DataModel.edmx</DependentUpon>
+      <LastGenOutput>DataModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\DataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DataModel.edmx</DependentUpon>
+      <LastGenOutput>DataModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Empleador\AdquirirPlanEmpleador.aspx" />
+    <Content Include="Empleador\CalificacionDePerfiles.aspx" />
+    <Content Include="Empleador\Checkout.aspx" />
+    <Content Include="Empleador\colaboradores.aspx" />
+    <Content Include="comunidad.aspx" />
+    <Content Include="Empleador\detalleContratacion.aspx" />
+    <Content Include="Empleador\fichaColaboradorTemporal.aspx" />
+    <Content Include="Empleador\fichaEmpleado.aspx" />
+    <Content Include="Empleador\Impresion\PrintViewer.aspx" />
+    <Content Include="Empleador\Impresion\ReciboDescargoEmpresa_Empleador1.html" />
+    <Content Include="Empleador\Impresion\ReciboDescargoPersonaFisica_Empleador1.html" />
+    <Content Include="Empleador\Impresion\ReciboPagoEmpresa_Empleador1.html" />
+    <Content Include="Empleador\Impresion\ReciboPagoPersonaFisica_Empleador1.html" />
+    <Content Include="Empleador\MiPerfilEmpleador.aspx" />
+    <Content Include="Empleador\nomina.aspx" />
+    <Content Include="FAQ.aspx" />
+    <Content Include="HtmlTemplates\AutorizacionEmpleadores.html" />
+    <Content Include="HtmlTemplates\AutorizacionProveedores.html" />
+    <Content Include="HtmlTemplates\TerminosMiGente.html" />
+    <Content Include="Images\bgProfile.jpg" />
+    <Content Include="Images\3.png" />
+    <Content Include="Images\angryimg.png" />
+    <Content Include="Images\bgLogin.jpg" />
+    <Content Include="Images\banner1.jpg" />
+    <Content Include="Images\banner2.jpg" />
+    <Content Include="Images\btnChat2%281%29.png" />
+    <Content Include="Images\Credit-Card-Icons.png" />
+    <Content Include="Images\image51.png" />
+    <Content Include="Images\lawyer-avatar.png" />
+    <Content Include="Images\MainBanner2.jpg" />
+    <Content Include="Images\banner3.jpg" />
+    <Content Include="Images\whatsapp.png" />
+    <Content Include="Login.aspx" />
+    <Content Include="MailTemplates\checkout.html" />
+    <Content Include="MailTemplates\confirmacionRegistro.html" />
+    <Content Include="MailTemplates\recuperarPass.html" />
+    <Content Include="Empleador\Impresion\ContratoEmpresa.html" />
+    <Content Include="Empleador\Impresion\ContratoPersonaFisica.html" />
+    <Content Include="MiSuscripcion.aspx" />
+    <Content Include="Registrar.aspx" />
+    <Content Include="Services\botService.asmx" />
+    <Content Include="Services\LoginService.asmx" />
+    <Content Include="UserControls\abogadoBot.ascx" />
+    <Content Include="UserControls\FormularioContratacion.ascx" />
+    <Content Include="UserControls\FormularioEmpleado.ascx" />
+    <Content Include="Images\employee.png" />
+    <Content Include="Images\payIcon.png" />
+    <Content Include="Images\logoMiGene.png" />
+    <Content Include="Images\logoMiGenteBlanco.png" />
+    <Content Include="Images\star.png" />
+    <Content Include="UserControls\TerminosMiGente.ascx" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="abogadoVirtual.aspx.cs">
+      <DependentUpon>abogadoVirtual.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="abogadoVirtual.aspx.designer.cs">
+      <DependentUpon>abogadoVirtual.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Activar.aspx.cs">
+      <DependentUpon>Activar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Activar.aspx.designer.cs">
+      <DependentUpon>Activar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Contratista\AdquirirPlanContratista.aspx.cs">
+      <DependentUpon>AdquirirPlanContratista.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Contratista\AdquirirPlanContratista.aspx.designer.cs">
+      <DependentUpon>AdquirirPlanContratista.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Contratista\Comunity2.Master.cs">
+      <DependentUpon>Comunity2.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Contratista\Comunity2.Master.designer.cs">
+      <DependentUpon>Comunity2.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Contratista\index_contratista.aspx.cs">
+      <DependentUpon>index_contratista.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Contratista\index_contratista.aspx.designer.cs">
+      <DependentUpon>index_contratista.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Contratista\MisCalificaciones.aspx.cs">
+      <DependentUpon>MisCalificaciones.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Contratista\MisCalificaciones.aspx.designer.cs">
+      <DependentUpon>MisCalificaciones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Calificaciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Config_Correo.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Contratistas.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Contratistas_Fotos.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Contratistas_Servicios.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Credenciales.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Cuentas.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DataModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DataModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DataModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Deducciones_TSS.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DetalleContrataciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Empleador_Recibos_Detalle.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Empleador_Recibos_Detalle_Contrataciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Empleador_Recibos_Header.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Empleador_Recibos_Header_Contrataciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Empleados.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\EmpleadosTemporales.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ObtenerSuscripcion_Result.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Ofertantes.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\OpenAi_Config.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PadronModel.cs" />
+    <Compile Include="Data\PaymentGateway.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\perfilesInfo.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Planes_Contratistas.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Planes_empleadores.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Provincias.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Remuneraciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Sectores.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Servicios.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sp_MisCalificaciones_Result.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Suscripciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\sysdiagrams.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VCalificaciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VContratacionesTemporales.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VContratistas.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VEmpleados.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Ventas.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VMisCalificaciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VPagosContrataciones.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VPerfiles.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\VRecibosEmpleados.cs">
+      <DependentUpon>DataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\AdquirirPlanEmpleador.aspx.cs">
+      <DependentUpon>AdquirirPlanEmpleador.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\AdquirirPlanEmpleador.aspx.designer.cs">
+      <DependentUpon>AdquirirPlanEmpleador.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\CalificacionDePerfiles.aspx.cs">
+      <DependentUpon>CalificacionDePerfiles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\CalificacionDePerfiles.aspx.designer.cs">
+      <DependentUpon>CalificacionDePerfiles.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\Checkout.aspx.cs">
+      <DependentUpon>Checkout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\Checkout.aspx.designer.cs">
+      <DependentUpon>Checkout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\colaboradores.aspx.cs">
+      <DependentUpon>colaboradores.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\colaboradores.aspx.designer.cs">
+      <DependentUpon>colaboradores.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="comunidad.aspx.cs">
+      <DependentUpon>comunidad.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="comunidad.aspx.designer.cs">
+      <DependentUpon>comunidad.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\detalleContratacion.aspx.cs">
+      <DependentUpon>detalleContratacion.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\detalleContratacion.aspx.designer.cs">
+      <DependentUpon>detalleContratacion.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\fichaColaboradorTemporal.aspx.cs">
+      <DependentUpon>fichaColaboradorTemporal.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\fichaColaboradorTemporal.aspx.designer.cs">
+      <DependentUpon>fichaColaboradorTemporal.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\fichaEmpleado.aspx.cs">
+      <DependentUpon>fichaEmpleado.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\fichaEmpleado.aspx.designer.cs">
+      <DependentUpon>fichaEmpleado.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\Impresion\PrintViewer.aspx.cs">
+      <DependentUpon>PrintViewer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\Impresion\PrintViewer.aspx.designer.cs">
+      <DependentUpon>PrintViewer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\MiPerfilEmpleador.aspx.cs">
+      <DependentUpon>MiPerfilEmpleador.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\MiPerfilEmpleador.aspx.designer.cs">
+      <DependentUpon>MiPerfilEmpleador.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\nomina.aspx.cs">
+      <DependentUpon>nomina.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Empleador\nomina.aspx.designer.cs">
+      <DependentUpon>nomina.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FAQ.aspx.cs">
+      <DependentUpon>FAQ.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FAQ.aspx.designer.cs">
+      <DependentUpon>FAQ.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Empleador\Impresion\ContratoPersonaFisica.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Empleador\Impresion\ContratoPersonaFisica.Designer.cs">
+      <DependentUpon>ContratoPersonaFisica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MiSuscripcion.aspx.cs">
+      <DependentUpon>MiSuscripcion.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MiSuscripcion.aspx.designer.cs">
+      <DependentUpon>MiSuscripcion.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="NumeroEnLetras.cs" />
+    <Compile Include="Comunity1.Master.cs">
+      <DependentUpon>Comunity1.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Comunity1.Master.designer.cs">
+      <DependentUpon>Comunity1.Master</DependentUpon>
+    </Compile>
+    <Compile Include="ContratistaM.Master.cs">
+      <DependentUpon>ContratistaM.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ContratistaM.Master.designer.cs">
+      <DependentUpon>ContratistaM.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Registrar.aspx.cs">
+      <DependentUpon>Registrar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Registrar.aspx.designer.cs">
+      <DependentUpon>Registrar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\botService.asmx.cs">
+      <DependentUpon>botService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Services\BotServices.cs" />
+    <Compile Include="Services\CalificacionesService.cs" />
+    <Compile Include="Services\ContratistasService.cs" />
+    <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\EmailSender.cs" />
+    <Compile Include="Services\EmpleadosService.cs" />
+    <Compile Include="Services\LoginService.asmx.cs">
+      <DependentUpon>LoginService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Services\PaymentService.cs" />
+    <Compile Include="Services\SuscripcionesService.cs" />
+    <Compile Include="Services\Utilitario.cs" />
+    <Compile Include="UserControls\abogadoBot.ascx.cs">
+      <DependentUpon>abogadoBot.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\abogadoBot.ascx.designer.cs">
+      <DependentUpon>abogadoBot.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FormularioContratacion.ascx.cs">
+      <DependentUpon>FormularioContratacion.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\FormularioContratacion.ascx.designer.cs">
+      <DependentUpon>FormularioContratacion.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FormularioEmpleado.ascx.cs">
+      <DependentUpon>FormularioEmpleado.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\FormularioEmpleado.ascx.designer.cs">
+      <DependentUpon>FormularioEmpleado.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Platform.Master.cs">
+      <DependentUpon>Platform.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Platform.Master.designer.cs">
+      <DependentUpon>Platform.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserControls\TerminosMiGente.ascx.cs">
+      <DependentUpon>TerminosMiGente.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\TerminosMiGente.ascx.designer.cs">
+      <DependentUpon>TerminosMiGente.ascx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\img\not-found.svg" />
+    <Content Include="assets\vendor\apexcharts\locales\ar.json" />
+    <Content Include="assets\vendor\apexcharts\locales\be-cyrl.json" />
+    <Content Include="assets\vendor\apexcharts\locales\be-latn.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ca.json" />
+    <Content Include="assets\vendor\apexcharts\locales\cs.json" />
+    <Content Include="assets\vendor\apexcharts\locales\da.json" />
+    <Content Include="assets\vendor\apexcharts\locales\de.json" />
+    <Content Include="assets\vendor\apexcharts\locales\el.json" />
+    <Content Include="assets\vendor\apexcharts\locales\en.json" />
+    <Content Include="assets\vendor\apexcharts\locales\es.json" />
+    <Content Include="assets\vendor\apexcharts\locales\et.json" />
+    <Content Include="assets\vendor\apexcharts\locales\fa.json" />
+    <Content Include="assets\vendor\apexcharts\locales\fi.json" />
+    <Content Include="assets\vendor\apexcharts\locales\fr.json" />
+    <Content Include="assets\vendor\apexcharts\locales\he.json" />
+    <Content Include="assets\vendor\apexcharts\locales\hi.json" />
+    <Content Include="assets\vendor\apexcharts\locales\hr.json" />
+    <Content Include="assets\vendor\apexcharts\locales\hu.json" />
+    <Content Include="assets\vendor\apexcharts\locales\hy.json" />
+    <Content Include="assets\vendor\apexcharts\locales\id.json" />
+    <Content Include="assets\vendor\apexcharts\locales\it.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ja.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ka.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ko.json" />
+    <Content Include="assets\vendor\apexcharts\locales\lt.json" />
+    <Content Include="assets\vendor\apexcharts\locales\lv.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ms.json" />
+    <Content Include="assets\vendor\apexcharts\locales\nb.json" />
+    <Content Include="assets\vendor\apexcharts\locales\nl.json" />
+    <Content Include="assets\vendor\apexcharts\locales\pl.json" />
+    <Content Include="assets\vendor\apexcharts\locales\pt-br.json" />
+    <Content Include="assets\vendor\apexcharts\locales\pt.json" />
+    <Content Include="assets\vendor\apexcharts\locales\rs.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ru.json" />
+    <Content Include="assets\vendor\apexcharts\locales\se.json" />
+    <Content Include="assets\vendor\apexcharts\locales\sk.json" />
+    <Content Include="assets\vendor\apexcharts\locales\sl.json" />
+    <Content Include="assets\vendor\apexcharts\locales\sq.json" />
+    <Content Include="assets\vendor\apexcharts\locales\th.json" />
+    <Content Include="assets\vendor\apexcharts\locales\tr.json" />
+    <Content Include="assets\vendor\apexcharts\locales\ua.json" />
+    <Content Include="assets\vendor\apexcharts\locales\vi.json" />
+    <Content Include="assets\vendor\apexcharts\locales\zh-cn.json" />
+    <Content Include="assets\vendor\apexcharts\locales\zh-tw.json" />
+    <Content Include="assets\vendor\bootstrap-icons\bootstrap-icons.json" />
+    <Content Include="assets\vendor\bootstrap-icons\bootstrap-icons.scss" />
+    <Content Include="assets\vendor\bootstrap-icons\fonts\bootstrap-icons.woff" />
+    <Content Include="assets\vendor\bootstrap-icons\fonts\bootstrap-icons.woff2" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.rtl.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-grid.rtl.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.rtl.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-reboot.rtl.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.rtl.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap-utilities.rtl.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.rtl.css.map" />
+    <Content Include="assets\vendor\bootstrap\css\bootstrap.rtl.min.css.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.bundle.js.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.bundle.min.js.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.esm.js.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.esm.min.js.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.js.map" />
+    <Content Include="assets\vendor\bootstrap\js\bootstrap.min.js.map" />
+    <Content Include="assets\vendor\boxicons\fonts\boxicons.eot" />
+    <Content Include="assets\vendor\boxicons\fonts\boxicons.svg" />
+    <Content Include="assets\vendor\boxicons\fonts\boxicons.ttf" />
+    <Content Include="assets\vendor\boxicons\fonts\boxicons.woff" />
+    <Content Include="assets\vendor\boxicons\fonts\boxicons.woff2" />
+    <Content Include="assets\vendor\chart.js\chart.cjs.map" />
+    <Content Include="assets\vendor\chart.js\chart.js.map" />
+    <Content Include="assets\vendor\chart.js\chart.umd.js.map" />
+    <Content Include="assets\vendor\chart.js\chunks\helpers.segment.cjs.map" />
+    <Content Include="assets\vendor\chart.js\chunks\helpers.segment.js.map" />
+    <Content Include="assets\vendor\chart.js\helpers.cjs.map" />
+    <Content Include="assets\vendor\chart.js\helpers.js.map" />
+    <Content Include="assets\vendor\echarts\echarts.common.js.map" />
+    <Content Include="assets\vendor\echarts\echarts.esm.js.map" />
+    <Content Include="assets\vendor\echarts\echarts.esm.mjs.map" />
+    <Content Include="assets\vendor\echarts\echarts.js.map" />
+    <Content Include="assets\vendor\echarts\echarts.simple.js.map" />
+    <Content Include="assets\vendor\echarts\extension\bmap.js.map" />
+    <Content Include="assets\vendor\echarts\extension\dataTool.js.map" />
+    <Content Include="assets\vendor\echarts\package.json" />
+    <Content Include="assets\vendor\quill\quill.bubble.css.map" />
+    <Content Include="assets\vendor\quill\quill.core.css.map" />
+    <Content Include="assets\vendor\quill\quill.core.js.map" />
+    <Content Include="assets\vendor\quill\quill.js.map" />
+    <Content Include="assets\vendor\quill\quill.snow.css.map" />
+    <Content Include="assets\vendor\remixicon\remixicon.eot" />
+    <Content Include="assets\vendor\remixicon\remixicon.glyph.json" />
+    <Content Include="assets\vendor\remixicon\remixicon.less" />
+    <Content Include="assets\vendor\remixicon\remixicon.svg" />
+    <Content Include="assets\vendor\remixicon\remixicon.symbol.svg" />
+    <Content Include="assets\vendor\remixicon\remixicon.ttf" />
+    <Content Include="assets\vendor\remixicon\remixicon.woff" />
+    <Content Include="assets\vendor\remixicon\remixicon.woff2" />
+    <Content Include="assets\vendor\tinymce\bower.json" />
+    <Content Include="assets\vendor\tinymce\CHANGELOG.md" />
+    <Content Include="assets\vendor\tinymce\composer.json" />
+    <Content Include="assets\vendor\tinymce\license.md" />
+    <Content Include="assets\vendor\tinymce\package.json" />
+    <Content Include="assets\vendor\tinymce\README.md" />
+    <EntityDeploy Include="Data\DataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Data\DataModel.edmx.diagram">
+      <DependentUpon>DataModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="Contratista\Comunity2.Master" />
+    <None Include="packages.config" />
+    <Content Include="Platform.Master" />
+    <Content Include="Comunity1.Master" />
+    <Content Include="ContratistaM.Master" />
+    <None Include="Properties\PublishProfiles\migente - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\migente-001-site4 - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\migente-001-site4 - Web Deploy.pubxml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.bar.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.bubble.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.doughnut.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.line.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.pie.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.polarArea.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.radar.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\controller.scatter.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\controllers\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.adapters.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.animation.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.animations.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.animations.defaults.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.animator.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.config.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.controller.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.datasetController.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.defaults.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.element.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.interaction.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.layouts.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.layouts.defaults.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.plugins.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.registry.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.scale.autoskip.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.scale.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.scale.defaults.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.ticks.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\core.typedRegistry.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\core\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\elements\element.arc.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\elements\element.bar.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\elements\element.line.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\elements\element.point.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\elements\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.canvas.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.collection.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.color.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.config.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.config.types.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.core.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.curve.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.dom.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.easing.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.extras.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.interpolation.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.intl.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.math.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.options.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.rtl.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\helpers.segment.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\helpers\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\index.umd.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\platform\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\platform\platform.base.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\platform\platform.basic.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\platform\platform.dom.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.colors.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.decimation.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.drawing.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.helper.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.options.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.segment.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.target.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\filler.target.stack.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.filler\simpleArc.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.legend.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.subtitle.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.title.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\plugins\plugin.tooltip.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.category.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.linear.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.linearbase.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.logarithmic.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.radialLinear.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.time.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\scales\scale.timeseries.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\animation.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\basic.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\color.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\geometric.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\index.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\layout.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\chart.js\types\utils.d.ts" />
+    <TypeScriptCompile Include="assets\vendor\tinymce\tinymce.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Empleador\Impresion\ContratoPersonaFisica.resx">
+      <DependentUpon>ContratoPersonaFisica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Images\Contratista\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>31479</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost:44358/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets" Condition="Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.19.225.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
