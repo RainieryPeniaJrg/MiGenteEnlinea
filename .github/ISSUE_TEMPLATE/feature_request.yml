@@ -1,0 +1,155 @@
+name: ✨ Solicitud de Feature
+description: Sugerir una nueva funcionalidad o mejora
+title: "[FEATURE]: "
+labels: ["enhancement", "needs-review"]
+assignees:
+  - RainieryPeniaJrg
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por sugerir una mejora para MiGente En Línea! 🚀
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo de Feature
+      description: Qué tipo de mejora estás proponiendo?
+      options:
+        - 🆕 Nueva Funcionalidad
+        - 🔧 Mejora de Funcionalidad Existente
+        - 🎨 Mejora de UI/UX
+        - ⚡ Optimización de Performance
+        - 🔒 Mejora de Seguridad
+        - 📚 Documentación
+        - 🏗️ Refactoring/Arquitectura
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Módulo
+      description: A qué módulo aplica este feature?
+      options:
+        - Autenticación
+        - Empleadores
+        - Contratistas
+        - Nómina
+        - Pagos (Cardnet)
+        - Suscripciones
+        - Abogado Virtual
+        - Reportes/PDFs
+        - Dashboard
+        - Configuración
+        - Infraestructura
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema o Necesidad
+      description: Describe el problema que este feature resolvería o la necesidad que cubriría
+      placeholder: |
+        Actualmente tenemos el problema de...
+        Los usuarios necesitan...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Describe cómo imaginas que funcionaría este feature
+      placeholder: |
+        La solución sería implementar...
+        El usuario podría...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Has considerado otras soluciones o workarounds?
+      placeholder: También consideré...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridad
+      description: Qué tan importante es este feature?
+      options:
+        - 🔴 Crítico - Bloqueante para negocio
+        - 🟡 Alto - Muy importante
+        - 🟢 Medio - Importante
+        - 🔵 Bajo - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-value
+    attributes:
+      label: Valor de Negocio
+      description: Qué valor aporta este feature al negocio o usuarios?
+      placeholder: |
+        - Aumentaría la satisfacción del usuario
+        - Reduciría tiempo de proceso
+        - Mejoraría la seguridad
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Criterios de Aceptación
+      description: Cómo sabremos que este feature está completo?
+      placeholder: |
+        - [ ] El usuario puede...
+        - [ ] El sistema valida...
+        - [ ] Se muestra un mensaje de...
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Notas Técnicas
+      description: Consideraciones técnicas, dependencias, o impacto en otros módulos
+      placeholder: |
+        - Requiere cambios en la base de datos
+        - Afecta el módulo de...
+        - Se necesita integración con...
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups o Wireframes
+      description: Si tienes diseños visuales, screenshots de referencia, o diagramas, agrégalos aquí
+      placeholder: Arrastra imágenes aquí...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Consideraciones de Seguridad
+      description: Este feature requiere consideraciones especiales de seguridad?
+      options:
+        - label: Este feature maneja datos sensibles
+        - label: Requiere autenticación/autorización especial
+        - label: Tiene implicaciones de seguridad
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Información Adicional
+      description: Cualquier otro contexto o información relevante
+    validations:
+      required: false
