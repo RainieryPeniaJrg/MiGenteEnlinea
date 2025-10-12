@@ -12,6 +12,7 @@ using MiGenteEnLinea.Domain.Entities.Pagos;
 using MiGenteEnLinea.Domain.Entities.Catalogos;
 using MiGenteEnLinea.Domain.Entities.Contrataciones;
 using MiGenteEnLinea.Domain.Entities.Seguridad;
+using MiGenteEnLinea.Domain.Entities.Configuracion;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -29,7 +30,11 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces Calificacione)
     public virtual DbSet<Calificacion> Calificaciones { get; set; }
 
-    public virtual DbSet<ConfigCorreo> ConfigCorreos { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.ConfigCorreo> ConfigCorreosLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy ConfigCorreo)
+    public virtual DbSet<Domain.Entities.Configuracion.ConfigCorreo> ConfigCorreos { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Contratista> ContratistasLegacy { get; set; }
@@ -85,7 +90,11 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces EmpleadorRecibosDetalle)
     public virtual DbSet<ReciboDetalle> RecibosDetalle { get; set; }
 
-    public virtual DbSet<EmpleadorRecibosDetalleContratacione> EmpleadorRecibosDetalleContrataciones { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosDetalleContratacione> EmpleadorRecibosDetalleContratacionesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy EmpleadorRecibosDetalleContratacione)
+    public virtual DbSet<Domain.Entities.Pagos.EmpleadorRecibosDetalleContratacione> EmpleadorRecibosDetalleContrataciones { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<EmpleadorRecibosHeader> EmpleadorRecibosHeadersLegacy { get; set; }
@@ -93,7 +102,11 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces EmpleadorRecibosHeader)
     public virtual DbSet<ReciboHeader> RecibosHeader { get; set; }
 
-    public virtual DbSet<EmpleadorRecibosHeaderContratacione> EmpleadorRecibosHeaderContrataciones { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosHeaderContratacione> EmpleadorRecibosHeaderContratacionesLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy EmpleadorRecibosHeaderContratacione)
+    public virtual DbSet<Domain.Entities.Pagos.EmpleadorRecibosHeaderContratacione> EmpleadorRecibosHeaderContrataciones { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<EmpleadosNota> EmpleadosNotasLegacy { get; set; }
@@ -146,7 +159,11 @@ public partial class MiGenteDbContext : DbContext
     // DDD Refactored entity (replaces PlanesEmpleadore)
     public virtual DbSet<PlanEmpleador> PlanesEmpleadores { get; set; }
 
-    public virtual DbSet<Provincia> Provincias { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Provincia> ProvinciasLegacy { get; set; }
+
+    // DDD Refactored entity (replaces legacy Provincia)
+    public virtual DbSet<Domain.Entities.Catalogos.Provincia> Provincias { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Sectore> SectoresLegacy { get; set; }
@@ -233,10 +250,11 @@ public partial class MiGenteDbContext : DbContext
         //     entity.HasOne(d => d.Pago).WithMany(p => p.EmpleadorRecibosDetalles).HasConstraintName("FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header");
         // });
 
-        modelBuilder.Entity<EmpleadorRecibosDetalleContratacione>(entity =>
-        {
-            entity.HasOne(d => d.Pago).WithMany(p => p.EmpleadorRecibosDetalleContrataciones).HasConstraintName("FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones");
-        });
+        // Legacy EmpleadorRecibosDetalleContratacione mapping (commented out - using DDD refactored version with Fluent API)
+        // modelBuilder.Entity<EmpleadorRecibosDetalleContratacione>(entity =>
+        // {
+        //     entity.HasOne(d => d.Pago).WithMany(p => p.EmpleadorRecibosDetalleContrataciones).HasConstraintName("FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones");
+        // });
 
         // Legacy EmpleadorRecibosHeader mapping (commented out - using refactored ReciboHeader version)
         // modelBuilder.Entity<EmpleadorRecibosHeader>(entity =>
@@ -244,10 +262,11 @@ public partial class MiGenteDbContext : DbContext
         //     entity.HasOne(d => d.Empleado).WithMany(p => p.EmpleadorRecibosHeaders).HasConstraintName("FK_Empleador_Recibos_Header_Empleados");
         // });
 
-        modelBuilder.Entity<EmpleadorRecibosHeaderContratacione>(entity =>
-        {
-            entity.HasOne(d => d.Contratacion).WithMany(p => p.EmpleadorRecibosHeaderContrataciones).HasConstraintName("FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales");
-        });
+        // Legacy EmpleadorRecibosHeaderContratacione mapping (commented out - using DDD refactored version with Fluent API)
+        // modelBuilder.Entity<EmpleadorRecibosHeaderContratacione>(entity =>
+        // {
+        //     entity.HasOne(d => d.Contratacion).WithMany(p => p.EmpleadorRecibosHeaderContrataciones).HasConstraintName("FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales");
+        // });
 
         // Legacy Ofertante mapping (commented out - using refactored Empleador version)
         // modelBuilder.Entity<Ofertante>(entity =>
