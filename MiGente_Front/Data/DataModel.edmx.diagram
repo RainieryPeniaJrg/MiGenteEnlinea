@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="7de684fbac964ca69316bcf90fcbdc24" Name="Diagram1" ZoomLevel="64">
+        <EntityTypeShape EntityType="migenteV2Model.Config_Correo" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Credenciales" Width="1.5" PointX="3.375" PointY="3.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Suscripciones" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Planes_empleadores" Width="1.5" PointX="0.75" PointY="7.5" />
+        <EntityTypeShape EntityType="migenteV2Model.sysdiagrams" Width="1.5" PointX="5.375" PointY="0.75" />
+        <AssociationConnector Association="migenteV2Model.FK_Suscripciones_Planes_empleadores" />
+        <EntityTypeShape EntityType="migenteV2Model.perfilesInfo" Width="1.5" PointX="3" PointY="6.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VPerfiles" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Ventas" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Planes_Contratistas" Width="1.5" PointX="7.375" PointY="4.75" />
+        <EntityTypeShape EntityType="migenteV2Model.PaymentGateway" Width="1.5" PointX="7.375" PointY="7.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Cuentas" Width="1.5" PointX="0.75" PointY="11" />
+        <AssociationConnector Association="migenteV2Model.FK_perfilesInfo_Cuentas" />
+        <EntityTypeShape EntityType="migenteV2Model.Empleados" Width="1.5" PointX="9.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Empleador_Recibos_Detalle" Width="1.5" PointX="13.875" PointY="3.625" />
+        <EntityTypeShape EntityType="migenteV2Model.Empleador_Recibos_Header" Width="1.5" PointX="11.625" PointY="3.25" />
+        <AssociationConnector Association="migenteV2Model.FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header" />
+        <AssociationConnector Association="migenteV2Model.FK_Empleador_Recibos_Header_Empleados" />
+        <EntityTypeShape EntityType="migenteV2Model.Remuneraciones" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Empleador_Recibos_Detalle_Contrataciones" Width="1.5" PointX="15" PointY="11" />
+        <EntityTypeShape EntityType="migenteV2Model.Empleador_Recibos_Header_Contrataciones" Width="2.125" PointX="11.625" PointY="11" />
+        <EntityTypeShape EntityType="migenteV2Model.EmpleadosTemporales" Width="1.5" PointX="9.375" PointY="10" />
+        <EntityTypeShape EntityType="migenteV2Model.Provincias" Width="1.5" PointX="5.375" PointY="10.75" />
+        <AssociationConnector Association="migenteV2Model.FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones" />
+        <AssociationConnector Association="migenteV2Model.FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales" />
+        <EntityTypeShape EntityType="migenteV2Model.Deducciones_TSS" Width="1.5" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VRecibosEmpleados" Width="1.5" PointX="11.375" PointY="6.75" />
+        <EntityTypeShape EntityType="migenteV2Model.DetalleContrataciones" Width="1.5" PointX="11.625" PointY="14.75" />
+        <AssociationConnector Association="migenteV2Model.FK_DetalleContrataciones_EmpleadosTemporales" />
+        <EntityTypeShape EntityType="migenteV2Model.Calificaciones" Width="1.5" PointX="3.375" PointY="13.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VContratacionesTemporales" Width="1.5" PointX="5.375" PointY="13.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VPagosContrataciones" Width="1.5" PointX="13.375" PointY="6.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VCalificaciones" Width="1.5" PointX="14.375" PointY="13.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VEmpleados" Width="1.5" PointX="0.75" PointY="15.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Contratistas" Width="1.5" PointX="7.375" PointY="15.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VContratistas" Width="1.5" PointX="16.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Contratistas_Fotos" Width="1.5" PointX="9.625" PointY="21.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Contratistas_Servicios" Width="1.5" PointX="9.625" PointY="19.25" />
+        <EntityTypeShape EntityType="migenteV2Model.Ofertantes" Width="1.5" PointX="15.375" PointY="6.75" />
+        <AssociationConnector Association="migenteV2Model.FK_Contratistas_Fotos_Contratistas" />
+        <AssociationConnector Association="migenteV2Model.FK_Contratistas_Servicios_Contratistas" />
+        <EntityTypeShape EntityType="migenteV2Model.Sectores" Width="1.5" PointX="13.375" PointY="0.75" />
+        <EntityTypeShape EntityType="migenteV2Model.Servicios" Width="1.5" PointX="16.375" PointY="13.75" />
+        <EntityTypeShape EntityType="migenteV2Model.VMisCalificaciones" Width="1.5" PointX="16.375" PointY="16.75" />
+        <EntityTypeShape EntityType="migenteV2Model.OpenAi_Config" Width="1.5" PointX="17.375" PointY="6.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

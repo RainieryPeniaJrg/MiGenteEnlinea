@@ -1,0 +1,2432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="migenteV2Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Calificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="calificacionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fecha" Type="datetime" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="tipo" Type="varchar" MaxLength="20" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="nombre" Type="varchar" MaxLength="100" />
+          <Property Name="puntualidad" Type="int" />
+          <Property Name="cumplimiento" Type="int" />
+          <Property Name="conocimientos" Type="int" />
+          <Property Name="recomendacion" Type="int" />
+        </EntityType>
+        <EntityType Name="Config_Correo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="email" Type="varchar" MaxLength="70" />
+          <Property Name="pass" Type="varchar" MaxLength="50" />
+          <Property Name="servidor" Type="varchar" MaxLength="50" />
+          <Property Name="puerto" Type="int" />
+        </EntityType>
+        <EntityType Name="Contratistas">
+          <Key>
+            <PropertyRef Name="contratistaID" />
+          </Key>
+          <Property Name="contratistaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fechaIngreso" Type="datetime" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="titulo" Type="varchar" MaxLength="70" />
+          <Property Name="tipo" Type="int" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="Nombre" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="sector" Type="varchar" MaxLength="40" />
+          <Property Name="experiencia" Type="int" />
+          <Property Name="presentacion" Type="varchar" MaxLength="250" />
+          <Property Name="telefono1" Type="varchar" MaxLength="16" />
+          <Property Name="whatsapp1" Type="bit" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="whatsapp2" Type="bit" />
+          <Property Name="email" Type="varchar" MaxLength="50" />
+          <Property Name="activo" Type="bit" />
+          <Property Name="provincia" Type="varchar" MaxLength="50" />
+          <Property Name="nivelNacional" Type="bit" />
+          <Property Name="imagenURL" Type="varchar" MaxLength="150" />
+        </EntityType>
+        <EntityType Name="Contratistas_Fotos">
+          <Key>
+            <PropertyRef Name="imagenID" />
+          </Key>
+          <Property Name="imagenID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="contratistaID" Type="int" />
+          <Property Name="imagenURL" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Contratistas_Servicios">
+          <Key>
+            <PropertyRef Name="servicioID" />
+          </Key>
+          <Property Name="servicioID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="contratistaID" Type="int" />
+          <Property Name="detalleServicio" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Credenciales">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="email" Type="varchar" MaxLength="100" />
+          <Property Name="password" Type="varchar(max)" />
+          <Property Name="activo" Type="bit" />
+        </EntityType>
+        <EntityType Name="Cuentas">
+          <Key>
+            <PropertyRef Name="cuentaID" />
+          </Key>
+          <Property Name="cuentaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fechaCreacion" Type="datetime" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="Tipo" Type="int" Nullable="false" />
+          <Property Name="Nombre" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="100" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="isActive" Type="bit" />
+        </EntityType>
+        <EntityType Name="Deducciones_TSS">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="descripcion" Type="varchar" MaxLength="50" />
+          <Property Name="porcentaje" Type="decimal" Precision="5" Scale="2" />
+        </EntityType>
+        <EntityType Name="DetalleContrataciones">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="contratacionID" Type="int" />
+          <Property Name="descripcionCorta" Type="varchar" MaxLength="60" />
+          <Property Name="descripcionAmpliada" Type="varchar" MaxLength="250" />
+          <Property Name="fechaInicio" Type="date" />
+          <Property Name="fechaFinal" Type="date" />
+          <Property Name="montoAcordado" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="esquemaPagos" Type="varchar" MaxLength="50" />
+          <Property Name="estatus" Type="int" />
+          <Property Name="calificado" Type="bit" />
+          <Property Name="calificacionID" Type="int" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Detalle">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="pagoID" Type="int" />
+          <Property Name="Concepto" Type="varchar" MaxLength="90" />
+          <Property Name="Monto" Type="decimal" Precision="10" Scale="2" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Detalle_Contrataciones">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="pagoID" Type="int" />
+          <Property Name="Concepto" Type="varchar" MaxLength="90" />
+          <Property Name="Monto" Type="decimal" Precision="10" Scale="2" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Header">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="empleadoID" Type="int" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaPago" Type="datetime" />
+          <Property Name="conceptoPago" Type="varchar" MaxLength="50" />
+          <Property Name="tipo" Type="int" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Header_Contrataciones">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="contratacionID" Type="int" />
+          <Property Name="detalleID" Type="int" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaPago" Type="datetime" />
+          <Property Name="conceptoPago" Type="varchar" MaxLength="50" />
+          <Property Name="tipo" Type="int" />
+        </EntityType>
+        <EntityType Name="Empleados">
+          <Key>
+            <PropertyRef Name="empleadoID" />
+          </Key>
+          <Property Name="empleadoID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaInicio" Type="date" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="Nombre" Type="varchar" MaxLength="50" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="alias" Type="varchar" MaxLength="20" />
+          <Property Name="nacimiento" Type="date" />
+          <Property Name="estadoCivil" Type="int" />
+          <Property Name="direccion" Type="varchar" MaxLength="250" />
+          <Property Name="provincia" Type="varchar" MaxLength="50" />
+          <Property Name="municipio" Type="varchar" MaxLength="20" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="posicion" Type="varchar" MaxLength="50" />
+          <Property Name="salario" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="periodoPago" Type="int" />
+          <Property Name="contactoEmergencia" Type="varchar" MaxLength="50" />
+          <Property Name="telefonoEmergencia" Type="varchar" MaxLength="20" />
+          <Property Name="contrato" Type="bit" />
+          <Property Name="remuneracionExtra1" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra1" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra2" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra2" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra3" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra3" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="tss" Type="bit" />
+          <Property Name="diasPago" Type="int" />
+          <Property Name="Activo" Type="bit" />
+          <Property Name="fechaSalida" Type="datetime" />
+          <Property Name="motivoBaja" Type="varchar" MaxLength="20" />
+          <Property Name="prestaciones" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="foto" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="EmpleadosTemporales">
+          <Key>
+            <PropertyRef Name="contratacionID" />
+          </Key>
+          <Property Name="contratacionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar" MaxLength="100" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="tipo" Type="int" />
+          <Property Name="nombreComercial" Type="varchar" MaxLength="50" />
+          <Property Name="rnc" Type="varchar" MaxLength="20" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" />
+          <Property Name="apellido" Type="varchar" MaxLength="50" />
+          <Property Name="alias" Type="varchar" MaxLength="20" />
+          <Property Name="nombreRepresentante" Type="varchar" MaxLength="50" />
+          <Property Name="cedulaRepresentante" Type="varchar" MaxLength="20" />
+          <Property Name="direccion" Type="varchar" MaxLength="250" />
+          <Property Name="provincia" Type="varchar" MaxLength="20" />
+          <Property Name="municipio" Type="varchar" MaxLength="20" />
+          <Property Name="telefono1" Type="varchar" MaxLength="18" />
+          <Property Name="telefono2" Type="varchar" MaxLength="18" />
+          <Property Name="foto" Type="varchar(max)" />
+        </EntityType>
+        <EntityType Name="Ofertantes">
+          <Key>
+            <PropertyRef Name="ofertanteID" />
+          </Key>
+          <Property Name="ofertanteID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fechaPublicacion" Type="datetime" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="habilidades" Type="varchar" MaxLength="200" />
+          <Property Name="experiencia" Type="varchar" MaxLength="200" />
+          <Property Name="descripcion" Type="varchar" MaxLength="500" />
+          <Property Name="foto" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="OpenAi_Config">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="OpenAIApiKey" Type="varchar" MaxLength="250" />
+          <Property Name="OpenAIApiUrl" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="PaymentGateway">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="test" Type="bit" />
+          <Property Name="productionURL" Type="varchar" MaxLength="150" />
+          <Property Name="testURL" Type="varchar" MaxLength="150" />
+          <Property Name="merchantID" Type="varchar" MaxLength="20" />
+          <Property Name="terminalID" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="perfilesInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="cuentaID" Type="int" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="tipoIdentificacion" Type="int" />
+          <Property Name="nombreComercial" Type="varchar" MaxLength="50" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="direccion" Type="text" />
+          <Property Name="fotoPerfil" Type="varbinary(max)" />
+          <Property Name="presentacion" Type="text" />
+          <Property Name="cedulaGerente" Type="varchar" MaxLength="20" />
+          <Property Name="nombreGerente" Type="varchar" MaxLength="50" />
+          <Property Name="apellidoGerente" Type="varchar" MaxLength="50" />
+          <Property Name="direccionGerente" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Planes_Contratistas">
+          <Key>
+            <PropertyRef Name="planID" />
+          </Key>
+          <Property Name="planID" Type="int" Nullable="false" />
+          <Property Name="nombrePlan" Type="varchar" MaxLength="50" />
+          <Property Name="precio" Type="decimal" Precision="10" Scale="2" />
+        </EntityType>
+        <EntityType Name="Planes_empleadores">
+          <Key>
+            <PropertyRef Name="planID" />
+          </Key>
+          <Property Name="planID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="20" />
+          <Property Name="precio" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="empleados" Type="int" />
+          <Property Name="historico" Type="int" />
+          <Property Name="nomina" Type="bit" />
+        </EntityType>
+        <EntityType Name="Provincias">
+          <Key>
+            <PropertyRef Name="provinciaID" />
+          </Key>
+          <Property Name="provinciaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Remuneraciones">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="empleadoID" Type="int" />
+          <Property Name="userID" Type="varchar" MaxLength="150" />
+          <Property Name="descripcion" Type="varchar" MaxLength="150" />
+          <Property Name="monto" Type="decimal" Precision="18" Scale="2" />
+        </EntityType>
+        <EntityType Name="Sectores">
+          <Key>
+            <PropertyRef Name="sectorID" />
+          </Key>
+          <Property Name="sectorID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sector" Type="varchar" MaxLength="60" />
+        </EntityType>
+        <EntityType Name="Servicios">
+          <Key>
+            <PropertyRef Name="servicioID" />
+          </Key>
+          <Property Name="servicioID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="descripcion" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Suscripciones">
+          <Key>
+            <PropertyRef Name="suscripcionID" />
+          </Key>
+          <Property Name="suscripcionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="planID" Type="int" />
+          <Property Name="vencimiento" Type="date" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="Ventas">
+          <Key>
+            <PropertyRef Name="ventaID" />
+          </Key>
+          <Property Name="ventaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="fecha" Type="datetime" />
+          <Property Name="metodo" Type="int" />
+          <Property Name="planID" Type="int" />
+          <Property Name="precio" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="comentario" Type="varchar(max)" />
+          <Property Name="idTransaccion" Type="varchar" MaxLength="100" />
+          <Property Name="idempotencyKey" Type="varchar" MaxLength="100" />
+          <Property Name="card" Type="varchar" MaxLength="20" />
+          <Property Name="ip" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VCalificaciones' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VCalificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="calificacionID" Type="int" Nullable="false" />
+          <Property Name="fecha" Type="datetime" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="tipo" Type="varchar" MaxLength="20" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="nombre" Type="varchar" MaxLength="100" />
+          <Property Name="puntualidad" Type="int" />
+          <Property Name="cumplimiento" Type="int" />
+          <Property Name="conocimientos" Type="int" />
+          <Property Name="recomendacion" Type="int" />
+          <Property Name="cuentaID" Type="int" />
+          <Property Name="fechaCreacion" Type="datetime" />
+          <Property Name="Expr1" Type="varchar(max)" />
+          <Property Name="Expr2" Type="int" />
+          <Property Name="Expr3" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="100" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VContratacionesTemporales' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VContratacionesTemporales">
+          <Key>
+            <PropertyRef Name="contratacionID" />
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="contratacionID" Type="int" Nullable="false" />
+          <Property Name="userID" Type="varchar" MaxLength="100" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="tipo" Type="int" />
+          <Property Name="nombreComercial" Type="varchar" MaxLength="50" />
+          <Property Name="rnc" Type="varchar" MaxLength="20" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="nombre" Type="varchar" MaxLength="50" />
+          <Property Name="apellido" Type="varchar" MaxLength="50" />
+          <Property Name="alias" Type="varchar" MaxLength="20" />
+          <Property Name="direccion" Type="varchar" MaxLength="250" />
+          <Property Name="provincia" Type="varchar" MaxLength="20" />
+          <Property Name="municipio" Type="varchar" MaxLength="20" />
+          <Property Name="telefono1" Type="varchar" MaxLength="18" />
+          <Property Name="telefono2" Type="varchar" MaxLength="18" />
+          <Property Name="detalleID" Type="int" Nullable="false" />
+          <Property Name="Expr1" Type="int" />
+          <Property Name="descripcionCorta" Type="varchar" MaxLength="60" />
+          <Property Name="descripcionAmpliada" Type="varchar" MaxLength="250" />
+          <Property Name="fechaInicio" Type="date" />
+          <Property Name="fechaFinal" Type="date" />
+          <Property Name="montoAcordado" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="esquemaPagos" Type="varchar" MaxLength="50" />
+          <Property Name="estatus" Type="int" />
+          <Property Name="composicionNombre" Type="varchar" MaxLength="101" />
+          <Property Name="composicionID" Type="varchar" MaxLength="20" />
+          <Property Name="conocimientos" Type="int" />
+          <Property Name="puntualidad" Type="int" />
+          <Property Name="recomendacion" Type="int" />
+          <Property Name="cumplimiento" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VContratistas' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VContratistas">
+          <Key>
+            <PropertyRef Name="contratistaID" />
+            <PropertyRef Name="calificacion" />
+            <PropertyRef Name="total_registros" />
+          </Key>
+          <Property Name="contratistaID" Type="int" Nullable="false" />
+          <Property Name="fechaIngreso" Type="datetime" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="titulo" Type="varchar" MaxLength="70" />
+          <Property Name="tipo" Type="int" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="Nombre" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="sector" Type="varchar" MaxLength="40" />
+          <Property Name="experiencia" Type="int" />
+          <Property Name="presentacion" Type="varchar" MaxLength="250" />
+          <Property Name="telefono1" Type="varchar" MaxLength="16" />
+          <Property Name="whatsapp1" Type="bit" />
+          <Property Name="whatsapp2" Type="bit" />
+          <Property Name="email" Type="varchar" MaxLength="50" />
+          <Property Name="activo" Type="bit" />
+          <Property Name="provincia" Type="varchar" MaxLength="50" />
+          <Property Name="nivelNacional" Type="bit" />
+          <Property Name="calificacion" Type="decimal" Precision="10" Scale="2" Nullable="false" />
+          <Property Name="total_registros" Type="int" Nullable="false" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="imagenURL" Type="varchar" MaxLength="150" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VEmpleados' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VEmpleados">
+          <Key>
+            <PropertyRef Name="empleadoID" />
+          </Key>
+          <Property Name="empleadoID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaInicio" Type="date" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="Nombre" Type="varchar" MaxLength="101" />
+          <Property Name="nacimiento" Type="date" />
+          <Property Name="direccion" Type="varchar" MaxLength="250" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="salario" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="periodoPago" Type="int" />
+          <Property Name="contrato" Type="bit" />
+          <Property Name="Activo" Type="bit" />
+          <Property Name="alias" Type="varchar" MaxLength="20" />
+          <Property Name="estadoCivil" Type="int" />
+          <Property Name="provincia" Type="varchar" MaxLength="50" />
+          <Property Name="municipio" Type="varchar" MaxLength="20" />
+          <Property Name="posicion" Type="varchar" MaxLength="50" />
+          <Property Name="contactoEmergencia" Type="varchar" MaxLength="50" />
+          <Property Name="telefonoEmergencia" Type="varchar" MaxLength="20" />
+          <Property Name="remuneracionExtra1" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra1" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra2" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra2" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra3" Type="varchar" MaxLength="100" />
+          <Property Name="montoExtra3" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="tss" Type="bit" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VMisCalificaciones' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VMisCalificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="NombreCalificador" Type="varchar" MaxLength="70" />
+          <Property Name="idCalificador" Type="varchar" MaxLength="20" />
+          <Property Name="calificacionID" Type="int" Nullable="false" />
+          <Property Name="fecha" Type="datetime" />
+          <Property Name="userID" Type="varchar" MaxLength="250" />
+          <Property Name="tipo" Type="varchar" MaxLength="20" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="nombre" Type="varchar" MaxLength="100" />
+          <Property Name="puntualidad" Type="int" />
+          <Property Name="cumplimiento" Type="int" />
+          <Property Name="conocimientos" Type="int" />
+          <Property Name="recomendacion" Type="int" />
+          <Property Name="cuentaID" Type="int" />
+          <Property Name="fechaCreacion" Type="datetime" />
+          <Property Name="Expr1" Type="varchar(max)" />
+          <Property Name="Expr2" Type="int" />
+          <Property Name="Expr3" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="100" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VPagosContrataciones' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VPagosContrataciones">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="int" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaPago" Type="datetime" />
+          <Property Name="Expr1" Type="varchar" MaxLength="18" />
+          <Property Name="Monto" Type="decimal" Precision="38" Scale="2" />
+          <Property Name="contratacionID" Type="int" />
+          <Property Name="detalleID" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VPerfiles' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VPerfiles">
+          <Key>
+            <PropertyRef Name="cuentaID" />
+          </Key>
+          <Property Name="cuentaID" Type="int" Nullable="false" />
+          <Property Name="fechaCreacion" Type="datetime" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="Tipo" Type="int" />
+          <Property Name="Nombre" Type="varchar" MaxLength="20" />
+          <Property Name="Apellido" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="100" />
+          <Property Name="telefono1" Type="varchar" MaxLength="20" />
+          <Property Name="telefono2" Type="varchar" MaxLength="20" />
+          <Property Name="id" Type="int" />
+          <Property Name="tipoIdentificacion" Type="int" />
+          <Property Name="identificacion" Type="varchar" MaxLength="20" />
+          <Property Name="direccion" Type="text" />
+          <Property Name="fotoPerfil" Type="varbinary(max)" />
+          <Property Name="presentacion" Type="text" />
+          <Property Name="nombreComercial" Type="varchar" MaxLength="50" />
+          <Property Name="cedulaGerente" Type="varchar" MaxLength="20" />
+          <Property Name="nombreGerente" Type="varchar" MaxLength="50" />
+          <Property Name="apellidoGerente" Type="varchar" MaxLength="50" />
+          <Property Name="direccionGerente" Type="varchar" MaxLength="250" />
+          <Property Name="emailUsuario" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'migenteV2.dbo.VRecibosEmpleados' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="VRecibosEmpleados">
+          <Key>
+            <PropertyRef Name="pagoID" />
+            <PropertyRef Name="Tipo" />
+          </Key>
+          <Property Name="Total" Type="decimal" Precision="38" Scale="2" />
+          <Property Name="pagoID" Type="int" Nullable="false" />
+          <Property Name="userID" Type="varchar(max)" />
+          <Property Name="empleadoID" Type="int" />
+          <Property Name="fechaRegistro" Type="datetime" />
+          <Property Name="fechaPago" Type="datetime" />
+          <Property Name="conceptoPago" Type="varchar" MaxLength="50" />
+          <Property Name="Tipo" Type="varchar" MaxLength="19" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Contratistas_Fotos_Contratistas">
+          <End Role="Contratistas" Type="Self.Contratistas" Multiplicity="0..1" />
+          <End Role="Contratistas_Fotos" Type="Self.Contratistas_Fotos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Contratistas">
+              <PropertyRef Name="contratistaID" />
+            </Principal>
+            <Dependent Role="Contratistas_Fotos">
+              <PropertyRef Name="contratistaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Contratistas_Servicios_Contratistas">
+          <End Role="Contratistas" Type="Self.Contratistas" Multiplicity="0..1" />
+          <End Role="Contratistas_Servicios" Type="Self.Contratistas_Servicios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Contratistas">
+              <PropertyRef Name="contratistaID" />
+            </Principal>
+            <Dependent Role="Contratistas_Servicios">
+              <PropertyRef Name="contratistaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleContrataciones_EmpleadosTemporales">
+          <End Role="EmpleadosTemporales" Type="Self.EmpleadosTemporales" Multiplicity="0..1" />
+          <End Role="DetalleContrataciones" Type="Self.DetalleContrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmpleadosTemporales">
+              <PropertyRef Name="contratacionID" />
+            </Principal>
+            <Dependent Role="DetalleContrataciones">
+              <PropertyRef Name="contratacionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones">
+          <End Role="Empleador_Recibos_Header_Contrataciones" Type="Self.Empleador_Recibos_Header_Contrataciones" Multiplicity="0..1" />
+          <End Role="Empleador_Recibos_Detalle_Contrataciones" Type="Self.Empleador_Recibos_Detalle_Contrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleador_Recibos_Header_Contrataciones">
+              <PropertyRef Name="pagoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Detalle_Contrataciones">
+              <PropertyRef Name="pagoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header">
+          <End Role="Empleador_Recibos_Header" Type="Self.Empleador_Recibos_Header" Multiplicity="0..1" />
+          <End Role="Empleador_Recibos_Detalle" Type="Self.Empleador_Recibos_Detalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleador_Recibos_Header">
+              <PropertyRef Name="pagoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Detalle">
+              <PropertyRef Name="pagoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales">
+          <End Role="EmpleadosTemporales" Type="Self.EmpleadosTemporales" Multiplicity="0..1" />
+          <End Role="Empleador_Recibos_Header_Contrataciones" Type="Self.Empleador_Recibos_Header_Contrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmpleadosTemporales">
+              <PropertyRef Name="contratacionID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Header_Contrataciones">
+              <PropertyRef Name="contratacionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Header_Empleados">
+          <End Role="Empleados" Type="Self.Empleados" Multiplicity="0..1" />
+          <End Role="Empleador_Recibos_Header" Type="Self.Empleador_Recibos_Header" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleados">
+              <PropertyRef Name="empleadoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Header">
+              <PropertyRef Name="empleadoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_perfilesInfo_Cuentas">
+          <End Role="Cuentas" Type="Self.Cuentas" Multiplicity="0..1" />
+          <End Role="perfilesInfo" Type="Self.perfilesInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuentas">
+              <PropertyRef Name="cuentaID" />
+            </Principal>
+            <Dependent Role="perfilesInfo">
+              <PropertyRef Name="cuentaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suscripciones_Planes_empleadores">
+          <End Role="Planes_empleadores" Type="Self.Planes_empleadores" Multiplicity="0..1" />
+          <End Role="Suscripciones" Type="Self.Suscripciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Planes_empleadores">
+              <PropertyRef Name="planID" />
+            </Principal>
+            <Dependent Role="Suscripciones">
+              <PropertyRef Name="planID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="ObtenerSuscripcion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="userID" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="sp_MisCalificaciones" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="identificacion" Type="varchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="migenteV2ModelStoreContainer">
+          <EntitySet Name="Calificaciones" EntityType="Self.Calificaciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Config_Correo" EntityType="Self.Config_Correo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Contratistas" EntityType="Self.Contratistas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Contratistas_Fotos" EntityType="Self.Contratistas_Fotos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Contratistas_Servicios" EntityType="Self.Contratistas_Servicios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Credenciales" EntityType="Self.Credenciales" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Cuentas" EntityType="Self.Cuentas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Deducciones_TSS" EntityType="Self.Deducciones_TSS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DetalleContrataciones" EntityType="Self.DetalleContrataciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Empleador_Recibos_Detalle" EntityType="Self.Empleador_Recibos_Detalle" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Empleador_Recibos_Detalle_Contrataciones" EntityType="Self.Empleador_Recibos_Detalle_Contrataciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Empleador_Recibos_Header" EntityType="Self.Empleador_Recibos_Header" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Empleador_Recibos_Header_Contrataciones" EntityType="Self.Empleador_Recibos_Header_Contrataciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Empleados" EntityType="Self.Empleados" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmpleadosTemporales" EntityType="Self.EmpleadosTemporales" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ofertantes" EntityType="Self.Ofertantes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OpenAi_Config" EntityType="Self.OpenAi_Config" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PaymentGateway" EntityType="Self.PaymentGateway" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="perfilesInfo" EntityType="Self.perfilesInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Planes_Contratistas" EntityType="Self.Planes_Contratistas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Planes_empleadores" EntityType="Self.Planes_empleadores" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Provincias" EntityType="Self.Provincias" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Remuneraciones" EntityType="Self.Remuneraciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Sectores" EntityType="Self.Sectores" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Servicios" EntityType="Self.Servicios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Suscripciones" EntityType="Self.Suscripciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ventas" EntityType="Self.Ventas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VCalificaciones" EntityType="Self.VCalificaciones" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VCalificaciones].[calificacionID] AS [calificacionID], 
+    [VCalificaciones].[fecha] AS [fecha], 
+    [VCalificaciones].[userID] AS [userID], 
+    [VCalificaciones].[tipo] AS [tipo], 
+    [VCalificaciones].[identificacion] AS [identificacion], 
+    [VCalificaciones].[nombre] AS [nombre], 
+    [VCalificaciones].[puntualidad] AS [puntualidad], 
+    [VCalificaciones].[cumplimiento] AS [cumplimiento], 
+    [VCalificaciones].[conocimientos] AS [conocimientos], 
+    [VCalificaciones].[recomendacion] AS [recomendacion], 
+    [VCalificaciones].[cuentaID] AS [cuentaID], 
+    [VCalificaciones].[fechaCreacion] AS [fechaCreacion], 
+    [VCalificaciones].[Expr1] AS [Expr1], 
+    [VCalificaciones].[Expr2] AS [Expr2], 
+    [VCalificaciones].[Expr3] AS [Expr3], 
+    [VCalificaciones].[Apellido] AS [Apellido], 
+    [VCalificaciones].[Email] AS [Email], 
+    [VCalificaciones].[telefono1] AS [telefono1], 
+    [VCalificaciones].[telefono2] AS [telefono2]
+    FROM [dbo].[VCalificaciones] AS [VCalificaciones]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VContratacionesTemporales" EntityType="Self.VContratacionesTemporales" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VContratacionesTemporales].[contratacionID] AS [contratacionID], 
+    [VContratacionesTemporales].[userID] AS [userID], 
+    [VContratacionesTemporales].[fechaRegistro] AS [fechaRegistro], 
+    [VContratacionesTemporales].[tipo] AS [tipo], 
+    [VContratacionesTemporales].[nombreComercial] AS [nombreComercial], 
+    [VContratacionesTemporales].[rnc] AS [rnc], 
+    [VContratacionesTemporales].[identificacion] AS [identificacion], 
+    [VContratacionesTemporales].[nombre] AS [nombre], 
+    [VContratacionesTemporales].[apellido] AS [apellido], 
+    [VContratacionesTemporales].[alias] AS [alias], 
+    [VContratacionesTemporales].[direccion] AS [direccion], 
+    [VContratacionesTemporales].[provincia] AS [provincia], 
+    [VContratacionesTemporales].[municipio] AS [municipio], 
+    [VContratacionesTemporales].[telefono1] AS [telefono1], 
+    [VContratacionesTemporales].[telefono2] AS [telefono2], 
+    [VContratacionesTemporales].[detalleID] AS [detalleID], 
+    [VContratacionesTemporales].[Expr1] AS [Expr1], 
+    [VContratacionesTemporales].[descripcionCorta] AS [descripcionCorta], 
+    [VContratacionesTemporales].[descripcionAmpliada] AS [descripcionAmpliada], 
+    [VContratacionesTemporales].[fechaInicio] AS [fechaInicio], 
+    [VContratacionesTemporales].[fechaFinal] AS [fechaFinal], 
+    [VContratacionesTemporales].[montoAcordado] AS [montoAcordado], 
+    [VContratacionesTemporales].[esquemaPagos] AS [esquemaPagos], 
+    [VContratacionesTemporales].[estatus] AS [estatus], 
+    [VContratacionesTemporales].[composicionNombre] AS [composicionNombre], 
+    [VContratacionesTemporales].[composicionID] AS [composicionID], 
+    [VContratacionesTemporales].[conocimientos] AS [conocimientos], 
+    [VContratacionesTemporales].[puntualidad] AS [puntualidad], 
+    [VContratacionesTemporales].[recomendacion] AS [recomendacion], 
+    [VContratacionesTemporales].[cumplimiento] AS [cumplimiento]
+    FROM [dbo].[VContratacionesTemporales] AS [VContratacionesTemporales]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VContratistas" EntityType="Self.VContratistas" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VContratistas].[contratistaID] AS [contratistaID], 
+    [VContratistas].[fechaIngreso] AS [fechaIngreso], 
+    [VContratistas].[userID] AS [userID], 
+    [VContratistas].[titulo] AS [titulo], 
+    [VContratistas].[tipo] AS [tipo], 
+    [VContratistas].[identificacion] AS [identificacion], 
+    [VContratistas].[Nombre] AS [Nombre], 
+    [VContratistas].[Apellido] AS [Apellido], 
+    [VContratistas].[sector] AS [sector], 
+    [VContratistas].[experiencia] AS [experiencia], 
+    [VContratistas].[presentacion] AS [presentacion], 
+    [VContratistas].[telefono1] AS [telefono1], 
+    [VContratistas].[whatsapp1] AS [whatsapp1], 
+    [VContratistas].[whatsapp2] AS [whatsapp2], 
+    [VContratistas].[email] AS [email], 
+    [VContratistas].[activo] AS [activo], 
+    [VContratistas].[provincia] AS [provincia], 
+    [VContratistas].[nivelNacional] AS [nivelNacional], 
+    [VContratistas].[calificacion] AS [calificacion], 
+    [VContratistas].[total_registros] AS [total_registros], 
+    [VContratistas].[telefono2] AS [telefono2], 
+    [VContratistas].[imagenURL] AS [imagenURL]
+    FROM [dbo].[VContratistas] AS [VContratistas]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VEmpleados" EntityType="Self.VEmpleados" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VEmpleados].[empleadoID] AS [empleadoID], 
+    [VEmpleados].[userID] AS [userID], 
+    [VEmpleados].[fechaRegistro] AS [fechaRegistro], 
+    [VEmpleados].[fechaInicio] AS [fechaInicio], 
+    [VEmpleados].[identificacion] AS [identificacion], 
+    [VEmpleados].[Nombre] AS [Nombre], 
+    [VEmpleados].[nacimiento] AS [nacimiento], 
+    [VEmpleados].[direccion] AS [direccion], 
+    [VEmpleados].[telefono1] AS [telefono1], 
+    [VEmpleados].[telefono2] AS [telefono2], 
+    [VEmpleados].[salario] AS [salario], 
+    [VEmpleados].[periodoPago] AS [periodoPago], 
+    [VEmpleados].[contrato] AS [contrato], 
+    [VEmpleados].[Activo] AS [Activo], 
+    [VEmpleados].[alias] AS [alias], 
+    [VEmpleados].[estadoCivil] AS [estadoCivil], 
+    [VEmpleados].[provincia] AS [provincia], 
+    [VEmpleados].[municipio] AS [municipio], 
+    [VEmpleados].[posicion] AS [posicion], 
+    [VEmpleados].[contactoEmergencia] AS [contactoEmergencia], 
+    [VEmpleados].[telefonoEmergencia] AS [telefonoEmergencia], 
+    [VEmpleados].[remuneracionExtra1] AS [remuneracionExtra1], 
+    [VEmpleados].[montoExtra1] AS [montoExtra1], 
+    [VEmpleados].[remuneracionExtra2] AS [remuneracionExtra2], 
+    [VEmpleados].[montoExtra2] AS [montoExtra2], 
+    [VEmpleados].[remuneracionExtra3] AS [remuneracionExtra3], 
+    [VEmpleados].[montoExtra3] AS [montoExtra3], 
+    [VEmpleados].[tss] AS [tss]
+    FROM [dbo].[VEmpleados] AS [VEmpleados]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VMisCalificaciones" EntityType="Self.VMisCalificaciones" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VMisCalificaciones].[NombreCalificador] AS [NombreCalificador], 
+    [VMisCalificaciones].[idCalificador] AS [idCalificador], 
+    [VMisCalificaciones].[calificacionID] AS [calificacionID], 
+    [VMisCalificaciones].[fecha] AS [fecha], 
+    [VMisCalificaciones].[userID] AS [userID], 
+    [VMisCalificaciones].[tipo] AS [tipo], 
+    [VMisCalificaciones].[identificacion] AS [identificacion], 
+    [VMisCalificaciones].[nombre] AS [nombre], 
+    [VMisCalificaciones].[puntualidad] AS [puntualidad], 
+    [VMisCalificaciones].[cumplimiento] AS [cumplimiento], 
+    [VMisCalificaciones].[conocimientos] AS [conocimientos], 
+    [VMisCalificaciones].[recomendacion] AS [recomendacion], 
+    [VMisCalificaciones].[cuentaID] AS [cuentaID], 
+    [VMisCalificaciones].[fechaCreacion] AS [fechaCreacion], 
+    [VMisCalificaciones].[Expr1] AS [Expr1], 
+    [VMisCalificaciones].[Expr2] AS [Expr2], 
+    [VMisCalificaciones].[Expr3] AS [Expr3], 
+    [VMisCalificaciones].[Apellido] AS [Apellido], 
+    [VMisCalificaciones].[Email] AS [Email], 
+    [VMisCalificaciones].[telefono1] AS [telefono1], 
+    [VMisCalificaciones].[telefono2] AS [telefono2]
+    FROM [dbo].[VMisCalificaciones] AS [VMisCalificaciones]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VPagosContrataciones" EntityType="Self.VPagosContrataciones" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VPagosContrataciones].[pagoID] AS [pagoID], 
+    [VPagosContrataciones].[userID] AS [userID], 
+    [VPagosContrataciones].[fechaRegistro] AS [fechaRegistro], 
+    [VPagosContrataciones].[fechaPago] AS [fechaPago], 
+    [VPagosContrataciones].[Expr1] AS [Expr1], 
+    [VPagosContrataciones].[Monto] AS [Monto], 
+    [VPagosContrataciones].[contratacionID] AS [contratacionID], 
+    [VPagosContrataciones].[detalleID] AS [detalleID]
+    FROM [dbo].[VPagosContrataciones] AS [VPagosContrataciones]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VPerfiles" EntityType="Self.VPerfiles" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VPerfiles].[cuentaID] AS [cuentaID], 
+    [VPerfiles].[fechaCreacion] AS [fechaCreacion], 
+    [VPerfiles].[userID] AS [userID], 
+    [VPerfiles].[Tipo] AS [Tipo], 
+    [VPerfiles].[Nombre] AS [Nombre], 
+    [VPerfiles].[Apellido] AS [Apellido], 
+    [VPerfiles].[Email] AS [Email], 
+    [VPerfiles].[telefono1] AS [telefono1], 
+    [VPerfiles].[telefono2] AS [telefono2], 
+    [VPerfiles].[id] AS [id], 
+    [VPerfiles].[tipoIdentificacion] AS [tipoIdentificacion], 
+    [VPerfiles].[identificacion] AS [identificacion], 
+    [VPerfiles].[direccion] AS [direccion], 
+    [VPerfiles].[fotoPerfil] AS [fotoPerfil], 
+    [VPerfiles].[presentacion] AS [presentacion], 
+    [VPerfiles].[nombreComercial] AS [nombreComercial], 
+    [VPerfiles].[cedulaGerente] AS [cedulaGerente], 
+    [VPerfiles].[nombreGerente] AS [nombreGerente], 
+    [VPerfiles].[apellidoGerente] AS [apellidoGerente], 
+    [VPerfiles].[direccionGerente] AS [direccionGerente], 
+    [VPerfiles].[emailUsuario] AS [emailUsuario]
+    FROM [dbo].[VPerfiles] AS [VPerfiles]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="VRecibosEmpleados" EntityType="Self.VRecibosEmpleados" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [VRecibosEmpleados].[Total] AS [Total], 
+    [VRecibosEmpleados].[pagoID] AS [pagoID], 
+    [VRecibosEmpleados].[userID] AS [userID], 
+    [VRecibosEmpleados].[empleadoID] AS [empleadoID], 
+    [VRecibosEmpleados].[fechaRegistro] AS [fechaRegistro], 
+    [VRecibosEmpleados].[fechaPago] AS [fechaPago], 
+    [VRecibosEmpleados].[conceptoPago] AS [conceptoPago], 
+    [VRecibosEmpleados].[Tipo] AS [Tipo]
+    FROM [dbo].[VRecibosEmpleados] AS [VRecibosEmpleados]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Contratistas_Fotos_Contratistas" Association="Self.FK_Contratistas_Fotos_Contratistas">
+            <End Role="Contratistas" EntitySet="Contratistas" />
+            <End Role="Contratistas_Fotos" EntitySet="Contratistas_Fotos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Contratistas_Servicios_Contratistas" Association="Self.FK_Contratistas_Servicios_Contratistas">
+            <End Role="Contratistas" EntitySet="Contratistas" />
+            <End Role="Contratistas_Servicios" EntitySet="Contratistas_Servicios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleContrataciones_EmpleadosTemporales" Association="Self.FK_DetalleContrataciones_EmpleadosTemporales">
+            <End Role="EmpleadosTemporales" EntitySet="EmpleadosTemporales" />
+            <End Role="DetalleContrataciones" EntitySet="DetalleContrataciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones" Association="Self.FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones">
+            <End Role="Empleador_Recibos_Header_Contrataciones" EntitySet="Empleador_Recibos_Header_Contrataciones" />
+            <End Role="Empleador_Recibos_Detalle_Contrataciones" EntitySet="Empleador_Recibos_Detalle_Contrataciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header" Association="Self.FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header">
+            <End Role="Empleador_Recibos_Header" EntitySet="Empleador_Recibos_Header" />
+            <End Role="Empleador_Recibos_Detalle" EntitySet="Empleador_Recibos_Detalle" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales" Association="Self.FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales">
+            <End Role="EmpleadosTemporales" EntitySet="EmpleadosTemporales" />
+            <End Role="Empleador_Recibos_Header_Contrataciones" EntitySet="Empleador_Recibos_Header_Contrataciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Header_Empleados" Association="Self.FK_Empleador_Recibos_Header_Empleados">
+            <End Role="Empleados" EntitySet="Empleados" />
+            <End Role="Empleador_Recibos_Header" EntitySet="Empleador_Recibos_Header" />
+          </AssociationSet>
+          <AssociationSet Name="FK_perfilesInfo_Cuentas" Association="Self.FK_perfilesInfo_Cuentas">
+            <End Role="Cuentas" EntitySet="Cuentas" />
+            <End Role="perfilesInfo" EntitySet="perfilesInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suscripciones_Planes_empleadores" Association="Self.FK_Suscripciones_Planes_empleadores">
+            <End Role="Planes_empleadores" EntitySet="Planes_empleadores" />
+            <End Role="Suscripciones" EntitySet="Suscripciones" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="migenteV2Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="migenteEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Config_Correo" EntityType="migenteV2Model.Config_Correo" />
+          <EntitySet Name="Credenciales" EntityType="migenteV2Model.Credenciales" />
+          <EntitySet Name="Suscripciones" EntityType="migenteV2Model.Suscripciones" />
+          <EntitySet Name="Planes_empleadores" EntityType="migenteV2Model.Planes_empleadores" />
+          <EntitySet Name="sysdiagrams" EntityType="migenteV2Model.sysdiagrams" />
+          <AssociationSet Name="FK_Suscripciones_Planes_empleadores" Association="migenteV2Model.FK_Suscripciones_Planes_empleadores">
+            <End Role="Planes_empleadores" EntitySet="Planes_empleadores" />
+            <End Role="Suscripciones" EntitySet="Suscripciones" />
+          </AssociationSet>
+          <EntitySet Name="perfilesInfo" EntityType="migenteV2Model.perfilesInfo" />
+          <EntitySet Name="VPerfiles" EntityType="migenteV2Model.VPerfiles" />
+          <EntitySet Name="Ventas" EntityType="migenteV2Model.Ventas" />
+          <EntitySet Name="Planes_Contratistas" EntityType="migenteV2Model.Planes_Contratistas" />
+          <FunctionImport Name="ObtenerSuscripcion" ReturnType="Collection(migenteV2Model.ObtenerSuscripcion_Result)">
+          <Parameter Name="userID" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="PaymentGateway" EntityType="migenteV2Model.PaymentGateway" />
+          <EntitySet Name="Cuentas" EntityType="migenteV2Model.Cuentas" />
+          <AssociationSet Name="FK_perfilesInfo_Cuentas" Association="migenteV2Model.FK_perfilesInfo_Cuentas">
+            <End Role="Cuentas" EntitySet="Cuentas" />
+            <End Role="perfilesInfo" EntitySet="perfilesInfo" />
+          </AssociationSet>
+          <EntitySet Name="Empleados" EntityType="migenteV2Model.Empleados" />
+          <EntitySet Name="Empleador_Recibos_Detalle" EntityType="migenteV2Model.Empleador_Recibos_Detalle" />
+          <EntitySet Name="Empleador_Recibos_Header" EntityType="migenteV2Model.Empleador_Recibos_Header" />
+          <AssociationSet Name="FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header" Association="migenteV2Model.FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header">
+            <End Role="Empleador_Recibos_Header" EntitySet="Empleador_Recibos_Header" />
+            <End Role="Empleador_Recibos_Detalle" EntitySet="Empleador_Recibos_Detalle" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Header_Empleados" Association="migenteV2Model.FK_Empleador_Recibos_Header_Empleados">
+            <End Role="Empleados" EntitySet="Empleados" />
+            <End Role="Empleador_Recibos_Header" EntitySet="Empleador_Recibos_Header" />
+          </AssociationSet>
+          <EntitySet Name="Remuneraciones" EntityType="migenteV2Model.Remuneraciones" />
+          <EntitySet Name="Empleador_Recibos_Detalle_Contrataciones" EntityType="migenteV2Model.Empleador_Recibos_Detalle_Contrataciones" />
+          <EntitySet Name="Empleador_Recibos_Header_Contrataciones" EntityType="migenteV2Model.Empleador_Recibos_Header_Contrataciones" />
+          <EntitySet Name="EmpleadosTemporales" EntityType="migenteV2Model.EmpleadosTemporales" />
+          <EntitySet Name="Provincias" EntityType="migenteV2Model.Provincias" />
+          <AssociationSet Name="FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones" Association="migenteV2Model.FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones">
+            <End Role="Empleador_Recibos_Header_Contrataciones" EntitySet="Empleador_Recibos_Header_Contrataciones" />
+            <End Role="Empleador_Recibos_Detalle_Contrataciones" EntitySet="Empleador_Recibos_Detalle_Contrataciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales" Association="migenteV2Model.FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales">
+            <End Role="EmpleadosTemporales" EntitySet="EmpleadosTemporales" />
+            <End Role="Empleador_Recibos_Header_Contrataciones" EntitySet="Empleador_Recibos_Header_Contrataciones" />
+          </AssociationSet>
+          <EntitySet Name="Deducciones_TSS" EntityType="migenteV2Model.Deducciones_TSS" />
+          <EntitySet Name="VRecibosEmpleados" EntityType="migenteV2Model.VRecibosEmpleados" />
+          <EntitySet Name="DetalleContrataciones" EntityType="migenteV2Model.DetalleContrataciones" />
+          <AssociationSet Name="FK_DetalleContrataciones_EmpleadosTemporales" Association="migenteV2Model.FK_DetalleContrataciones_EmpleadosTemporales">
+            <End Role="EmpleadosTemporales" EntitySet="EmpleadosTemporales" />
+            <End Role="DetalleContrataciones" EntitySet="DetalleContrataciones" />
+          </AssociationSet>
+          <EntitySet Name="Calificaciones" EntityType="migenteV2Model.Calificaciones" />
+          <EntitySet Name="VContratacionesTemporales" EntityType="migenteV2Model.VContratacionesTemporales" />
+          <EntitySet Name="VPagosContrataciones" EntityType="migenteV2Model.VPagosContrataciones" />
+          <EntitySet Name="VCalificaciones" EntityType="migenteV2Model.VCalificaciones" />
+          <EntitySet Name="VEmpleados" EntityType="migenteV2Model.VEmpleados" />
+          <EntitySet Name="Contratistas" EntityType="migenteV2Model.Contratistas" />
+          <EntitySet Name="VContratistas" EntityType="migenteV2Model.VContratistas" />
+          <EntitySet Name="Contratistas_Fotos" EntityType="migenteV2Model.Contratistas_Fotos" />
+          <EntitySet Name="Contratistas_Servicios" EntityType="migenteV2Model.Contratistas_Servicios" />
+          <EntitySet Name="Ofertantes" EntityType="migenteV2Model.Ofertantes" />
+          <AssociationSet Name="FK_Contratistas_Fotos_Contratistas" Association="migenteV2Model.FK_Contratistas_Fotos_Contratistas">
+            <End Role="Contratistas" EntitySet="Contratistas" />
+            <End Role="Contratistas_Fotos" EntitySet="Contratistas_Fotos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Contratistas_Servicios_Contratistas" Association="migenteV2Model.FK_Contratistas_Servicios_Contratistas">
+            <End Role="Contratistas" EntitySet="Contratistas" />
+            <End Role="Contratistas_Servicios" EntitySet="Contratistas_Servicios" />
+          </AssociationSet>
+          <EntitySet Name="Sectores" EntityType="migenteV2Model.Sectores" />
+          <EntitySet Name="Servicios" EntityType="migenteV2Model.Servicios" />
+          <FunctionImport Name="sp_MisCalificaciones" ReturnType="Collection(migenteV2Model.sp_MisCalificaciones_Result)">
+          <Parameter Name="identificacion" Mode="In" Type="String" />
+          </FunctionImport>
+          <EntitySet Name="VMisCalificaciones" EntityType="migenteV2Model.VMisCalificaciones" />
+          <EntitySet Name="OpenAi_Config" EntityType="migenteV2Model.OpenAi_Config" />
+        </EntityContainer>
+        <EntityType Name="Config_Correo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="email" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="pass" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="servidor" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="puerto" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Credenciales">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="activo" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="Suscripciones">
+          <Key>
+            <PropertyRef Name="suscripcionID" />
+          </Key>
+          <Property Name="suscripcionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="planID" Type="Int32" />
+          <Property Name="vencimiento" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="Planes_empleadores" Relationship="migenteV2Model.FK_Suscripciones_Planes_empleadores" FromRole="Suscripciones" ToRole="Planes_empleadores" />
+        </EntityType>
+        <EntityType Name="Planes_empleadores">
+          <Key>
+            <PropertyRef Name="planID" />
+          </Key>
+          <Property Name="planID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="precio" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="empleados" Type="Int32" />
+          <Property Name="historico" Type="Int32" />
+          <Property Name="nomina" Type="Boolean" />
+          <NavigationProperty Name="Suscripciones" Relationship="migenteV2Model.FK_Suscripciones_Planes_empleadores" FromRole="Planes_empleadores" ToRole="Suscripciones" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <Association Name="FK_Suscripciones_Planes_empleadores">
+          <End Type="migenteV2Model.Planes_empleadores" Role="Planes_empleadores" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Suscripciones" Role="Suscripciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Planes_empleadores">
+              <PropertyRef Name="planID" />
+            </Principal>
+            <Dependent Role="Suscripciones">
+              <PropertyRef Name="planID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="perfilesInfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="cuentaID" Type="Int32" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="tipoIdentificacion" Type="Int32" />
+          <Property Name="nombreComercial" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="direccion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fotoPerfil" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="presentacion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="cedulaGerente" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombreGerente" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apellidoGerente" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="direccionGerente" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Cuentas" Relationship="migenteV2Model.FK_perfilesInfo_Cuentas" FromRole="perfilesInfo" ToRole="Cuentas" />
+        </EntityType>
+        <EntityType Name="VPerfiles">
+          <Key>
+            <PropertyRef Name="cuentaID" />
+          </Key>
+          <Property Name="cuentaID" Type="Int32" Nullable="false" />
+          <Property Name="fechaCreacion" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Tipo" Type="Int32" />
+          <Property Name="Nombre" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="id" Type="Int32" />
+          <Property Name="tipoIdentificacion" Type="Int32" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="direccion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fotoPerfil" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="presentacion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="nombreComercial" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="cedulaGerente" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombreGerente" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apellidoGerente" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="direccionGerente" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="emailUsuario" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Ventas">
+          <Key>
+            <PropertyRef Name="ventaID" />
+          </Key>
+          <Property Name="ventaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
+          <Property Name="metodo" Type="Int32" />
+          <Property Name="planID" Type="Int32" />
+          <Property Name="precio" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="comentario" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="idTransaccion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="idempotencyKey" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="card" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="ip" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Planes_Contratistas">
+          <Key>
+            <PropertyRef Name="planID" />
+          </Key>
+          <Property Name="planID" Type="Int32" Nullable="false" />
+          <Property Name="nombrePlan" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="precio" Type="Decimal" Precision="10" Scale="2" />
+        </EntityType>
+        <ComplexType Name="ObtenerSuscripcion_Result">
+          <Property Type="Int32" Name="suscripcionID" Nullable="false" />
+          <Property Type="String" Name="userID" Nullable="true" />
+          <Property Type="Int32" Name="planID" Nullable="true" />
+          <Property Type="DateTime" Name="vencimiento" Nullable="true" />
+          <Property Type="String" Name="nombre" Nullable="true" MaxLength="50" />
+          <Property Type="DateTime" Name="ProximoPago" Nullable="true" Precision="23" />
+          <Property Type="DateTime" Name="fechaInicio" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="PaymentGateway">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="test" Type="Boolean" />
+          <Property Name="productionURL" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="testURL" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="merchantID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="terminalID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Cuentas">
+          <Key>
+            <PropertyRef Name="cuentaID" />
+          </Key>
+          <Property Name="cuentaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fechaCreacion" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Tipo" Type="Int32" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="isActive" Type="Boolean" />
+          <NavigationProperty Name="perfilesInfo" Relationship="migenteV2Model.FK_perfilesInfo_Cuentas" FromRole="Cuentas" ToRole="perfilesInfo" />
+        </EntityType>
+        <Association Name="FK_perfilesInfo_Cuentas">
+          <End Type="migenteV2Model.Cuentas" Role="Cuentas" Multiplicity="0..1" />
+          <End Type="migenteV2Model.perfilesInfo" Role="perfilesInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuentas">
+              <PropertyRef Name="cuentaID" />
+            </Principal>
+            <Dependent Role="perfilesInfo">
+              <PropertyRef Name="cuentaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Empleados">
+          <Key>
+            <PropertyRef Name="empleadoID" />
+          </Key>
+          <Property Name="empleadoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaInicio" Type="DateTime" Precision="0" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="alias" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nacimiento" Type="DateTime" Precision="0" />
+          <Property Name="estadoCivil" Type="Int32" />
+          <Property Name="direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="provincia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="municipio" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="posicion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="salario" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="periodoPago" Type="Int32" />
+          <Property Name="contactoEmergencia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="telefonoEmergencia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="contrato" Type="Boolean" />
+          <Property Name="remuneracionExtra1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra1" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra2" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra2" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra3" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra3" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="tss" Type="Boolean" />
+          <Property Name="diasPago" Type="Int32" />
+          <Property Name="Activo" Type="Boolean" />
+          <Property Name="fechaSalida" Type="DateTime" Precision="3" />
+          <Property Name="motivoBaja" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="prestaciones" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="foto" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Empleador_Recibos_Header" Relationship="migenteV2Model.FK_Empleador_Recibos_Header_Empleados" FromRole="Empleados" ToRole="Empleador_Recibos_Header" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Detalle">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="pagoID" Type="Int32" />
+          <Property Name="Concepto" Type="String" MaxLength="90" FixedLength="false" Unicode="false" />
+          <Property Name="Monto" Type="Decimal" Precision="10" Scale="2" />
+          <NavigationProperty Name="Empleador_Recibos_Header" Relationship="migenteV2Model.FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header" FromRole="Empleador_Recibos_Detalle" ToRole="Empleador_Recibos_Header" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Header">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="empleadoID" Type="Int32" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaPago" Type="DateTime" Precision="3" />
+          <Property Name="conceptoPago" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="Int32" />
+          <NavigationProperty Name="Empleador_Recibos_Detalle" Relationship="migenteV2Model.FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header" FromRole="Empleador_Recibos_Header" ToRole="Empleador_Recibos_Detalle" />
+          <NavigationProperty Name="Empleados" Relationship="migenteV2Model.FK_Empleador_Recibos_Header_Empleados" FromRole="Empleador_Recibos_Header" ToRole="Empleados" />
+        </EntityType>
+        <Association Name="FK_Empleador_Recibos_Detalle_Empleador_Recibos_Header">
+          <End Type="migenteV2Model.Empleador_Recibos_Header" Role="Empleador_Recibos_Header" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Empleador_Recibos_Detalle" Role="Empleador_Recibos_Detalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleador_Recibos_Header">
+              <PropertyRef Name="pagoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Detalle">
+              <PropertyRef Name="pagoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Header_Empleados">
+          <End Type="migenteV2Model.Empleados" Role="Empleados" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Empleador_Recibos_Header" Role="Empleador_Recibos_Header" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleados">
+              <PropertyRef Name="empleadoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Header">
+              <PropertyRef Name="empleadoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Remuneraciones">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="monto" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="empleadoID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Detalle_Contrataciones">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="pagoID" Type="Int32" />
+          <Property Name="Concepto" Type="String" MaxLength="90" FixedLength="false" Unicode="false" />
+          <Property Name="Monto" Type="Decimal" Precision="10" Scale="2" />
+          <NavigationProperty Name="Empleador_Recibos_Header_Contrataciones" Relationship="migenteV2Model.FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones" FromRole="Empleador_Recibos_Detalle_Contrataciones" ToRole="Empleador_Recibos_Header_Contrataciones" />
+        </EntityType>
+        <EntityType Name="Empleador_Recibos_Header_Contrataciones">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="contratacionID" Type="Int32" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaPago" Type="DateTime" Precision="3" />
+          <Property Name="conceptoPago" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="Int32" />
+          <NavigationProperty Name="Empleador_Recibos_Detalle_Contrataciones" Relationship="migenteV2Model.FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones" FromRole="Empleador_Recibos_Header_Contrataciones" ToRole="Empleador_Recibos_Detalle_Contrataciones" />
+          <NavigationProperty Name="EmpleadosTemporales" Relationship="migenteV2Model.FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales" FromRole="Empleador_Recibos_Header_Contrataciones" ToRole="EmpleadosTemporales" />
+          <Property Name="detalleID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="EmpleadosTemporales">
+          <Key>
+            <PropertyRef Name="contratacionID" />
+          </Key>
+          <Property Name="contratacionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="tipo" Type="Int32" />
+          <Property Name="nombreComercial" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="rnc" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="alias" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombreRepresentante" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="cedulaRepresentante" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="provincia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="municipio" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="18" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="18" FixedLength="false" Unicode="false" />
+          <Property Name="foto" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Empleador_Recibos_Header_Contrataciones" Relationship="migenteV2Model.FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales" FromRole="EmpleadosTemporales" ToRole="Empleador_Recibos_Header_Contrataciones" />
+          <NavigationProperty Name="DetalleContrataciones" Relationship="migenteV2Model.FK_DetalleContrataciones_EmpleadosTemporales" FromRole="EmpleadosTemporales" ToRole="DetalleContrataciones" />
+        </EntityType>
+        <EntityType Name="Provincias">
+          <Key>
+            <PropertyRef Name="provinciaID" />
+          </Key>
+          <Property Name="provinciaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones">
+          <End Type="migenteV2Model.Empleador_Recibos_Header_Contrataciones" Role="Empleador_Recibos_Header_Contrataciones" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Empleador_Recibos_Detalle_Contrataciones" Role="Empleador_Recibos_Detalle_Contrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Empleador_Recibos_Header_Contrataciones">
+              <PropertyRef Name="pagoID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Detalle_Contrataciones">
+              <PropertyRef Name="pagoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales">
+          <End Type="migenteV2Model.EmpleadosTemporales" Role="EmpleadosTemporales" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Empleador_Recibos_Header_Contrataciones" Role="Empleador_Recibos_Header_Contrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmpleadosTemporales">
+              <PropertyRef Name="contratacionID" />
+            </Principal>
+            <Dependent Role="Empleador_Recibos_Header_Contrataciones">
+              <PropertyRef Name="contratacionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Deducciones_TSS">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="descripcion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="porcentaje" Type="Decimal" Precision="5" Scale="2" />
+        </EntityType>
+        <EntityType Name="VRecibosEmpleados">
+          <Key>
+            <PropertyRef Name="pagoID" />
+            <PropertyRef Name="Tipo" />
+          </Key>
+          <Property Name="Total" Type="Decimal" Precision="38" Scale="2" />
+          <Property Name="pagoID" Type="Int32" Nullable="false" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="empleadoID" Type="Int32" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaPago" Type="DateTime" Precision="3" />
+          <Property Name="conceptoPago" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Tipo" Type="String" Nullable="false" MaxLength="19" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="DetalleContrataciones">
+          <Key>
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="detalleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="contratacionID" Type="Int32" />
+          <Property Name="descripcionCorta" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="descripcionAmpliada" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="fechaInicio" Type="DateTime" Precision="0" />
+          <Property Name="fechaFinal" Type="DateTime" Precision="0" />
+          <Property Name="montoAcordado" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="esquemaPagos" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="estatus" Type="Int32" />
+          <Property Name="calificado" Type="Boolean" />
+          <Property Name="calificacionID" Type="Int32" />
+          <NavigationProperty Name="EmpleadosTemporales" Relationship="migenteV2Model.FK_DetalleContrataciones_EmpleadosTemporales" FromRole="DetalleContrataciones" ToRole="EmpleadosTemporales" />
+        </EntityType>
+        <Association Name="FK_DetalleContrataciones_EmpleadosTemporales">
+          <End Type="migenteV2Model.EmpleadosTemporales" Role="EmpleadosTemporales" Multiplicity="0..1" />
+          <End Type="migenteV2Model.DetalleContrataciones" Role="DetalleContrataciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmpleadosTemporales">
+              <PropertyRef Name="contratacionID" />
+            </Principal>
+            <Dependent Role="DetalleContrataciones">
+              <PropertyRef Name="contratacionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Calificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="calificacionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="puntualidad" Type="Int32" />
+          <Property Name="cumplimiento" Type="Int32" />
+          <Property Name="conocimientos" Type="Int32" />
+          <Property Name="recomendacion" Type="Int32" />
+        </EntityType>
+        <EntityType Name="VContratacionesTemporales">
+          <Key>
+            <PropertyRef Name="contratacionID" />
+            <PropertyRef Name="detalleID" />
+          </Key>
+          <Property Name="contratacionID" Type="Int32" Nullable="false" />
+          <Property Name="userID" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="tipo" Type="Int32" />
+          <Property Name="nombreComercial" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="rnc" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="alias" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="provincia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="municipio" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="18" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="18" FixedLength="false" Unicode="false" />
+          <Property Name="detalleID" Type="Int32" Nullable="false" />
+          <Property Name="Expr1" Type="Int32" />
+          <Property Name="descripcionCorta" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="descripcionAmpliada" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="fechaInicio" Type="DateTime" Precision="0" />
+          <Property Name="fechaFinal" Type="DateTime" Precision="0" />
+          <Property Name="montoAcordado" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="esquemaPagos" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="estatus" Type="Int32" />
+          <Property Name="composicionNombre" Type="String" MaxLength="101" FixedLength="false" Unicode="false" />
+          <Property Name="composicionID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="conocimientos" Type="Int32" />
+          <Property Name="puntualidad" Type="Int32" />
+          <Property Name="recomendacion" Type="Int32" />
+          <Property Name="cumplimiento" Type="Int32" />
+        </EntityType>
+        <EntityType Name="VPagosContrataciones">
+          <Key>
+            <PropertyRef Name="pagoID" />
+          </Key>
+          <Property Name="pagoID" Type="Int32" Nullable="false" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaPago" Type="DateTime" Precision="3" />
+          <Property Name="Expr1" Type="String" MaxLength="18" FixedLength="false" Unicode="false" />
+          <Property Name="Monto" Type="Decimal" Precision="38" Scale="2" />
+          <Property Name="contratacionID" Type="Int32" />
+          <Property Name="detalleID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="VCalificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="calificacionID" Type="Int32" Nullable="false" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="puntualidad" Type="Int32" />
+          <Property Name="cumplimiento" Type="Int32" />
+          <Property Name="conocimientos" Type="Int32" />
+          <Property Name="recomendacion" Type="Int32" />
+          <Property Name="cuentaID" Type="Int32" />
+          <Property Name="fechaCreacion" Type="DateTime" Precision="3" />
+          <Property Name="Expr1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Expr2" Type="Int32" />
+          <Property Name="Expr3" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="VEmpleados">
+          <Key>
+            <PropertyRef Name="empleadoID" />
+          </Key>
+          <Property Name="empleadoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="fechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="fechaInicio" Type="DateTime" Precision="0" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="101" FixedLength="false" Unicode="false" />
+          <Property Name="nacimiento" Type="DateTime" Precision="0" />
+          <Property Name="direccion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="salario" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="periodoPago" Type="Int32" />
+          <Property Name="contrato" Type="Boolean" />
+          <Property Name="Activo" Type="Boolean" />
+          <Property Name="alias" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="estadoCivil" Type="Int32" />
+          <Property Name="provincia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="municipio" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="posicion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="contactoEmergencia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="telefonoEmergencia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="remuneracionExtra1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra1" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra2" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra2" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="remuneracionExtra3" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="montoExtra3" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="tss" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="Contratistas">
+          <Key>
+            <PropertyRef Name="contratistaID" />
+          </Key>
+          <Property Name="contratistaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fechaIngreso" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="titulo" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="Int32" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="sector" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="experiencia" Type="Int32" />
+          <Property Name="presentacion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="16" FixedLength="false" Unicode="false" />
+          <Property Name="whatsapp1" Type="Boolean" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="whatsapp2" Type="Boolean" />
+          <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="activo" Type="Boolean" />
+          <Property Name="provincia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="nivelNacional" Type="Boolean" />
+          <Property Name="imagenURL" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Contratistas_Fotos" Relationship="migenteV2Model.FK_Contratistas_Fotos_Contratistas" FromRole="Contratistas" ToRole="Contratistas_Fotos" />
+          <NavigationProperty Name="Contratistas_Servicios" Relationship="migenteV2Model.FK_Contratistas_Servicios_Contratistas" FromRole="Contratistas" ToRole="Contratistas_Servicios" />
+        </EntityType>
+        <EntityType Name="VContratistas">
+          <Key>
+            <PropertyRef Name="contratistaID" />
+            <PropertyRef Name="calificacion" />
+            <PropertyRef Name="total_registros" />
+          </Key>
+          <Property Name="contratistaID" Type="Int32" Nullable="false" />
+          <Property Name="fechaIngreso" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="titulo" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="Int32" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="sector" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="experiencia" Type="Int32" />
+          <Property Name="presentacion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="16" FixedLength="false" Unicode="false" />
+          <Property Name="whatsapp1" Type="Boolean" />
+          <Property Name="whatsapp2" Type="Boolean" />
+          <Property Name="email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="activo" Type="Boolean" />
+          <Property Name="provincia" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="nivelNacional" Type="Boolean" />
+          <Property Name="calificacion" Type="Decimal" Nullable="false" Precision="10" Scale="2" />
+          <Property Name="total_registros" Type="Int32" Nullable="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="imagenURL" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Contratistas_Fotos">
+          <Key>
+            <PropertyRef Name="imagenID" />
+          </Key>
+          <Property Name="imagenID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="contratistaID" Type="Int32" />
+          <Property Name="imagenURL" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Contratistas" Relationship="migenteV2Model.FK_Contratistas_Fotos_Contratistas" FromRole="Contratistas_Fotos" ToRole="Contratistas" />
+        </EntityType>
+        <EntityType Name="Contratistas_Servicios">
+          <Key>
+            <PropertyRef Name="servicioID" />
+          </Key>
+          <Property Name="servicioID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="contratistaID" Type="Int32" />
+          <Property Name="detalleServicio" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Contratistas" Relationship="migenteV2Model.FK_Contratistas_Servicios_Contratistas" FromRole="Contratistas_Servicios" ToRole="Contratistas" />
+        </EntityType>
+        <EntityType Name="Ofertantes">
+          <Key>
+            <PropertyRef Name="ofertanteID" />
+          </Key>
+          <Property Name="ofertanteID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fechaPublicacion" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="habilidades" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="experiencia" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="foto" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <Association Name="FK_Contratistas_Fotos_Contratistas">
+          <End Type="migenteV2Model.Contratistas" Role="Contratistas" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Contratistas_Fotos" Role="Contratistas_Fotos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Contratistas">
+              <PropertyRef Name="contratistaID" />
+            </Principal>
+            <Dependent Role="Contratistas_Fotos">
+              <PropertyRef Name="contratistaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Contratistas_Servicios_Contratistas">
+          <End Type="migenteV2Model.Contratistas" Role="Contratistas" Multiplicity="0..1" />
+          <End Type="migenteV2Model.Contratistas_Servicios" Role="Contratistas_Servicios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Contratistas">
+              <PropertyRef Name="contratistaID" />
+            </Principal>
+            <Dependent Role="Contratistas_Servicios">
+              <PropertyRef Name="contratistaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Sectores">
+          <Key>
+            <PropertyRef Name="sectorID" />
+          </Key>
+          <Property Name="sectorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sector" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Servicios">
+          <Key>
+            <PropertyRef Name="servicioID" />
+          </Key>
+          <Property Name="servicioID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="descripcion" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="sp_MisCalificaciones_Result">
+          <Property Type="String" Name="Nombre" Nullable="true" MaxLength="70" />
+          <Property Type="String" Name="idCalificador" Nullable="true" MaxLength="20" />
+          <Property Type="Int32" Name="calificacionID" Nullable="false" />
+          <Property Type="DateTime" Name="fecha" Nullable="true" Precision="23" />
+          <Property Type="String" Name="userID" Nullable="true" MaxLength="250" />
+          <Property Type="String" Name="tipo" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="identificacion" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="nombre1" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="puntualidad" Nullable="true" />
+          <Property Type="Int32" Name="cumplimiento" Nullable="true" />
+          <Property Type="Int32" Name="conocimientos" Nullable="true" />
+          <Property Type="Int32" Name="recomendacion" Nullable="true" />
+          <Property Type="Int32" Name="cuentaID" Nullable="false" />
+          <Property Type="DateTime" Name="fechaCreacion" Nullable="true" Precision="23" />
+          <Property Type="String" Name="userID1" Nullable="true" />
+          <Property Type="Int32" Name="Tipo1" Nullable="false" />
+          <Property Type="String" Name="Nombre2" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="Apellido" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="Email" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="telefono1" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="telefono2" Nullable="true" MaxLength="20" />
+          <Property Type="Boolean" Name="isActive" Nullable="true" />
+          <Property Type="Int32" Name="id" Nullable="true" />
+          <Property Type="Int32" Name="cuentaID1" Nullable="true" />
+          <Property Type="String" Name="userID2" Nullable="true" />
+          <Property Type="Int32" Name="tipoIdentificacion" Nullable="true" />
+          <Property Type="String" Name="nombreComercial" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="identificacion1" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="direccion" Nullable="true" MaxLength="Max" />
+          <Property Type="Binary" Name="fotoPerfil" Nullable="true" />
+          <Property Type="String" Name="presentacion" Nullable="true" MaxLength="Max" />
+          <Property Type="String" Name="cedulaGerente" Nullable="true" MaxLength="20" />
+          <Property Type="String" Name="nombreGerente" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="apellidoGerente" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="direccionGerente" Nullable="true" MaxLength="250" />
+        </ComplexType>
+        <EntityType Name="VMisCalificaciones">
+          <Key>
+            <PropertyRef Name="calificacionID" />
+          </Key>
+          <Property Name="NombreCalificador" Type="String" MaxLength="70" FixedLength="false" Unicode="false" />
+          <Property Name="idCalificador" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="calificacionID" Type="Int32" Nullable="false" />
+          <Property Name="fecha" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="tipo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="identificacion" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="puntualidad" Type="Int32" />
+          <Property Name="cumplimiento" Type="Int32" />
+          <Property Name="conocimientos" Type="Int32" />
+          <Property Name="recomendacion" Type="Int32" />
+          <Property Name="cuentaID" Type="Int32" />
+          <Property Name="fechaCreacion" Type="DateTime" Precision="3" />
+          <Property Name="Expr1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Expr2" Type="Int32" />
+          <Property Name="Expr3" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Apellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="telefono1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="telefono2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="OpenAi_Config">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="OpenAIApiKey" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="OpenAIApiUrl" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="migenteV2ModelStoreContainer" CdmEntityContainer="migenteEntities">
+          <EntitySetMapping Name="Config_Correo">
+            <EntityTypeMapping TypeName="migenteV2Model.Config_Correo">
+              <MappingFragment StoreEntitySet="Config_Correo">
+                <ScalarProperty Name="puerto" ColumnName="puerto" />
+                <ScalarProperty Name="servidor" ColumnName="servidor" />
+                <ScalarProperty Name="pass" ColumnName="pass" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Credenciales">
+            <EntityTypeMapping TypeName="migenteV2Model.Credenciales">
+              <MappingFragment StoreEntitySet="Credenciales">
+                <ScalarProperty Name="activo" ColumnName="activo" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Suscripciones">
+            <EntityTypeMapping TypeName="migenteV2Model.Suscripciones">
+              <MappingFragment StoreEntitySet="Suscripciones">
+                <ScalarProperty Name="vencimiento" ColumnName="vencimiento" />
+                <ScalarProperty Name="planID" ColumnName="planID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="suscripcionID" ColumnName="suscripcionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Planes_empleadores">
+            <EntityTypeMapping TypeName="migenteV2Model.Planes_empleadores">
+              <MappingFragment StoreEntitySet="Planes_empleadores">
+                <ScalarProperty Name="nomina" ColumnName="nomina" />
+                <ScalarProperty Name="historico" ColumnName="historico" />
+                <ScalarProperty Name="empleados" ColumnName="empleados" />
+                <ScalarProperty Name="precio" ColumnName="precio" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="planID" ColumnName="planID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="migenteV2Model.sysdiagrams">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="perfilesInfo">
+            <EntityTypeMapping TypeName="migenteV2Model.perfilesInfo">
+              <MappingFragment StoreEntitySet="perfilesInfo">
+                <ScalarProperty Name="direccionGerente" ColumnName="direccionGerente" />
+                <ScalarProperty Name="apellidoGerente" ColumnName="apellidoGerente" />
+                <ScalarProperty Name="nombreGerente" ColumnName="nombreGerente" />
+                <ScalarProperty Name="cedulaGerente" ColumnName="cedulaGerente" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="fotoPerfil" ColumnName="fotoPerfil" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="nombreComercial" ColumnName="nombreComercial" />
+                <ScalarProperty Name="tipoIdentificacion" ColumnName="tipoIdentificacion" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VPerfiles">
+            <EntityTypeMapping TypeName="migenteV2Model.VPerfiles">
+              <MappingFragment StoreEntitySet="VPerfiles">
+                <ScalarProperty Name="emailUsuario" ColumnName="emailUsuario" />
+                <ScalarProperty Name="direccionGerente" ColumnName="direccionGerente" />
+                <ScalarProperty Name="apellidoGerente" ColumnName="apellidoGerente" />
+                <ScalarProperty Name="nombreGerente" ColumnName="nombreGerente" />
+                <ScalarProperty Name="cedulaGerente" ColumnName="cedulaGerente" />
+                <ScalarProperty Name="nombreComercial" ColumnName="nombreComercial" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="fotoPerfil" ColumnName="fotoPerfil" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipoIdentificacion" ColumnName="tipoIdentificacion" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fechaCreacion" ColumnName="fechaCreacion" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ventas">
+            <EntityTypeMapping TypeName="migenteV2Model.Ventas">
+              <MappingFragment StoreEntitySet="Ventas">
+                <ScalarProperty Name="ip" ColumnName="ip" />
+                <ScalarProperty Name="card" ColumnName="card" />
+                <ScalarProperty Name="idempotencyKey" ColumnName="idempotencyKey" />
+                <ScalarProperty Name="idTransaccion" ColumnName="idTransaccion" />
+                <ScalarProperty Name="comentario" ColumnName="comentario" />
+                <ScalarProperty Name="precio" ColumnName="precio" />
+                <ScalarProperty Name="planID" ColumnName="planID" />
+                <ScalarProperty Name="metodo" ColumnName="metodo" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="ventaID" ColumnName="ventaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Planes_Contratistas">
+            <EntityTypeMapping TypeName="migenteV2Model.Planes_Contratistas">
+              <MappingFragment StoreEntitySet="Planes_Contratistas">
+                <ScalarProperty Name="precio" ColumnName="precio" />
+                <ScalarProperty Name="nombrePlan" ColumnName="nombrePlan" />
+                <ScalarProperty Name="planID" ColumnName="planID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="ObtenerSuscripcion" FunctionName="migenteV2Model.Store.ObtenerSuscripcion">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="migenteV2Model.ObtenerSuscripcion_Result">
+                <ScalarProperty Name="suscripcionID" ColumnName="suscripcionID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="planID" ColumnName="planID" />
+                <ScalarProperty Name="vencimiento" ColumnName="vencimiento" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="ProximoPago" ColumnName="ProximoPago" />
+                <ScalarProperty Name="fechaInicio" ColumnName="fechaInicio" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="PaymentGateway">
+            <EntityTypeMapping TypeName="migenteV2Model.PaymentGateway">
+              <MappingFragment StoreEntitySet="PaymentGateway">
+                <ScalarProperty Name="terminalID" ColumnName="terminalID" />
+                <ScalarProperty Name="merchantID" ColumnName="merchantID" />
+                <ScalarProperty Name="testURL" ColumnName="testURL" />
+                <ScalarProperty Name="productionURL" ColumnName="productionURL" />
+                <ScalarProperty Name="test" ColumnName="test" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Cuentas">
+            <EntityTypeMapping TypeName="migenteV2Model.Cuentas">
+              <MappingFragment StoreEntitySet="Cuentas">
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fechaCreacion" ColumnName="fechaCreacion" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empleados">
+            <EntityTypeMapping TypeName="migenteV2Model.Empleados">
+              <MappingFragment StoreEntitySet="Empleados">
+                <ScalarProperty Name="foto" ColumnName="foto" />
+                <ScalarProperty Name="prestaciones" ColumnName="prestaciones" />
+                <ScalarProperty Name="motivoBaja" ColumnName="motivoBaja" />
+                <ScalarProperty Name="fechaSalida" ColumnName="fechaSalida" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="diasPago" ColumnName="diasPago" />
+                <ScalarProperty Name="tss" ColumnName="tss" />
+                <ScalarProperty Name="montoExtra3" ColumnName="montoExtra3" />
+                <ScalarProperty Name="remuneracionExtra3" ColumnName="remuneracionExtra3" />
+                <ScalarProperty Name="montoExtra2" ColumnName="montoExtra2" />
+                <ScalarProperty Name="remuneracionExtra2" ColumnName="remuneracionExtra2" />
+                <ScalarProperty Name="montoExtra1" ColumnName="montoExtra1" />
+                <ScalarProperty Name="remuneracionExtra1" ColumnName="remuneracionExtra1" />
+                <ScalarProperty Name="contrato" ColumnName="contrato" />
+                <ScalarProperty Name="telefonoEmergencia" ColumnName="telefonoEmergencia" />
+                <ScalarProperty Name="contactoEmergencia" ColumnName="contactoEmergencia" />
+                <ScalarProperty Name="periodoPago" ColumnName="periodoPago" />
+                <ScalarProperty Name="salario" ColumnName="salario" />
+                <ScalarProperty Name="posicion" ColumnName="posicion" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="municipio" ColumnName="municipio" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="estadoCivil" ColumnName="estadoCivil" />
+                <ScalarProperty Name="nacimiento" ColumnName="nacimiento" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="fechaInicio" ColumnName="fechaInicio" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="empleadoID" ColumnName="empleadoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empleador_Recibos_Detalle">
+            <EntityTypeMapping TypeName="migenteV2Model.Empleador_Recibos_Detalle">
+              <MappingFragment StoreEntitySet="Empleador_Recibos_Detalle">
+                <ScalarProperty Name="Monto" ColumnName="Monto" />
+                <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empleador_Recibos_Header">
+            <EntityTypeMapping TypeName="migenteV2Model.Empleador_Recibos_Header">
+              <MappingFragment StoreEntitySet="Empleador_Recibos_Header">
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="conceptoPago" ColumnName="conceptoPago" />
+                <ScalarProperty Name="fechaPago" ColumnName="fechaPago" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="empleadoID" ColumnName="empleadoID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Remuneraciones">
+            <EntityTypeMapping TypeName="migenteV2Model.Remuneraciones">
+              <MappingFragment StoreEntitySet="Remuneraciones">
+                <ScalarProperty Name="empleadoID" ColumnName="empleadoID" />
+                <ScalarProperty Name="monto" ColumnName="monto" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empleador_Recibos_Detalle_Contrataciones">
+            <EntityTypeMapping TypeName="migenteV2Model.Empleador_Recibos_Detalle_Contrataciones">
+              <MappingFragment StoreEntitySet="Empleador_Recibos_Detalle_Contrataciones">
+                <ScalarProperty Name="Monto" ColumnName="Monto" />
+                <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empleador_Recibos_Header_Contrataciones">
+            <EntityTypeMapping TypeName="migenteV2Model.Empleador_Recibos_Header_Contrataciones">
+              <MappingFragment StoreEntitySet="Empleador_Recibos_Header_Contrataciones">
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="conceptoPago" ColumnName="conceptoPago" />
+                <ScalarProperty Name="fechaPago" ColumnName="fechaPago" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="contratacionID" ColumnName="contratacionID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmpleadosTemporales">
+            <EntityTypeMapping TypeName="migenteV2Model.EmpleadosTemporales">
+              <MappingFragment StoreEntitySet="EmpleadosTemporales">
+                <ScalarProperty Name="foto" ColumnName="foto" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="municipio" ColumnName="municipio" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="cedulaRepresentante" ColumnName="cedulaRepresentante" />
+                <ScalarProperty Name="nombreRepresentante" ColumnName="nombreRepresentante" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="apellido" ColumnName="apellido" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="rnc" ColumnName="rnc" />
+                <ScalarProperty Name="nombreComercial" ColumnName="nombreComercial" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="contratacionID" ColumnName="contratacionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Provincias">
+            <EntityTypeMapping TypeName="migenteV2Model.Provincias">
+              <MappingFragment StoreEntitySet="Provincias">
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="provinciaID" ColumnName="provinciaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Deducciones_TSS">
+            <EntityTypeMapping TypeName="migenteV2Model.Deducciones_TSS">
+              <MappingFragment StoreEntitySet="Deducciones_TSS">
+                <ScalarProperty Name="porcentaje" ColumnName="porcentaje" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VRecibosEmpleados">
+            <EntityTypeMapping TypeName="migenteV2Model.VRecibosEmpleados">
+              <MappingFragment StoreEntitySet="VRecibosEmpleados">
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="conceptoPago" ColumnName="conceptoPago" />
+                <ScalarProperty Name="fechaPago" ColumnName="fechaPago" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="empleadoID" ColumnName="empleadoID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+                <ScalarProperty Name="Total" ColumnName="Total" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DetalleContrataciones">
+            <EntityTypeMapping TypeName="migenteV2Model.DetalleContrataciones">
+              <MappingFragment StoreEntitySet="DetalleContrataciones">
+                <ScalarProperty Name="calificacionID" ColumnName="calificacionID" />
+                <ScalarProperty Name="calificado" ColumnName="calificado" />
+                <ScalarProperty Name="estatus" ColumnName="estatus" />
+                <ScalarProperty Name="esquemaPagos" ColumnName="esquemaPagos" />
+                <ScalarProperty Name="montoAcordado" ColumnName="montoAcordado" />
+                <ScalarProperty Name="fechaFinal" ColumnName="fechaFinal" />
+                <ScalarProperty Name="fechaInicio" ColumnName="fechaInicio" />
+                <ScalarProperty Name="descripcionAmpliada" ColumnName="descripcionAmpliada" />
+                <ScalarProperty Name="descripcionCorta" ColumnName="descripcionCorta" />
+                <ScalarProperty Name="contratacionID" ColumnName="contratacionID" />
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Calificaciones">
+            <EntityTypeMapping TypeName="migenteV2Model.Calificaciones">
+              <MappingFragment StoreEntitySet="Calificaciones">
+                <ScalarProperty Name="recomendacion" ColumnName="recomendacion" />
+                <ScalarProperty Name="conocimientos" ColumnName="conocimientos" />
+                <ScalarProperty Name="cumplimiento" ColumnName="cumplimiento" />
+                <ScalarProperty Name="puntualidad" ColumnName="puntualidad" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="calificacionID" ColumnName="calificacionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VContratacionesTemporales">
+            <EntityTypeMapping TypeName="migenteV2Model.VContratacionesTemporales">
+              <MappingFragment StoreEntitySet="VContratacionesTemporales">
+                <ScalarProperty Name="cumplimiento" ColumnName="cumplimiento" />
+                <ScalarProperty Name="recomendacion" ColumnName="recomendacion" />
+                <ScalarProperty Name="puntualidad" ColumnName="puntualidad" />
+                <ScalarProperty Name="conocimientos" ColumnName="conocimientos" />
+                <ScalarProperty Name="composicionID" ColumnName="composicionID" />
+                <ScalarProperty Name="composicionNombre" ColumnName="composicionNombre" />
+                <ScalarProperty Name="estatus" ColumnName="estatus" />
+                <ScalarProperty Name="esquemaPagos" ColumnName="esquemaPagos" />
+                <ScalarProperty Name="montoAcordado" ColumnName="montoAcordado" />
+                <ScalarProperty Name="fechaFinal" ColumnName="fechaFinal" />
+                <ScalarProperty Name="fechaInicio" ColumnName="fechaInicio" />
+                <ScalarProperty Name="descripcionAmpliada" ColumnName="descripcionAmpliada" />
+                <ScalarProperty Name="descripcionCorta" ColumnName="descripcionCorta" />
+                <ScalarProperty Name="Expr1" ColumnName="Expr1" />
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="municipio" ColumnName="municipio" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="apellido" ColumnName="apellido" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="rnc" ColumnName="rnc" />
+                <ScalarProperty Name="nombreComercial" ColumnName="nombreComercial" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="contratacionID" ColumnName="contratacionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VPagosContrataciones">
+            <EntityTypeMapping TypeName="migenteV2Model.VPagosContrataciones">
+              <MappingFragment StoreEntitySet="VPagosContrataciones">
+                <ScalarProperty Name="detalleID" ColumnName="detalleID" />
+                <ScalarProperty Name="contratacionID" ColumnName="contratacionID" />
+                <ScalarProperty Name="Monto" ColumnName="Monto" />
+                <ScalarProperty Name="Expr1" ColumnName="Expr1" />
+                <ScalarProperty Name="fechaPago" ColumnName="fechaPago" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="pagoID" ColumnName="pagoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VCalificaciones">
+            <EntityTypeMapping TypeName="migenteV2Model.VCalificaciones">
+              <MappingFragment StoreEntitySet="VCalificaciones">
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Expr3" ColumnName="Expr3" />
+                <ScalarProperty Name="Expr2" ColumnName="Expr2" />
+                <ScalarProperty Name="Expr1" ColumnName="Expr1" />
+                <ScalarProperty Name="fechaCreacion" ColumnName="fechaCreacion" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+                <ScalarProperty Name="recomendacion" ColumnName="recomendacion" />
+                <ScalarProperty Name="conocimientos" ColumnName="conocimientos" />
+                <ScalarProperty Name="cumplimiento" ColumnName="cumplimiento" />
+                <ScalarProperty Name="puntualidad" ColumnName="puntualidad" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="calificacionID" ColumnName="calificacionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VEmpleados">
+            <EntityTypeMapping TypeName="migenteV2Model.VEmpleados">
+              <MappingFragment StoreEntitySet="VEmpleados">
+                <ScalarProperty Name="tss" ColumnName="tss" />
+                <ScalarProperty Name="montoExtra3" ColumnName="montoExtra3" />
+                <ScalarProperty Name="remuneracionExtra3" ColumnName="remuneracionExtra3" />
+                <ScalarProperty Name="montoExtra2" ColumnName="montoExtra2" />
+                <ScalarProperty Name="remuneracionExtra2" ColumnName="remuneracionExtra2" />
+                <ScalarProperty Name="montoExtra1" ColumnName="montoExtra1" />
+                <ScalarProperty Name="remuneracionExtra1" ColumnName="remuneracionExtra1" />
+                <ScalarProperty Name="telefonoEmergencia" ColumnName="telefonoEmergencia" />
+                <ScalarProperty Name="contactoEmergencia" ColumnName="contactoEmergencia" />
+                <ScalarProperty Name="posicion" ColumnName="posicion" />
+                <ScalarProperty Name="municipio" ColumnName="municipio" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="estadoCivil" ColumnName="estadoCivil" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="contrato" ColumnName="contrato" />
+                <ScalarProperty Name="periodoPago" ColumnName="periodoPago" />
+                <ScalarProperty Name="salario" ColumnName="salario" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="nacimiento" ColumnName="nacimiento" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="fechaInicio" ColumnName="fechaInicio" />
+                <ScalarProperty Name="fechaRegistro" ColumnName="fechaRegistro" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="empleadoID" ColumnName="empleadoID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Contratistas">
+            <EntityTypeMapping TypeName="migenteV2Model.Contratistas">
+              <MappingFragment StoreEntitySet="Contratistas">
+                <ScalarProperty Name="imagenURL" ColumnName="imagenURL" />
+                <ScalarProperty Name="nivelNacional" ColumnName="nivelNacional" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="activo" ColumnName="activo" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="whatsapp2" ColumnName="whatsapp2" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="whatsapp1" ColumnName="whatsapp1" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="experiencia" ColumnName="experiencia" />
+                <ScalarProperty Name="sector" ColumnName="sector" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="titulo" ColumnName="titulo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fechaIngreso" ColumnName="fechaIngreso" />
+                <ScalarProperty Name="contratistaID" ColumnName="contratistaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VContratistas">
+            <EntityTypeMapping TypeName="migenteV2Model.VContratistas">
+              <MappingFragment StoreEntitySet="VContratistas">
+                <ScalarProperty Name="imagenURL" ColumnName="imagenURL" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="total_registros" ColumnName="total_registros" />
+                <ScalarProperty Name="calificacion" ColumnName="calificacion" />
+                <ScalarProperty Name="nivelNacional" ColumnName="nivelNacional" />
+                <ScalarProperty Name="provincia" ColumnName="provincia" />
+                <ScalarProperty Name="activo" ColumnName="activo" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="whatsapp2" ColumnName="whatsapp2" />
+                <ScalarProperty Name="whatsapp1" ColumnName="whatsapp1" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="experiencia" ColumnName="experiencia" />
+                <ScalarProperty Name="sector" ColumnName="sector" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="titulo" ColumnName="titulo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fechaIngreso" ColumnName="fechaIngreso" />
+                <ScalarProperty Name="contratistaID" ColumnName="contratistaID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Contratistas_Fotos">
+            <EntityTypeMapping TypeName="migenteV2Model.Contratistas_Fotos">
+              <MappingFragment StoreEntitySet="Contratistas_Fotos">
+                <ScalarProperty Name="imagenURL" ColumnName="imagenURL" />
+                <ScalarProperty Name="contratistaID" ColumnName="contratistaID" />
+                <ScalarProperty Name="imagenID" ColumnName="imagenID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Contratistas_Servicios">
+            <EntityTypeMapping TypeName="migenteV2Model.Contratistas_Servicios">
+              <MappingFragment StoreEntitySet="Contratistas_Servicios">
+                <ScalarProperty Name="detalleServicio" ColumnName="detalleServicio" />
+                <ScalarProperty Name="contratistaID" ColumnName="contratistaID" />
+                <ScalarProperty Name="servicioID" ColumnName="servicioID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ofertantes">
+            <EntityTypeMapping TypeName="migenteV2Model.Ofertantes">
+              <MappingFragment StoreEntitySet="Ofertantes">
+                <ScalarProperty Name="foto" ColumnName="foto" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="experiencia" ColumnName="experiencia" />
+                <ScalarProperty Name="habilidades" ColumnName="habilidades" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fechaPublicacion" ColumnName="fechaPublicacion" />
+                <ScalarProperty Name="ofertanteID" ColumnName="ofertanteID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sectores">
+            <EntityTypeMapping TypeName="migenteV2Model.Sectores">
+              <MappingFragment StoreEntitySet="Sectores">
+                <ScalarProperty Name="sector" ColumnName="sector" />
+                <ScalarProperty Name="sectorID" ColumnName="sectorID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Servicios">
+            <EntityTypeMapping TypeName="migenteV2Model.Servicios">
+              <MappingFragment StoreEntitySet="Servicios">
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="servicioID" ColumnName="servicioID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_MisCalificaciones" FunctionName="migenteV2Model.Store.sp_MisCalificaciones">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="migenteV2Model.sp_MisCalificaciones_Result">
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="idCalificador" ColumnName="idCalificador" />
+                <ScalarProperty Name="calificacionID" ColumnName="calificacionID" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="nombre1" ColumnName="nombre1" />
+                <ScalarProperty Name="puntualidad" ColumnName="puntualidad" />
+                <ScalarProperty Name="cumplimiento" ColumnName="cumplimiento" />
+                <ScalarProperty Name="conocimientos" ColumnName="conocimientos" />
+                <ScalarProperty Name="recomendacion" ColumnName="recomendacion" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+                <ScalarProperty Name="fechaCreacion" ColumnName="fechaCreacion" />
+                <ScalarProperty Name="userID1" ColumnName="userID1" />
+                <ScalarProperty Name="Tipo1" ColumnName="Tipo1" />
+                <ScalarProperty Name="Nombre2" ColumnName="Nombre2" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="isActive" ColumnName="isActive" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="cuentaID1" ColumnName="cuentaID1" />
+                <ScalarProperty Name="userID2" ColumnName="userID2" />
+                <ScalarProperty Name="tipoIdentificacion" ColumnName="tipoIdentificacion" />
+                <ScalarProperty Name="nombreComercial" ColumnName="nombreComercial" />
+                <ScalarProperty Name="identificacion1" ColumnName="identificacion1" />
+                <ScalarProperty Name="direccion" ColumnName="direccion" />
+                <ScalarProperty Name="fotoPerfil" ColumnName="fotoPerfil" />
+                <ScalarProperty Name="presentacion" ColumnName="presentacion" />
+                <ScalarProperty Name="cedulaGerente" ColumnName="cedulaGerente" />
+                <ScalarProperty Name="nombreGerente" ColumnName="nombreGerente" />
+                <ScalarProperty Name="apellidoGerente" ColumnName="apellidoGerente" />
+                <ScalarProperty Name="direccionGerente" ColumnName="direccionGerente" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="VMisCalificaciones">
+            <EntityTypeMapping TypeName="migenteV2Model.VMisCalificaciones">
+              <MappingFragment StoreEntitySet="VMisCalificaciones">
+                <ScalarProperty Name="telefono2" ColumnName="telefono2" />
+                <ScalarProperty Name="telefono1" ColumnName="telefono1" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Apellido" ColumnName="Apellido" />
+                <ScalarProperty Name="Expr3" ColumnName="Expr3" />
+                <ScalarProperty Name="Expr2" ColumnName="Expr2" />
+                <ScalarProperty Name="Expr1" ColumnName="Expr1" />
+                <ScalarProperty Name="fechaCreacion" ColumnName="fechaCreacion" />
+                <ScalarProperty Name="cuentaID" ColumnName="cuentaID" />
+                <ScalarProperty Name="recomendacion" ColumnName="recomendacion" />
+                <ScalarProperty Name="conocimientos" ColumnName="conocimientos" />
+                <ScalarProperty Name="cumplimiento" ColumnName="cumplimiento" />
+                <ScalarProperty Name="puntualidad" ColumnName="puntualidad" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="identificacion" ColumnName="identificacion" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="calificacionID" ColumnName="calificacionID" />
+                <ScalarProperty Name="idCalificador" ColumnName="idCalificador" />
+                <ScalarProperty Name="NombreCalificador" ColumnName="NombreCalificador" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OpenAi_Config">
+            <EntityTypeMapping TypeName="migenteV2Model.OpenAi_Config">
+              <MappingFragment StoreEntitySet="OpenAi_Config">
+                <ScalarProperty Name="OpenAIApiUrl" ColumnName="OpenAIApiUrl" />
+                <ScalarProperty Name="OpenAIApiKey" ColumnName="OpenAIApiKey" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

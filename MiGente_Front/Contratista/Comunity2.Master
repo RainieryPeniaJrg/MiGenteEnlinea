@@ -1,0 +1,237 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Comunity2.Master.cs" Inherits="MiGente_Front.Comunity2" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+        <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Mi Gente en Linea</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/favicon.png" rel="icon">
+    <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="~/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="~/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="~/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/assets/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <form id="form1" runat="server"  enctype="multipart/form-data">
+        <div>
+            <!-- ======= Header ======= -->
+            <header id="header" class="header fixed-top d-flex align-items-center">
+
+                <div class="d-flex align-items-center justify-content-between">
+                    <a href="../../Contratista/index_contratista.aspx" class="logo d-flex align-items-center mt-3 mb-2">
+
+                        <asp:Image runat="server" Width="50%" ImageUrl="~/Images/logoMiGene.png" />
+                    </a>
+                    <i class="bi bi-list toggle-sidebar-btn"></i>
+                </div>
+                <!-- End -->
+
+                <div class="search-bar">
+                    <%--<form class="search-form d-flex align-items-center" method="POST" action="#">
+                        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+                    </form>--%>
+                </div>
+                <!-- End Search Bar -->
+
+                <nav class="header-nav ms-auto">
+                    <ul class="d-flex align-items-center">
+
+                        <li class="nav-item d-block d-lg-none">
+                            <a class="nav-link nav-icon search-bar-toggle " href="#">
+                                <i class="bi bi-search"></i>
+                            </a>
+                        </li>
+                        <!-- End Search Icon-->
+                     
+                        <li class="container">
+                            <a style="color: lightgray">|</a>
+                        </li>
+                        <li class="nav-item dropdown pe-3">
+
+                            <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                                <img src="../../assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                                <span class="d-none d-md-block dropdown-toggle ps-2" runat="server" id="lbAcceso">K. Anderson</span>
+                            </a>
+                            <!-- End Profile Iamge Icon -->
+
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                           
+
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="../../Contratista/index_contratista.aspx">
+                                        <i class="bi bi-person"></i>
+                                        <span>Mi Perfil</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                 
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                       <a class="dropdown-item d-flex align-items-center" href="~/FAQ.aspx">
+                                        <i class="bi bi-question-circle"></i>
+                                        <span>Ayuda</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <li>
+                                   <a class="dropdown-item d-flex align-items-center" runat="server" id="closeSession" onserverclick="closeSession_ServerClick">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        <span>Cerrar Sesion</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                            <!-- End Profile Dropdown Items -->
+                        </li>
+                        <!-- End Profile Nav -->
+
+                    </ul>
+                </nav>
+                <!-- End Icons Navigation -->
+
+            </header>
+            <!-- End Header -->
+
+
+            <!-- ======= Sidebar ======= -->
+            <aside id="sidebar" class="sidebar">
+
+                <ul class="sidebar-nav" id="sidebar-nav">
+
+                    <li class="nav-item">
+                        <a class="nav-link " href="../Contratista/index_contratista.aspx">
+                            <i class="bi bi-grid"></i>
+                            <span>Menu Principal</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link " href="../../Contratista/MisCalificaciones.aspx">
+                            <i class="bi bi-star"></i>
+                            <span>Mis Calificaciones</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                     <a class="nav-link " href="../../Comunidad.aspx">
+                            <i class="bi bi-person-rolodex"></i>
+                            <span>Comunidad de Profesionales</span>
+                        </a>
+                    </li>
+
+                    <!-- End expense Nav -->
+
+                    
+                    <!-- End reports Nav -->
+                    <li class="nav-heading">Gestión de Cuenta</li>
+
+
+                <li class="nav-item">
+                          <a class="nav-link " href="../../MiSuscripcion.aspx">
+                            <i class="bi bi-receipt"></i>
+                            <span>Suscripción</span>
+                        </a>
+                    </li>
+                          <li class="nav-item">
+                    <a class="nav-link " runat="server" onserverclick="Unnamed_ServerClick">
+                            <i class="bi bi-box-arrow-left"></i>
+                            <span>Cerrar Sesión</span>
+                        </a>
+                    </li>
+
+                </ul>
+
+            </aside>
+            <!-- End Sidebar-->
+             <!-- Vendor JS Files -->
+    <script src="../../assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="../../assets/vendor/echarts/echarts.min.js"></script>
+    <script src="../../assets/vendor/quill/quill.js"></script>
+    <script src="../../assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="../../assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="../../assets/vendor/php-email-form/validate.js"></script>
+
+            
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+
+    <!-- SweetAlert2 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="../../assets/js/main.js"></script>
+            <main id="main" class="main " style=" margin-top:-10px; " >
+                   <div style="height: 300px; background-image: url('Images/banner3.jpg'); background-size: contain; background-position: center; margin-left:-60px; margin-right:-30px">
+        <!-- Overlay para la transparencia -->
+        <div style="top: 0; left: 0; height: 100%; width: 100%; background-color: rgba(108, 122, 137, 0.7);">
+    
+  </div>
+            </div>
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                </asp:ContentPlaceHolder>
+
+            </main>
+            <!-- End #main -->
+
+
+
+        </div>
+    </form>
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            &copy; Copyright <strong><span>IntDoSystem, SRL</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+        </div>
+    </footer>
+    <!-- End Footer -->
+
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+   
+</body>
+
+</html>
