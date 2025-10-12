@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
+using MiGenteEnLinea.Domain.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -22,7 +23,11 @@ public partial class MiGenteDbContext : DbContext
 
     public virtual DbSet<ContratistasServicio> ContratistasServicios { get; set; }
 
-    public virtual DbSet<Credenciale> Credenciales { get; set; }
+    // Legacy scaffolded entity (kept for reference)
+    // public virtual DbSet<Credenciale> Credenciales { get; set; }
+
+    // DDD Refactored entity (replaces Credenciale)
+    public virtual DbSet<Credencial> CredencialesRefactored { get; set; }
 
     public virtual DbSet<DeduccionesTss> DeduccionesTsses { get; set; }
 
@@ -86,6 +91,9 @@ public partial class MiGenteDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Apply all configurations from assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(MiGenteDbContext).Assembly);
+
         modelBuilder.Entity<ContratistasFoto>(entity =>
         {
             entity.HasOne(d => d.Contratista).WithMany(p => p.ContratistasFotos).HasConstraintName("FK_Contratistas_Fotos_Contratistas");
@@ -96,10 +104,11 @@ public partial class MiGenteDbContext : DbContext
             entity.HasOne(d => d.Contratista).WithMany(p => p.ContratistasServicios).HasConstraintName("FK_Contratistas_Servicios_Contratistas");
         });
 
-        modelBuilder.Entity<Credenciale>(entity =>
-        {
-            entity.Property(e => e.Activo).HasDefaultValue(false);
-        });
+        // Legacy Credenciale mapping (commented out - using refactored version)
+        // modelBuilder.Entity<Credenciale>(entity =>
+        // {
+        //     entity.Property(e => e.Activo).HasDefaultValue(false);
+        // });
 
         modelBuilder.Entity<DeduccionesTss>(entity =>
         {
