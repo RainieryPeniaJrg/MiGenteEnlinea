@@ -17,6 +17,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Suscripciones.PlanEmpleador> PlanesEmpleadores { get; }
     DbSet<Domain.Entities.Seguridad.Perfile> Perfiles { get; }
     DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; }
+    DbSet<Domain.Entities.Contratistas.ContratistaServicio> ContratistasServicios { get; }
     DbSet<Domain.Entities.Empleadores.Empleador> Empleadores { get; }
     
     // Read Models (Views)

@@ -113,7 +113,23 @@
     "chat.todoListTool.writeOnly": true,
     "github.copilot.chat.codesearch.enabled": true,
     "github.copilot.chat.executePrompt.enabled": true,
-    "powershell.cwd": "🚀 MiGente Clean Architecture"
+    "powershell.cwd": "🚀 MiGente Clean Architecture",
+    "chat.useCloudButtonV2": true,
+    "inlineChat.enableV2": true,
+    "inlineChat.finishOnType": false,
+    "inlineChat.hideOnRequest": true,
+    "inlineChat.lineEmptyHint": true,
+    "chat.mcp.discovery.enabled": {
+      "claude-desktop": true,
+      "cursor-global": true,
+      "windsurf": true,
+      "cursor-workspace": true
+    },
+    "chat.mcp.gallery.enabled": true,
+    "chat.mcp.assisted.nuget.enabled": true,
+    "chat.edits2.enabled": true,
+    "chat.emptyState.history.enabled": true,
+    "chat.checkpoints.showFileChanges": true
   },
   "extensions": {
     "recommendations": [
