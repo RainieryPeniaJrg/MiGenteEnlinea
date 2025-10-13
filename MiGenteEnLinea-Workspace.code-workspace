@@ -112,7 +112,8 @@
     "inlineChat.notebookAgent": true,
     "chat.todoListTool.writeOnly": true,
     "github.copilot.chat.codesearch.enabled": true,
-    "github.copilot.chat.executePrompt.enabled": true
+    "github.copilot.chat.executePrompt.enabled": true,
+    "powershell.cwd": "🚀 MiGente Clean Architecture"
   },
   "extensions": {
     "recommendations": [
