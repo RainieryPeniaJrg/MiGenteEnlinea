@@ -11,8 +11,9 @@ prompts/
 ├── README.md                                   # Este archivo
 ├── AGENT_MODE_INSTRUCTIONS.md                  # 🤖 Claude Sonnet 4.5 - Modo Agente Autónomo
 ├── COMPLETE_ENTITY_MIGRATION_PLAN.md           # 🎯 Plan Maestro - 36 Entidades (COMPLETADO 100%)
-├── DATABASE_RELATIONSHIPS_VALIDATION.md        # ⚠️ CRÍTICO: Validación de FK relationships (NUEVO)
-├── PROGRAM_CS_AND_DI_CONFIGURATION.md          # ⚙️ Configuración completa Program.cs y DI (NUEVO)
+├── DATABASE_RELATIONSHIPS_VALIDATION.md        # ⚠️ CRÍTICO: FK relationships (COMPLETADO 100%)
+├── PROGRAM_CS_AND_DI_CONFIGURATION.md          # ⚙️ Program.cs y DI (COMPLETADO 100%)
+├── APPLICATION_LAYER_CQRS_IMPLEMENTATION.md    # 🚀 Application Layer CQRS (NUEVO - EN PROGRESO)
 ├── DDD_MIGRATION_PROMPT.md                     # 📚 Guía completa de patrones DDD
 ├── COPILOT_INSTRUCTIONS.md                     # 📝 Instrucciones específicas de Copilot
 ├── GITHUB_CONFIG_PROMPT.md                     # ⚙️ Setup de CI/CD
@@ -306,6 +307,97 @@ COMPONENTES:
 
 AUTORIZACIÓN: Ejecuta setup completo.
 ```
+
+---
+
+### Workflow 4: 🚀 Implementación de Application Layer (CQRS con MediatR)
+
+**Agente:** Claude Sonnet 4.5 (Modo Agente)  
+**Prompt:** `APPLICATION_LAYER_CQRS_IMPLEMENTATION.md` (NUEVO)
+
+**Estado:** 🔄 **EN PROGRESO - LOTE 1 PENDIENTE**
+
+**Prerequisito:** Workflows 1, 2 y 3 completados ✅
+
+**Objetivo:**  
+Migrar la lógica de negocio desde los **22 servicios Legacy** a **Application Layer** usando **CQRS** con **MediatR**. La lógica debe ser **EXACTAMENTE IDÉNTICA** al proyecto Legacy.
+
+**⚠️ REGLA CRÍTICA: Paridad 100% con Legacy**
+
+Antes de implementar CUALQUIER Command/Query/Handler:
+1. **LEE** el servicio/controlador Legacy correspondiente
+2. **IDENTIFICA** el método exacto y su lógica
+3. **ANALIZA** parámetros de entrada y salida
+4. **REPLICA** la lógica EXACTAMENTE (mismos pasos, validaciones, orden)
+5. **USA** las mismas queries EF Core (ajustadas a DbContext moderno)
+6. **MANTÉN** los mismos nombres de campos en DTOs
+7. **RESPETA** los mismos códigos de retorno y mensajes
+
+**7 LOTES Organizados:**
+- **LOTE 1 (CRÍTICO):** Authentication - 11 Commands/Queries (LoginService.asmx.cs)
+- **LOTE 2 (ALTA):** Empleadores - 6-8 Commands/Queries
+- **LOTE 3 (ALTA):** Contratistas - 10 Commands/Queries (ContratistasService.cs)
+- **LOTE 4 (MEDIA):** Empleados y Nómina - 15 Commands/Queries (EmpleadosService.cs)
+- **LOTE 5 (MEDIA):** Suscripciones y Pagos - 19 Commands/Queries
+- **LOTE 6 (BAJA):** Servicios Auxiliares - 10-12 Commands/Queries
+- **LOTE 7 (BAJA):** Bot y Avanzados - 3-5 Commands/Queries (BotServices.cs)
+
+**Comando de ejecución (LOTE 1):**
+```
+@workspace Lee prompts/APPLICATION_LAYER_CQRS_IMPLEMENTATION.md
+
+EJECUTAR: LOTE 1 completo (Authentication)
+
+OBJETIVO: Migrar 11 métodos de LoginService.asmx.cs a CQRS con MediatR
+
+METODOLOGÍA ESTRICTA:
+1. LEER Codigo Fuente Mi Gente/MiGente_Front/Services/LoginService.asmx.cs
+2. IDENTIFICAR los 11 métodos públicos listados
+3. Para CADA método:
+   a. ANALIZAR lógica paso a paso
+   b. CREAR Command o Query según operación
+   c. CREAR Handler con lógica IDÉNTICA al Legacy
+   d. CREAR Validator con FluentValidation
+   e. CREAR DTOs necesarios
+   f. CREAR endpoint en AuthController
+4. COMPILAR: dotnet build (debe ser exitoso)
+5. EJECUTAR: dotnet run (verificar API arranca)
+6. PROBAR: Swagger UI - endpoint /api/auth/login
+7. DOCUMENTAR: Crear LOTE_1_AUTHENTICATION_COMPLETADO.md
+
+PATRÓN DE REFERENCIA:
+Seguir el ejemplo completo de LoginCommand en el prompt.
+La lógica en Handler DEBE SER IDÉNTICA al método login() en LoginService.asmx.cs
+
+AUTORIZACIÓN COMPLETA:
+- Leer todos los archivos Legacy necesarios
+- Crear todos los archivos en Application Layer
+- Crear AuthController en API Layer
+- Ejecutar dotnet build y dotnet run
+- NO aplicar migraciones (solo uso de DbContext existente)
+
+DURACIÓN ESTIMADA: 4-6 horas
+
+CRITERIO DE ÉXITO:
+- 11 Commands/Queries funcionando
+- 11 endpoints en AuthController
+- dotnet build sin errores
+- Swagger UI accesible
+- Login endpoint funcional
+
+COMENZAR EJECUCIÓN AUTOMÁTICA AHORA.
+```
+
+**Resultado esperado:**
+- ✅ 11 Commands/Queries creados (Authentication module)
+- ✅ 11 Handlers implementados con lógica Legacy
+- ✅ 11 Validators con FluentValidation
+- ✅ AuthController con 11 endpoints REST
+- ✅ dotnet build sin errores
+- ✅ Swagger UI mostrando nuevos endpoints
+- ✅ Login endpoint funcional (POST /api/auth/login)
+- ✅ Logs mostrando eventos de autenticación
+- ✅ Documento LOTE_1_AUTHENTICATION_COMPLETADO.md
 
 ---
 

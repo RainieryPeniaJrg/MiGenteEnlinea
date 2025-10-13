@@ -11,12 +11,14 @@
 **⚠️ ACTIVE DEVELOPMENT**: This workspace contains TWO projects running simultaneously during migration:
 
 ### 🔷 PROJECT 1: Legacy Web Forms (Maintenance Mode)
+
 **Location:** `Codigo Fuente Mi Gente/`  
 **Purpose:** Production system being phased out  
 **DO NOT:** Add new features or major refactoring  
 **DO:** Only critical bug fixes and security patches
 
 ### 🚀 PROJECT 2: Clean Architecture (Active Development)
+
 **Location:** `MiGenteEnLinea.Clean/`  
 **Purpose:** New modern implementation being built  
 **DO:** All new development, DDD refactoring, testing  
@@ -29,12 +31,14 @@
 This workspace provides specialized prompts for different AI agents:
 
 ### For GitHub Copilot (This File)
+
 - **Mode:** IDE Integration (autocomplete, chat)
 - **Purpose:** Quick suggestions, code completion, inline help
 - **Scope:** Small to medium tasks
 - **Location:** `.github/copilot-instructions.md` (auto-loaded by VS Code)
 
 ### For Claude Sonnet 4.5 / External Agents
+
 - **Mode:** Autonomous Agent (batch execution)
 - **Purpose:** Large refactoring, multi-file changes, DDD migration
 - **Scope:** Complex architectural tasks
@@ -42,6 +46,7 @@ This workspace provides specialized prompts for different AI agents:
 - **Documentation:** `/prompts/README.md`
 
 **📖 Quick Reference:**
+
 ```
 /prompts/
 ├── README.md                        # Guide for using prompts
@@ -99,6 +104,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 ```
 
 **⚠️ IMPORTANT NAVIGATION RULES:**
+
 - When asked about **"legacy"**, **"Web Forms"**, or **"old project"** → Work in `Codigo Fuente Mi Gente/`
 - When asked about **"clean"**, **"new project"**, or **"API"** → Work in `MiGenteEnLinea.Clean/`
 - When asked about **"migration"** or **"refactoring"** → Reference legacy, implement in clean
@@ -115,6 +121,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 **MiGente En Línea** is a platform for managing employment relationships in the Dominican Republic. It connects **Empleadores** (employers) and **Contratistas** (contractors/service providers) with subscription-based access and integrated payment processing.
 
 ### 🔷 Legacy System (Current Production)
+
 - ASP.NET Web Forms (.NET Framework 4.7.2)
 - Database-First Entity Framework 6 with EDMX
 - Forms Authentication with cookies
@@ -123,6 +130,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 - Database: `db_a9f8ff_migente` on SQL Server
 
 ### 🚀 Clean Architecture System (Under Development)
+
 - ASP.NET Core 8.0 Web API
 - Clean Architecture (Onion Architecture)
 - Code-First Entity Framework Core 8
@@ -172,6 +180,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 ### Architecture Layers
 
 #### 1. Domain Layer (`MiGenteEnLinea.Domain`)
+
 **Purpose:** Core business logic and entities (no dependencies)
 
 - **Entities/**: Rich domain models with business logic
@@ -186,6 +195,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 - **Interfaces/**: Repository interfaces, domain services
 
 #### 2. Application Layer (`MiGenteEnLinea.Application`)
+
 **Purpose:** Use cases and application logic
 
 - **Features/**: Organized by feature (CQRS pattern)
@@ -202,11 +212,13 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
   - `Exceptions/`: Application-specific exceptions
 
 **Dependencies:**
+
 - `MediatR 12.2.0` - CQRS implementation
 - `AutoMapper 12.0.1` - Object mapping
 - `FluentValidation 11.9.0` - Input validation
 
 #### 3. Infrastructure Layer (`MiGenteEnLinea.Infrastructure`)
+
 **Purpose:** External concerns and persistence
 
 - **Persistence/**
@@ -227,12 +239,14 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
   - `StorageService.cs` - File storage (Azure Blob/Local)
 
 **Dependencies:**
+
 - `Microsoft.EntityFrameworkCore.SqlServer 8.0.0` - SQL Server provider
 - `BCrypt.Net-Next 4.0.3` - Password hashing
 - `Serilog.AspNetCore 8.0.0` - Structured logging
 - `Serilog.Sinks.MSSqlServer 6.5.0` - Log to database
 
 #### 4. Presentation Layer (`MiGenteEnLinea.API`)
+
 **Purpose:** REST API endpoints and HTTP concerns
 
 - **Controllers/**: REST API endpoints
@@ -254,6 +268,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
   - `ApplicationBuilderExtensions.cs` - Middleware configuration
 
 **Dependencies:**
+
 - `Microsoft.AspNetCore.Authentication.JwtBearer 8.0.0` - JWT authentication
 - `AspNetCoreRateLimit 5.0.0` - Rate limiting
 - `Swashbuckle.AspNetCore 6.5.0` - Swagger/OpenAPI documentation
@@ -261,6 +276,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 ### Authentication & Authorization
 
 #### JWT Token Structure
+
 ```json
 {
   "nameid": "123",
@@ -275,12 +291,14 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 ```
 
 #### Authorization Policies
+
 - `RequireEmpleadorRole` - Only Empleadores
 - `RequireContratistaRole` - Only Contratistas
 - `RequireActivePlan` - Only users with active subscription
 - `RequireVerifiedEmail` - Only users with verified email
 
 #### Rate Limiting
+
 - `/api/auth/login` - 5 requests per minute per IP
 - `/api/auth/register` - 3 requests per hour per IP
 - All other endpoints - 10 requests per second per IP
@@ -288,6 +306,7 @@ ProyectoMigente/ (WORKSPACE ROOT = REPOSITORY ROOT)
 ### Database Access Patterns
 
 #### Code-First with Fluent API
+
 ```csharp
 // Entity configuration example
 public class CredencialConfiguration : IEntityTypeConfiguration<Credencial>
@@ -295,21 +314,22 @@ public class CredencialConfiguration : IEntityTypeConfiguration<Credencial>
     public void Configure(EntityTypeBuilder<Credencial> builder)
     {
         builder.ToTable("Credenciales"); // Maps to existing table
-        
+
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id).HasColumnName("id");
-        
+
         builder.Property(c => c.Email)
             .IsRequired()
             .HasMaxLength(100)
             .HasColumnName("email");
-            
+
         builder.HasIndex(c => c.Email).IsUnique();
     }
 }
 ```
 
 #### Repository Pattern
+
 ```csharp
 public interface IRepository<T> where T : class
 {
@@ -322,6 +342,7 @@ public interface IRepository<T> where T : class
 ```
 
 #### CQRS with MediatR
+
 ```csharp
 // Command
 public record RegistrarUsuarioCommand(string Email, string Password) : IRequest<int>;
@@ -346,25 +367,142 @@ public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand com
 
 ### Migration Status
 
-#### ✅ Completed
-- Clean Architecture solution structure created
-- 36 entities scaffolded from database
-- DbContext configured with connection string
-- Base classes created (AuditableEntity, SoftDeletableEntity)
-- NuGet packages installed (EF Core, MediatR, BCrypt, JWT, etc.)
+#### ✅ Phase 1: Domain Layer - COMPLETADO 100%
 
-#### 🔄 In Progress
-- Refactoring scaffolded entities to rich domain models
-- Creating Fluent API configurations
-- Implementing BCrypt password hashing
-- Creating unit and integration tests
+- ✅ 36 entidades migradas a Rich Domain Models (24) y Read Models (12)
+- ✅ Clean Architecture solution structure creada
+- ✅ DbContext configurado con assembly scanning
+- ✅ Base classes creadas (AuditableEntity, SoftDeletableEntity, AggregateRoot)
+- ✅ Value Objects implementados (~15 value objects)
+- ✅ Domain Events creados (~60 events)
+- ✅ ~12,053 líneas de código limpio y documentado
+- ✅ 0 errores de compilación
+- ✅ Reporte: `MiGenteEnLinea.Clean/MIGRATION_100_COMPLETE.md`
 
-#### ⏳ Pending
-- Implementing CQRS commands and queries
-- Creating REST API controllers
-- Migrating plain text passwords to BCrypt
-- Setting up CI/CD pipeline
-- Performance testing and optimization
+#### ✅ Phase 2: Infrastructure Layer - COMPLETADO 100%
+
+- ✅ 9/9 FK relationships validadas y configuradas (paridad 100% con EDMX)
+- ✅ 27 Fluent API configurations con constraint names exactos
+- ✅ DeleteBehavior correcto para cada relación
+- ✅ Shadow properties sin propiedades de navegación (DDD puro)
+- ✅ Reporte: `MiGenteEnLinea.Clean/DATABASE_RELATIONSHIPS_REPORT.md`
+
+#### ✅ Phase 3: Application Configuration - COMPLETADO 100%
+
+- ✅ Program.cs completo con Serilog, CORS, Swagger, Health Check
+- ✅ DependencyInjection.cs (Infrastructure) con DbContext + Interceptors
+- ✅ DependencyInjection.cs (Application) con MediatR, FluentValidation, AutoMapper
+- ✅ appsettings.json configurado (Connection strings, JWT, Cardnet, Email)
+- ✅ NuGet packages instalados (10 packages totales)
+- ✅ API ejecutándose en puerto 5015
+- ✅ Swagger UI accesible en http://localhost:5015/
+- ✅ Health Check endpoint funcionando en /health
+- ✅ Reporte: `MiGenteEnLinea.Clean/PROGRAM_CS_CONFIGURATION_REPORT.md`
+
+#### 🔄 Phase 4: Application Layer (CQRS) - EN PROGRESO
+
+**Estado:** Listo para comenzar implementación  
+**Objetivo:** Migrar lógica de negocio desde Legacy Services a CQRS con MediatR
+
+**Servicios Legacy Identificados (12 servicios principales):**
+
+1. **LoginService.asmx.cs** - Autenticación, perfiles, credenciales (10 métodos)
+2. **EmpleadosService.cs** - Gestión de empleados, nómina, contrataciones (30+ métodos)
+3. **ContratistasService.cs** - Gestión de contratistas y servicios (10 métodos)
+4. **CalificacionesService.cs** - Sistema de ratings y reviews (4 métodos)
+5. **SuscripcionesService.cs** - Planes, suscripciones, registro (15+ métodos)
+6. **PaymentService.cs** - Procesamiento de pagos Cardnet (3 métodos)
+7. **EmailService.cs** - Envío de correos (5 métodos)
+8. **BotServices.cs** - Asistente virtual OpenAI (3 métodos)
+9. **Utilitario.cs** - Funciones auxiliares (5 métodos)
+10. Y otros servicios auxiliares
+
+**Prioridad de Implementación (6 LOTES CQRS):**
+
+**LOTE 1 (CRÍTICO):** Authentication & User Management
+
+- LoginCommand, RegisterCommand, ChangePasswordCommand, ResetPasswordCommand
+- GetUserByIdQuery, GetUserByEmailQuery, ValidateCredentialsQuery
+- **Tiempo estimado:** 8-10 horas
+- **Archivos Legacy:** LoginService.asmx.cs, SuscripcionesService.cs (parcial)
+
+**LOTE 2 (ALTA):** Empleadores - CRUD Básico
+
+- CreateEmpleadorCommand, UpdateEmpleadorCommand, DeleteEmpleadorCommand
+- GetEmpleadorByIdQuery, GetEmpleadoresQuery, SearchEmpleadoresQuery
+- **Tiempo estimado:** 6-8 horas
+- **Archivos Legacy:** Empleador/\*.aspx.cs (páginas de empleador)
+
+**LOTE 3 (ALTA):** Contratistas - CRUD + Búsqueda
+
+- CreateContratistaCommand, UpdateContratistaCommand, ActivarPerfilCommand
+- GetContratistaByIdQuery, SearchContratistasQuery, GetServiciosQuery
+- AddServicioCommand, RemoveServicioCommand
+- **Tiempo estimado:** 8-10 horas
+- **Archivos Legacy:** ContratistasService.cs
+
+**LOTE 4 (MEDIA):** Empleados y Nómina - CRUD + Procesamiento
+
+- CreateEmpleadoCommand, UpdateEmpleadoCommand, DarDeBajaCommand
+- ProcesarPagoCommand, ProcesarPagoContratacionCommand
+- GetEmpleadosQuery, GetRecibosQuery, GetDeduccionesQuery
+- **Tiempo estimado:** 12-15 horas
+- **Archivos Legacy:** EmpleadosService.cs (métodos más complejos)
+
+**LOTE 5 (MEDIA):** Suscripciones y Pagos
+
+- CreateSuscripcionCommand, UpdateSuscripcionCommand, ProcesarVentaCommand
+- ProcessPaymentCommand (Cardnet integration)
+- GetPlanesQuery, GetSuscripcionQuery, GetVentasQuery
+- **Tiempo estimado:** 10-12 horas
+- **Archivos Legacy:** SuscripcionesService.cs, PaymentService.cs
+
+**LOTE 6 (BAJA):** Calificaciones y Extras
+
+- CreateCalificacionCommand, UpdateCalificacionCommand
+- GetCalificacionesQuery, GetPromedioQuery
+- EnviarEmailCommand (EmailService)
+- ConsultarPadronCommand (API externa)
+- **Tiempo estimado:** 6-8 horas
+- **Archivos Legacy:** CalificacionesService.cs, EmailService.cs
+
+**Metodología OBLIGATORIA (CRITICAL):**
+
+⚠️ **REGLA #1:** Antes de implementar CUALQUIER Command/Query, SIEMPRE leer el método correspondiente en Legacy para copiar la lógica exacta.
+
+1. ✅ **LEER controlador/servicio en Legacy** (SIEMPRE PRIMERO)
+2. ✅ Identificar métodos públicos (lógica de negocio)
+3. ✅ Crear Command o Query según operación (Write/Read)
+4. ✅ Implementar Handler con **lógica EXACTAMENTE igual al Legacy**
+5. ✅ Crear Validator con FluentValidation (validar inputs)
+6. ✅ Crear DTO para request/response (AutoMapper)
+7. ✅ Crear Controller REST API endpoint
+8. ✅ Probar con Swagger UI
+9. ✅ Documentar en `LOTE_X_CQRS_COMPLETADO.md`
+
+#### ⏳ Phase 5: REST API Controllers - PENDIENTE
+
+- Implementar Controllers consumiendo Commands/Queries
+- JWT authentication middleware
+- Global exception handler
+- API versioning
+- Rate limiting
+
+#### ⏳ Phase 6: Testing - PENDIENTE
+
+- Unit tests para Domain entities
+- Unit tests para Handlers
+- Integration tests para Controllers
+- Unit tests para Validators
+- Cobertura objetivo: 80%+
+
+#### ⏳ Phase 7: Security & Deployment - PENDIENTE
+
+- Migrar plain text passwords a BCrypt
+- Implementar refresh tokens
+- Configurar CI/CD pipeline
+- Performance testing
+- Security audit validation
 
 ## Project Structure
 
@@ -545,6 +683,7 @@ msbuild MiGente.sln /p:Configuration=Debug
 ⚠️ **CRITICAL VULNERABILITIES IDENTIFIED (Sept 2025 Audit)**:
 
 #### 🔴 CRITICAL - Fix Immediately
+
 1. **SQL Injection**: Multiple instances of SQL string concatenation in controllers and services
 2. **Plain Text Passwords**: Passwords stored without hashing in database
 3. **Missing Authentication**: Critical endpoints accessible without authentication
@@ -552,6 +691,7 @@ msbuild MiGente.sln /p:Configuration=Debug
 5. **Hardcoded Credentials**: Database credentials and API keys in Web.config
 
 #### 🟡 HIGH - Address This Sprint
+
 6. **Permissive CORS**: Allow-all CORS policy in production
 7. **No Rate Limiting**: Brute force attacks possible on login endpoints
 8. **Missing Input Validation**: No systematic validation framework
@@ -559,6 +699,7 @@ msbuild MiGente.sln /p:Configuration=Debug
 10. **Session Management**: Insecure cookie configuration
 
 #### 🟢 MEDIUM - Address in Next Sprint
+
 11. **CSRF Protection**: Forms lack anti-forgery tokens
 12. **Missing HTTPS Enforcement**: HTTP not redirected to HTTPS
 13. **Weak Password Policy**: No password complexity requirements
@@ -568,6 +709,7 @@ msbuild MiGente.sln /p:Configuration=Debug
 ### 🚫 MANDATORY SECURITY RULES FOR AI AGENTS
 
 **NEVER DO (Will be rejected in code review)**:
+
 ```csharp
 // ❌ SQL Injection vulnerability
 string query = $"SELECT * FROM Users WHERE Username = '{username}'";
@@ -580,12 +722,13 @@ usuario.Password = password;
 public ActionResult GetSensitiveData() { }
 
 // ❌ Exposing errors
-catch (Exception ex) { 
-    return Json(new { error = ex.Message, stack = ex.StackTrace }); 
+catch (Exception ex) {
+    return Json(new { error = ex.Message, stack = ex.StackTrace });
 }
 ```
 
 **ALWAYS DO (Required pattern)**:
+
 ```csharp
 // ✅ Parameterized queries / Entity Framework
 var user = await _context.Users
@@ -718,6 +861,7 @@ MiGenteEnLinea/
 ### Migration Phases
 
 #### Phase 1: Security Remediation (Weeks 1-2) - CRITICAL
+
 - [ ] Implement BCrypt password hashing for all user authentication
 - [ ] Replace all SQL concatenation with Entity Framework queries
 - [ ] Add `[Authorize]` attributes to all protected endpoints
@@ -727,6 +871,7 @@ MiGenteEnLinea/
 - [ ] Add rate limiting to authentication endpoints
 
 #### Phase 2: Foundation Setup (Week 3)
+
 - [ ] Create Clean Architecture solution structure
 - [ ] Setup Entity Framework Core Code-First
 - [ ] Create domain entities with proper encapsulation
@@ -734,6 +879,7 @@ MiGenteEnLinea/
 - [ ] Configure dependency injection
 
 #### Phase 3: Application Layer (Week 4)
+
 - [ ] Implement CQRS with MediatR
 - [ ] Create Commands and Queries for all operations
 - [ ] Add FluentValidation for all inputs
@@ -741,6 +887,7 @@ MiGenteEnLinea/
 - [ ] Add logging with Serilog
 
 #### Phase 4: Authentication & Authorization (Week 5)
+
 - [ ] Implement JWT authentication
 - [ ] Add refresh token mechanism
 - [ ] Configure role-based authorization
@@ -748,6 +895,7 @@ MiGenteEnLinea/
 - [ ] Add multi-factor authentication (future)
 
 #### Phase 5: Testing & Documentation (Week 6)
+
 - [ ] Write unit tests (80%+ coverage target)
 - [ ] Create integration tests for critical paths
 - [ ] Security testing (OWASP validation)
@@ -788,6 +936,7 @@ MiGenteEnLinea/
 ## 🎯 AI Agent Checklist - Before ANY Code Change
 
 **Security Validation** (Must answer YES to all):
+
 - [ ] Does this change eliminate SQL injection risks?
 - [ ] Are passwords properly hashed (BCrypt work factor 12+)?
 - [ ] Are all endpoints properly authenticated/authorized?
@@ -797,6 +946,7 @@ MiGenteEnLinea/
 - [ ] Is this change following OWASP best practices?
 
 **Architecture Validation**:
+
 - [ ] Does this follow Clean Architecture principles?
 - [ ] Is dependency injection used properly?
 - [ ] Are domain entities properly encapsulated?
@@ -804,6 +954,7 @@ MiGenteEnLinea/
 - [ ] Are interfaces used for abstraction?
 
 **Code Quality**:
+
 - [ ] Is the code testable?
 - [ ] Are there unit tests for new functionality?
 - [ ] Is documentation updated?
@@ -813,16 +964,19 @@ MiGenteEnLinea/
 ## 📚 Essential Resources
 
 ### Security References
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
 - [Microsoft Security Best Practices](https://docs.microsoft.com/en-us/aspnet/core/security/)
 
 ### Architecture References
+
 - [Clean Architecture - Jason Taylor](https://github.com/jasontaylordev/CleanArchitecture)
 - [Clean Architecture - Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Domain-Driven Design](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/)
 
 ### Implementation Patterns
+
 - [CQRS Pattern](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Repository Pattern](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design)
 - [JWT Authentication in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/)
@@ -840,6 +994,7 @@ MiGenteEnLinea/
 ### Example 1: Fixing SQL Injection in LoginService
 
 **BEFORE (Vulnerable)**:
+
 ```csharp
 public class LoginService
 {
@@ -852,25 +1007,26 @@ public class LoginService
 ```
 
 **AFTER (Secure)**:
+
 ```csharp
 public class LoginService
 {
     private readonly migenteEntities _context;
     private readonly IPasswordHasher _passwordHasher;
-    
+
     public async Task<LoginResult> LoginAsync(string username, string password)
     {
         var usuario = await _context.Usuarios
             .Include(u => u.Rol)
             .Where(u => u.Username == username && u.Activo)
             .FirstOrDefaultAsync();
-            
+
         if (usuario == null || !_passwordHasher.VerifyPassword(password, usuario.PasswordHash))
         {
             _logger.LogWarning("Failed login attempt for username: {Username}", username);
             return LoginResult.Failed("Credenciales inválidas");
         }
-        
+
         _logger.LogInformation("Successful login for user: {UserId}", usuario.Id);
         return LoginResult.Success(usuario);
     }
@@ -880,6 +1036,7 @@ public class LoginService
 ### Example 2: Implementing Password Hashing
 
 **Password Hasher Service**:
+
 ```csharp
 public interface IPasswordHasher
 {
@@ -890,20 +1047,20 @@ public interface IPasswordHasher
 public class BCryptPasswordHasher : IPasswordHasher
 {
     private const int WorkFactor = 12;
-    
+
     public string HashPassword(string password)
     {
         if (string.IsNullOrWhiteSpace(password))
             throw new ArgumentException("Password cannot be empty", nameof(password));
-            
+
         return BCrypt.Net.BCrypt.HashPassword(password, WorkFactor);
     }
-    
+
     public bool VerifyPassword(string password, string hashedPassword)
     {
         if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(hashedPassword))
             return false;
-            
+
         try
         {
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
@@ -923,7 +1080,7 @@ public class GlobalExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
-    
+
     public GlobalExceptionHandlerMiddleware(
         RequestDelegate next,
         ILogger<GlobalExceptionHandlerMiddleware> logger)
@@ -931,7 +1088,7 @@ public class GlobalExceptionHandlerMiddleware
         _next = next;
         _logger = logger;
     }
-    
+
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -954,40 +1111,40 @@ public class GlobalExceptionHandlerMiddleware
             await HandleExceptionAsync(context, ex);
         }
     }
-    
+
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
-        
+
         var response = new
         {
             message = "Ha ocurrido un error procesando su solicitud",
             requestId = Activity.Current?.Id ?? context.TraceIdentifier
         };
-        
+
         return context.Response.WriteAsJsonAsync(response);
     }
-    
+
     private static Task HandleValidationExceptionAsync(HttpContext context, ValidationException exception)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.Response.ContentType = "application/json";
-        
+
         var response = new
         {
             message = "Error de validación",
             errors = exception.Errors.Select(e => new { e.PropertyName, e.ErrorMessage })
         };
-        
+
         return context.Response.WriteAsJsonAsync(response);
     }
-    
+
     private static Task HandleUnauthorizedAccessAsync(HttpContext context)
     {
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         context.Response.ContentType = "application/json";
-        
+
         var response = new { message = "No autorizado" };
         return context.Response.WriteAsJsonAsync(response);
     }
@@ -1015,26 +1172,26 @@ public class RegistrarUsuarioCommandValidator : AbstractValidator<RegistrarUsuar
             .NotEmpty().WithMessage("El nombre de usuario es requerido")
             .Length(3, 50).WithMessage("El nombre de usuario debe tener entre 3 y 50 caracteres")
             .Matches("^[a-zA-Z0-9_]+$").WithMessage("El nombre de usuario solo puede contener letras, números y guión bajo");
-            
+
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("El correo electrónico es requerido")
             .EmailAddress().WithMessage("El correo electrónico no es válido")
             .MaximumLength(100);
-            
+
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("La contraseña es requerida")
             .MinimumLength(8).WithMessage("La contraseña debe tener al menos 8 caracteres")
             .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$")
             .WithMessage("La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial");
-            
+
         RuleFor(x => x.Nombre)
             .NotEmpty().WithMessage("El nombre es requerido")
             .MaximumLength(100);
-            
+
         RuleFor(x => x.Apellido)
             .NotEmpty().WithMessage("El apellido es requerido")
             .MaximumLength(100);
-            
+
         RuleFor(x => x.TipoUsuario)
             .NotEmpty()
             .Must(x => x == "Empleador" || x == "Contratista")
@@ -1049,18 +1206,18 @@ public class RegistrarUsuarioCommandValidator : AbstractValidator<RegistrarUsuar
 public class JwtTokenService
 {
     private readonly IConfiguration _configuration;
-    
+
     public JwtTokenService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
-    
+
     public string GenerateToken(Usuario usuario)
     {
         var securityKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        
+
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
@@ -1070,7 +1227,7 @@ public class JwtTokenService
             new Claim("PlanID", usuario.PlanID?.ToString() ?? "0"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-        
+
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
@@ -1078,10 +1235,10 @@ public class JwtTokenService
             expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: credentials
         );
-        
+
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     public RefreshToken GenerateRefreshToken(int userId)
     {
         return new RefreshToken
@@ -1139,14 +1296,17 @@ app.UseIpRateLimiting();
 ## 🎯 Implementation Priorities
 
 ### Sprint 1 (Week 1-2): Critical Security Fixes
+
 1. **Password Security**
+
    - Install BCrypt.Net-Next NuGet package
    - Implement IPasswordHasher service
    - Create migration script to hash existing passwords
    - Update all registration/password change logic
 
 2. **SQL Injection Prevention**
-   - Audit all Services/*.cs files for SQL concatenation
+
+   - Audit all Services/\*.cs files for SQL concatenation
    - Replace with Entity Framework LINQ queries
    - Add code analysis rule to prevent future violations
 
@@ -1157,7 +1317,9 @@ app.UseIpRateLimiting();
    - Implement role-based authorization
 
 ### Sprint 2 (Week 3-4): Architecture Foundation
+
 1. **Project Structure**
+
    - Create Clean Architecture solution
    - Setup Domain, Application, Infrastructure, API projects
    - Configure project dependencies
@@ -1169,7 +1331,9 @@ app.UseIpRateLimiting();
    - Test migration rollback/reapply
 
 ### Sprint 3 (Week 5-6): Advanced Features & Testing
+
 1. **CQRS Implementation**
+
    - Install MediatR
    - Create Commands and Queries
    - Implement handlers
