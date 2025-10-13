@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MiGenteEnLinea.Domain.Entities.Empleados;
+using MiGenteEnLinea.Domain.Entities.Nominas;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Configurations;
 
@@ -212,6 +213,20 @@ public sealed class EmpleadoConfiguration : IEntityTypeConfiguration<Empleado>
 
         builder.HasIndex(e => new { e.UserId, e.Activo })
             .HasDatabaseName("IX_Empleados_UserId_Activo");
+
+        // ===========================
+        // RELACIONES
+        // ===========================
+        
+        // ✅ RELACIÓN: Empleado → ReciboHeader (1:N)
+        // Un empleado puede tener múltiples recibos de nómina
+        // Nota: Sin propiedades de navegación (DDD puro)
+        builder.HasMany<ReciboHeader>()
+            .WithOne()
+            .HasForeignKey(r => r.EmpleadoId)
+            .HasPrincipalKey(e => e.EmpleadoId)
+            .HasConstraintName("FK_Empleador_Recibos_Header_Empleados")
+            .OnDelete(DeleteBehavior.Restrict); // No borrar empleado si tiene recibos
 
         // Ignorar propiedades calculadas y eventos
         builder.Ignore(e => e.NombreCompleto);

@@ -101,12 +101,15 @@ public class SuscripcionConfiguration : IEntityTypeConfiguration<Suscripcion>
             .HasConstraintName("FK_Suscripciones_Credenciales")
             .OnDelete(DeleteBehavior.Cascade); // Si se elimina el usuario, se eliminan sus suscripciones
 
-        // NOTA IMPORTANTE SOBRE PLANES:
-        // No configuramos FK explícita a Planes porque es polimórfica:
-        // - Un empleador tiene suscripción a Planes_empleadores
-        // - Un contratista tiene suscripción a Planes_Contratistas
-        // Esto se manejará en la capa de aplicación/negocio
-        // Si se requiere integridad referencial, se pueden crear triggers en SQL Server
+        // ✅ FK: Suscripcion -> PlanEmpleador (PlanId)
+        // Según el EDMX legacy, Suscripciones.planID → Planes_empleadores.planID
+        // NOTA: En legacy, tanto empleadores como contratistas usan Planes_empleadores
+        builder.HasOne<Domain.Entities.Suscripciones.PlanEmpleador>()
+            .WithMany()
+            .HasForeignKey(s => s.PlanId)
+            .HasConstraintName("FK_Suscripciones_Planes_empleadores")
+            .OnDelete(DeleteBehavior.Restrict) // No borrar plan si tiene suscripciones activas
+            .IsRequired(false); // PlanId es nullable en la tabla
 
         // ========================================
         // ÍNDICES PARA OPTIMIZACIÓN

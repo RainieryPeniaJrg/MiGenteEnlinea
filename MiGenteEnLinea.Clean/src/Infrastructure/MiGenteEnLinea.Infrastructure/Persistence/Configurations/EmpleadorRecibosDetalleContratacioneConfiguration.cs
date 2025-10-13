@@ -41,10 +41,11 @@ public class EmpleadorRecibosDetalleContratacioneConfiguration : IEntityTypeConf
         builder.HasIndex(d => d.Monto)
             .HasDatabaseName("IX_EmpleadorRecibosDetalle_Monto");
 
-        // Relaciones - se configurará la relación con el header cuando sea necesario
-        // builder.HasOne<EmpleadorRecibosHeaderContratacione>()
-        //     .WithMany()
-        //     .HasForeignKey(d => d.PagoId)
-        //     .OnDelete(DeleteBehavior.Cascade);
+        // ===========================
+        // RELACIONES
+        // ===========================
+        // Nota: La relación con EmpleadorRecibosHeaderContratacione se configura
+        // desde el lado del Header (HasMany en EmpleadorRecibosHeaderContratacioneConfiguration)
+        // para mantener convención de configuración unidireccional desde el lado "principal"
     }
 }

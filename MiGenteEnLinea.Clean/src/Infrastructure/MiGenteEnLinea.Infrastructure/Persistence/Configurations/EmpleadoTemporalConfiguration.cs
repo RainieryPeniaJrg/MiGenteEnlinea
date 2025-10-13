@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MiGenteEnLinea.Domain.Entities.Empleados;
+using MiGenteEnLinea.Domain.Entities.Contrataciones;
+using MiGenteEnLinea.Domain.Entities.Pagos;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Configurations;
 
@@ -153,6 +155,28 @@ public sealed class EmpleadoTemporalConfiguration : IEntityTypeConfiguration<Emp
 
         builder.HasIndex(e => new { e.UserId, e.Activo })
             .HasDatabaseName("IX_EmpleadosTemporales_UserId_Activo");
+
+        // ===========================
+        // RELACIONES
+        // ===========================
+        
+        // ✅ RELACIÓN 1: EmpleadoTemporal → DetalleContratacion (1:N)
+        // Una contratación temporal puede tener múltiples detalles de trabajo
+        builder.HasMany<DetalleContratacion>()
+            .WithOne()
+            .HasForeignKey(d => d.ContratacionId)
+            .HasPrincipalKey(e => e.ContratacionId)
+            .HasConstraintName("FK_DetalleContrataciones_EmpleadosTemporales")
+            .OnDelete(DeleteBehavior.Restrict); // No borrar empleado si tiene detalles
+
+        // ✅ RELACIÓN 2: EmpleadoTemporal → EmpleadorRecibosHeaderContratacione (1:N)
+        // Una contratación temporal puede tener múltiples pagos/recibos
+        builder.HasMany<EmpleadorRecibosHeaderContratacione>()
+            .WithOne()
+            .HasForeignKey(r => r.ContratacionId)
+            .HasPrincipalKey(e => e.ContratacionId)
+            .HasConstraintName("FK_Empleador_Recibos_Header_Contrataciones_EmpleadosTemporales")
+            .OnDelete(DeleteBehavior.Restrict); // No borrar empleado si tiene pagos
 
         // Ignorar eventos
         builder.Ignore(e => e.Events);

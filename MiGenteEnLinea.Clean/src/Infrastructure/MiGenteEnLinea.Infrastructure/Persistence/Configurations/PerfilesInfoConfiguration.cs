@@ -136,11 +136,18 @@ public class PerfilesInfoConfiguration : IEntityTypeConfiguration<PerfilesInfo>
             .IsUnique()
             .HasDatabaseName("UX_PerfilesInfo_UserId");
 
-        // Relación con Perfile (si existe el FK en la tabla legacy)
-        // Nota: Esta relación se puede habilitar cuando se migren ambas tablas
-        // builder.HasOne<Perfile>()
-        //     .WithMany()
-        //     .HasForeignKey(p => p.PerfilId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        // ===========================
+        // RELACIONES
+        // ===========================
+        
+        // ✅ RELACIÓN: PerfilesInfo → Perfile (N:1) - OPCIONAL
+        // Una información de perfil puede estar asociada a un tipo de perfil
+        // Nota: PerfilId es NULLABLE porque esta relación es opcional
+        builder.HasOne<Perfile>()
+            .WithMany()
+            .HasForeignKey(p => p.PerfilId)
+            .HasConstraintName("FK_perfilesInfo_Perfiles")
+            .OnDelete(DeleteBehavior.Restrict) // No borrar Perfile si tiene PerfilesInfos asociados
+            .IsRequired(false); // Relación opcional (FK nullable)
     }
 }

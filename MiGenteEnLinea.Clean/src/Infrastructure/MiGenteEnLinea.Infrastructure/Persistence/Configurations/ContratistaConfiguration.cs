@@ -183,26 +183,26 @@ public sealed class ContratistaConfiguration : IEntityTypeConfiguration<Contrati
         // ===========================
         // RELACIONES
         // ===========================
-        // Relación con Credencial (si está en el DbContext)
-        // Un Contratista pertenece a una Credencial (relación 1:1)
-        // Nota: Descomentar cuando Credencial esté en el DbContext
-        /*
-        builder.HasOne<Credencial>()
-            .WithMany()
-            .HasForeignKey(c => c.UserId)
-            .HasPrincipalKey(cred => cred.UserId)
-            .OnDelete(DeleteBehavior.Restrict); // No eliminar en cascada
-        */
+        
+        // ✅ RELACIÓN 1: Contratista → ContratistaFoto (1:N)
+        // Un contratista puede tener múltiples fotos de trabajos realizados
+        // Nota: Sin propiedades de navegación (DDD puro)
+        builder.HasMany<ContratistaFoto>()
+            .WithOne()
+            .HasForeignKey(f => f.ContratistaId)
+            .HasPrincipalKey(c => c.Id)
+            .HasConstraintName("FK_Contratistas_Fotos_Contratistas")
+            .OnDelete(DeleteBehavior.Cascade); // Si se borra contratista, se borran fotos
 
-        // Relación con ContratistasFotos (1:N)
-        // Un contratista puede tener múltiples fotos de trabajos
-        // Nota: La relación inversa ya está configurada en la entidad scaffolded
-        // No necesitamos configurarla aquí si usamos la entidad legacy para fotos
-
-        // Relación con ContratistasServicios (N:M)
+        // ✅ RELACIÓN 2: Contratista → ContratistaServicio (1:N)
         // Un contratista puede ofrecer múltiples servicios
-        // Nota: La relación inversa ya está configurada en la entidad scaffolded
-        // No necesitamos configurarla aquí si usamos la entidad legacy para servicios
+        // Nota: Sin propiedades de navegación (DDD puro)
+        builder.HasMany<ContratistaServicio>()
+            .WithOne()
+            .HasForeignKey(s => s.ContratistaId)
+            .HasPrincipalKey(c => c.Id)
+            .HasConstraintName("FK_Contratistas_Servicios_Contratistas")
+            .OnDelete(DeleteBehavior.Cascade); // Si se borra contratista, se borran sus servicios
 
         // ===========================
         // PROPIEDADES IGNORADAS

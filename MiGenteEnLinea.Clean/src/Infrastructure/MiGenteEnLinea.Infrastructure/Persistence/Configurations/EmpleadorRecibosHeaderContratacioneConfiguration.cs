@@ -59,10 +59,17 @@ public class EmpleadorRecibosHeaderContratacioneConfiguration : IEntityTypeConfi
         builder.HasIndex(e => new { e.UserId, e.FechaPago })
             .HasDatabaseName("IX_EmpleadorRecibosHeader_UserId_FechaPago");
 
-        // Relaciones - se configurarán cuando migremos EmpleadosTemporales
-        // builder.HasOne<EmpleadosTemporale>()
-        //     .WithMany()
-        //     .HasForeignKey(e => e.ContratacionId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        // ===========================
+        // RELACIONES
+        // ===========================
+        
+        // ✅ RELACIÓN: EmpleadorRecibosHeaderContratacione → EmpleadorRecibosDetalleContratacione (1:N)
+        // Un header de recibo puede tener múltiples líneas de detalle
+        builder.HasMany<EmpleadorRecibosDetalleContratacione>()
+            .WithOne()
+            .HasForeignKey(d => d.PagoId)
+            .HasPrincipalKey(h => h.PagoId)
+            .HasConstraintName("FK_Empleador_Recibos_Detalle_Contrataciones_Empleador_Recibos_Header_Contrataciones")
+            .OnDelete(DeleteBehavior.Cascade); // Si se borra header, se borran detalles
     }
 }
