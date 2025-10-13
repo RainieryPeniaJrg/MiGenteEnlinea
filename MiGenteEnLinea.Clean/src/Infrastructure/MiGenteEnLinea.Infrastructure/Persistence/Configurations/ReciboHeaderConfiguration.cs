@@ -25,7 +25,7 @@ public sealed class ReciboHeaderConfiguration : IEntityTypeConfiguration<ReciboH
         builder.Property(r => r.UserId)
             .IsRequired()
             .HasColumnName("userID")
-            .HasMaxLength(100)
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false);
 
         builder.Property(r => r.EmpleadoId)

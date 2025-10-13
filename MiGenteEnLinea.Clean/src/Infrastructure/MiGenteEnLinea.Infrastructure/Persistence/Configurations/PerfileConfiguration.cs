@@ -29,7 +29,7 @@ public class PerfileConfiguration : IEntityTypeConfiguration<Perfile>
         // UserId
         builder.Property(p => p.UserId)
             .IsRequired()
-            .HasMaxLength(450)
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .HasColumnName("userID")
             .IsUnicode(false);
 

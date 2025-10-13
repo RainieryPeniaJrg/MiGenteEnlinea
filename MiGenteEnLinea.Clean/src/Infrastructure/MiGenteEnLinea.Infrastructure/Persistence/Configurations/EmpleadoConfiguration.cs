@@ -26,7 +26,7 @@ public sealed class EmpleadoConfiguration : IEntityTypeConfiguration<Empleado>
         builder.Property(e => e.UserId)
             .IsRequired()
             .HasColumnName("userID")
-            .HasMaxLength(100)
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false);
 
         builder.Property(e => e.Identificacion)

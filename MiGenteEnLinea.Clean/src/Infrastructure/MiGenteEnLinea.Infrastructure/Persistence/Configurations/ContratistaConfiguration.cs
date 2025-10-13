@@ -184,6 +184,16 @@ public sealed class ContratistaConfiguration : IEntityTypeConfiguration<Contrati
         // RELACIONES
         // ===========================
         
+        // ✅ RELACIÓN 0: Contratista → Credencial (N:1)
+        // Un contratista pertenece a una credencial (relación 1:1)
+        // IMPORTANTE: FK apunta a Credencial.UserId (string), NO a Credencial.Id (int)
+        builder.HasOne<Domain.Entities.Authentication.Credencial>()
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .HasPrincipalKey(cr => cr.UserId) // Especifica UserId como clave principal
+            .HasConstraintName("FK_Contratistas_Credenciales")
+            .OnDelete(DeleteBehavior.Restrict); // No eliminar en cascada
+        
         // ✅ RELACIÓN 1: Contratista → ContratistaFoto (1:N)
         // Un contratista puede tener múltiples fotos de trabajos realizados
         // Nota: Sin propiedades de navegación (DDD puro)

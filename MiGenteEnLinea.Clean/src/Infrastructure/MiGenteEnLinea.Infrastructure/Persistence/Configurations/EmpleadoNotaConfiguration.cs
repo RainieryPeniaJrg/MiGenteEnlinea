@@ -25,7 +25,7 @@ public sealed class EmpleadoNotaConfiguration : IEntityTypeConfiguration<Emplead
         builder.Property(n => n.UserId)
             .IsRequired()
             .HasColumnName("userID")
-            .HasMaxLength(150)
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false);
 
         builder.Property(n => n.EmpleadoId)

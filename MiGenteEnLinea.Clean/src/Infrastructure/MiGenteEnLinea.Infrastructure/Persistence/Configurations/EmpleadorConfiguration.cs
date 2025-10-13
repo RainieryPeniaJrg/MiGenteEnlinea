@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MiGenteEnLinea.Domain.Entities.Empleadores;
+using MiGenteEnLinea.Domain.Entities.Authentication;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Configurations;
 
@@ -38,6 +39,7 @@ public sealed class EmpleadorConfiguration : IEntityTypeConfiguration<Empleador>
 
         builder.Property(e => e.UserId)
             .HasColumnName("userID")
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false) // VARCHAR en legacy
             .IsRequired(); // FK obligatorio
 
@@ -102,16 +104,15 @@ public sealed class EmpleadorConfiguration : IEntityTypeConfiguration<Empleador>
         // ===========================
         // RELACIONES
         // ===========================
-        // Relación con Credencial (si está en el DbContext)
+        // Relación con Credencial
         // Un Empleador pertenece a una Credencial (relación 1:1)
-        // Nota: Descomentar cuando Credencial esté en el DbContext
-        /*
+        // IMPORTANTE: FK apunta a Credencial.UserId (string), NO a Credencial.Id (int)
         builder.HasOne<Credencial>()
             .WithMany()
             .HasForeignKey(e => e.UserId)
-            .HasPrincipalKey(c => c.UserId)
+            .HasPrincipalKey(c => c.UserId) // Especifica UserId como clave principal
+            .HasConstraintName("FK_Ofertantes_Credenciales")
             .OnDelete(DeleteBehavior.Restrict); // No eliminar en cascada
-        */
 
         // ===========================
         // PROPIEDADES IGNORADAS

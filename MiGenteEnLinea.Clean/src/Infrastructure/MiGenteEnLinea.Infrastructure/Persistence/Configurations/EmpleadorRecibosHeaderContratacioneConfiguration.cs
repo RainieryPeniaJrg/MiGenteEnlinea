@@ -24,6 +24,7 @@ public class EmpleadorRecibosHeaderContratacioneConfiguration : IEntityTypeConfi
         // Propiedades
         builder.Property(e => e.UserId)
             .IsRequired()
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false)
             .HasColumnName("userID");
 

@@ -23,6 +23,7 @@ public class VentaConfiguration : IEntityTypeConfiguration<Venta>
         builder.Property(v => v.UserId)
             .IsRequired()
             .HasColumnName("userID")
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsUnicode(false);
 
         builder.Property(v => v.FechaTransaccion)

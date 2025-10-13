@@ -49,7 +49,7 @@ public class SuscripcionConfiguration : IEntityTypeConfiguration<Suscripcion>
         // UserId - FK a Credenciales
         builder.Property(s => s.UserId)
             .HasColumnName("userID")
-            .HasMaxLength(128) // Coincide con ASP.NET Identity
+            .HasMaxLength(250) // Debe coincidir con Credenciales.userID
             .IsRequired();
 
         // PlanId - FK a Planes_empleadores o Planes_Contratistas
@@ -95,9 +95,11 @@ public class SuscripcionConfiguration : IEntityTypeConfiguration<Suscripcion>
         // ========================================
 
         // FK: Suscripcion -> Credencial (UserId)
+        // IMPORTANTE: FK apunta a Credencial.UserId (string), NO a Credencial.Id (int)
         builder.HasOne<Domain.Entities.Authentication.Credencial>()
             .WithMany()
             .HasForeignKey(s => s.UserId)
+            .HasPrincipalKey(cr => cr.UserId) // Especifica UserId como clave principal
             .HasConstraintName("FK_Suscripciones_Credenciales")
             .OnDelete(DeleteBehavior.Cascade); // Si se elimina el usuario, se eliminan sus suscripciones
 

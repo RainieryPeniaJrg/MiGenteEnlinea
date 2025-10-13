@@ -268,6 +268,9 @@ public partial class MiGenteDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Ignore domain events - they should NOT be persisted to database
+        modelBuilder.Ignore<MiGenteEnLinea.Domain.Common.DomainEvent>();
+        
         // Apply all configurations from assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MiGenteDbContext).Assembly);
 

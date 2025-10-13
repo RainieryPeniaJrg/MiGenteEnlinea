@@ -26,7 +26,7 @@ public sealed class CredencialConfiguration : IEntityTypeConfiguration<Credencia
         builder.Property(c => c.UserId)
             .IsRequired()
             .HasColumnName("userID")
-            .HasMaxLength(50)
+            .HasMaxLength(250) // Debe coincidir con FKs (Calificaciones, Suscripciones, etc.)
             .IsUnicode(false);
 
         // Email - Mapeo con Value Object

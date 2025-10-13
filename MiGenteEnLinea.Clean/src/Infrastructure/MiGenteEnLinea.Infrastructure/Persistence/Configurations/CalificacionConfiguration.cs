@@ -104,9 +104,11 @@ public class CalificacionConfiguration : IEntityTypeConfiguration<Calificacion>
 
         // FK: Calificacion -> Credencial (EmpleadorUserId)
         // Representa al empleador que dio la calificación
+        // IMPORTANTE: FK apunta a Credencial.UserId (string), NO a Credencial.Id (int)
         builder.HasOne<Domain.Entities.Authentication.Credencial>()
             .WithMany()
             .HasForeignKey(c => c.EmpleadorUserId)
+            .HasPrincipalKey(cr => cr.UserId) // Especifica UserId como clave principal
             .HasConstraintName("FK_Calificaciones_Credenciales_Empleador")
             .OnDelete(DeleteBehavior.Cascade); // Si se elimina el empleador, se eliminan sus calificaciones
 
