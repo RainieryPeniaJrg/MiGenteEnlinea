@@ -1,13 +1,15 @@
 using BCrypt.Net;
 using MiGenteEnLinea.Domain.Interfaces;
+using ApplicationPasswordHasher = MiGenteEnLinea.Application.Common.Interfaces.IPasswordHasher;
 
 namespace MiGenteEnLinea.Infrastructure.Identity.Services;
 
 /// <summary>
 /// Implementación de IPasswordHasher usando BCrypt.
 /// BCrypt es el estándar recomendado para hashing de contraseñas (work factor 12).
+/// Implementa tanto la interfaz de Domain como de Application para compatibilidad.
 /// </summary>
-public sealed class BCryptPasswordHasher : IPasswordHasher
+public sealed class BCryptPasswordHasher : IPasswordHasher, ApplicationPasswordHasher
 {
     private const int WorkFactor = 12;
 

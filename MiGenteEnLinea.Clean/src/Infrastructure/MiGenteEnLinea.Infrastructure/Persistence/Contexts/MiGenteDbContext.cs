@@ -15,15 +15,28 @@ using MiGenteEnLinea.Domain.Entities.Seguridad;
 using MiGenteEnLinea.Domain.Entities.Configuracion;
 using MiGenteEnLinea.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
+using MiGenteEnLinea.Application.Common.Interfaces;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 
-public partial class MiGenteDbContext : DbContext
+public partial class MiGenteDbContext : DbContext, IApplicationDbContext
 {
     public MiGenteDbContext(DbContextOptions<MiGenteDbContext> options)
         : base(options)
     {
     }
+
+    // ========================================
+    // EXPLICIT INTERFACE IMPLEMENTATION FOR IApplicationDbContext
+    // ========================================
+    // Expone propiedades DbContext con nombres de interfaz para Application Layer
+    DbSet<Credencial> IApplicationDbContext.Credenciales => CredencialesRefactored;
+    DbSet<VistaPerfil> IApplicationDbContext.VPerfiles => VistasPerfil;
+    // Suscripciones y PlanesEmpleadores ya coinciden con los nombres de interfaz
+
+    // ========================================
+    // DATABASE ENTITIES
+    // ========================================
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Calificacione> CalificacionesLegacy { get; set; }

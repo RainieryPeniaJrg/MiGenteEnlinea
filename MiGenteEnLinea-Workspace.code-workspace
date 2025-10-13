@@ -104,7 +104,15 @@
     "git.confirmSync": false,
     "git.enableSmartCommit": true,
     "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
-    "dotnet.preferCSharpExtension": true
+    "dotnet.preferCSharpExtension": true,
+    "chat.agent.maxRequests": 100,
+    "chat.agentSessionsViewLocation": "view",
+    "github.copilot.chat.agent.thinkingTool": true,
+    "chat.useNestedAgentsMdFiles": true,
+    "inlineChat.notebookAgent": true,
+    "chat.todoListTool.writeOnly": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.executePrompt.enabled": true
   },
   "extensions": {
     "recommendations": [

@@ -49,10 +49,15 @@ This workspace provides specialized prompts for different AI agents:
 
 ```
 /prompts/
-├── README.md                        # Guide for using prompts
-├── AGENT_MODE_INSTRUCTIONS.md       # Claude Sonnet 4.5 autonomous mode
-└── ddd-migration-agent.md           # DDD migration workflow (coming soon)
+├── README.md                               # Guide for using prompts
+├── AGENT_MODE_INSTRUCTIONS.md              # Claude Sonnet 4.5 autonomous mode
+├── APPLICATION_LAYER_CQRS_DETAILED.md      # ⭐ Phase 4: CQRS Implementation (ACTIVE)
+└── ddd-migration-agent.md                  # DDD migration workflow (coming soon)
 ```
+
+**🚀 CURRENT FOCUS:** Phase 4 - Application Layer (CQRS with MediatR)  
+**📄 Active Prompt:** `/prompts/APPLICATION_LAYER_CQRS_DETAILED.md`  
+**📊 Progress:** LOTE 1 at 85% (blocked by NuGet), LOTES 2-6 pending
 
 ---
 
@@ -401,84 +406,152 @@ public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand com
 
 #### 🔄 Phase 4: Application Layer (CQRS) - EN PROGRESO
 
-**Estado:** Listo para comenzar implementación  
-**Objetivo:** Migrar lógica de negocio desde Legacy Services a CQRS con MediatR
+**Estado:** LOTE 1 al 85% (bloqueado por NuGet), LOTES 2-6 pendientes  
+**Objetivo:** Migrar lógica de negocio desde Legacy Services a CQRS con MediatR  
+**📄 Prompt Detallado:** `/prompts/APPLICATION_LAYER_CQRS_DETAILED.md` (5,000+ líneas)
 
-**Servicios Legacy Identificados (12 servicios principales):**
+---
 
-1. **LoginService.asmx.cs** - Autenticación, perfiles, credenciales (10 métodos)
-2. **EmpleadosService.cs** - Gestión de empleados, nómina, contrataciones (30+ métodos)
-3. **ContratistasService.cs** - Gestión de contratistas y servicios (10 métodos)
-4. **CalificacionesService.cs** - Sistema de ratings y reviews (4 métodos)
-5. **SuscripcionesService.cs** - Planes, suscripciones, registro (15+ métodos)
-6. **PaymentService.cs** - Procesamiento de pagos Cardnet (3 métodos)
-7. **EmailService.cs** - Envío de correos (5 métodos)
-8. **BotServices.cs** - Asistente virtual OpenAI (3 métodos)
-9. **Utilitario.cs** - Funciones auxiliares (5 métodos)
-10. Y otros servicios auxiliares
+### ⚠️ ESTADO ACTUAL: LOTE 1 BLOQUEADO
 
-**Prioridad de Implementación (6 LOTES CQRS):**
+**LOTE 1: Authentication & User Management - 85% COMPLETADO**
+
+**Archivos Creados:** 23 archivos (~1,380 líneas de código)
+- ✅ 2/5 Commands completados (LoginCommand, ChangePasswordCommand)
+- ✅ 4/5 Queries completados (GetPerfil, GetPerfilByEmail, ValidarCorreo, GetCredenciales)
+- ✅ 5/5 DTOs completados
+- ✅ 4/4 Interfaces completadas (IApplicationDbContext, IPasswordHasher, IJwtTokenService, IEmailService)
+- ✅ 1/1 Controller completado (AuthController con 6 endpoints)
+
+**🚫 BLOQUEADO POR:** 27 errores de compilación (NuGet faltante)
+
+**Acción Inmediata Requerida (5 minutos):**
+```powershell
+# 1. Agregar referencias faltantes
+dotnet add src/Core/MiGenteEnLinea.Application/MiGenteEnLinea.Application.csproj package Microsoft.EntityFrameworkCore --version 8.0.0
+dotnet add src/Core/MiGenteEnLinea.Application/MiGenteEnLinea.Application.csproj package Microsoft.Extensions.Logging.Abstractions --version 8.0.0
+
+# 2. Fix namespace (cambiar Catalogos.Cuenta → Seguridad.Cuenta)
+# Archivo: Application/Common/Interfaces/IApplicationDbContext.cs línea 16
+
+# 3. Verificar compilación
+dotnet build --no-restore
+```
+
+**Pendiente (2-3 horas):**
+- ❌ RegisterCommand (desde SuscripcionesService.GuardarPerfil)
+- ❌ ActivateAccountCommand (desde activarperfil.aspx.cs)
+- ❌ UpdateProfileCommand (desde LoginService.actualizarPerfil)
+- ❌ Testing completo con Swagger UI
+
+**Reporte:** `LOTE_1_AUTHENTICATION_PARCIAL.md`
+
+---
+
+### 📋 SERVICIOS LEGACY IDENTIFICADOS (9 servicios, 89 métodos)
+
+| # | Servicio | Métodos | Complejidad | Prioridad |
+|---|----------|---------|-------------|-----------|
+| 1 | LoginService.asmx.cs | 10 | 🟡 MEDIA | 🔴 CRÍTICA |
+| 2 | EmpleadosService.cs | 32 | 🔴 ALTA | 🟠 ALTA |
+| 3 | ContratistasService.cs | 10 | 🟢 BAJA | 🟠 ALTA |
+| 4 | SuscripcionesService.cs | 17 | 🟡 MEDIA | 🟡 MEDIA |
+| 5 | CalificacionesService.cs | 4 | 🟢 BAJA | 🟢 BAJA |
+| 6 | PaymentService.cs | 3 | 🟡 MEDIA | 🟡 MEDIA |
+| 7 | EmailService.cs | 5 | 🟢 BAJA | 🟢 BAJA |
+| 8 | BotServices.cs | 3 | 🟢 BAJA | 🟢 BAJA |
+| 9 | Utilitario.cs | 5 | 🟢 BAJA | 🟢 BAJA |
+
+---
+
+### 🎯 PLAN DE IMPLEMENTACIÓN (6 LOTES CQRS)
 
 **LOTE 1 (CRÍTICO):** Authentication & User Management
-
-- LoginCommand, RegisterCommand, ChangePasswordCommand, ResetPasswordCommand
-- GetUserByIdQuery, GetUserByEmailQuery, ValidateCredentialsQuery
-- **Tiempo estimado:** 8-10 horas
-- **Archivos Legacy:** LoginService.asmx.cs, SuscripcionesService.cs (parcial)
+- **Estado:** 85% completado, bloqueado por NuGet
+- **Commands:** Login✅, ChangePassword✅, Register❌, Activate❌, UpdateProfile❌
+- **Queries:** GetPerfil✅, GetPerfilByEmail✅, ValidarCorreo✅, GetCredenciales✅
+- **Tiempo restante:** 2-3 horas
+- **Legacy:** LoginService.asmx.cs, SuscripcionesService.cs (parcial)
 
 **LOTE 2 (ALTA):** Empleadores - CRUD Básico
-
 - CreateEmpleadorCommand, UpdateEmpleadorCommand, DeleteEmpleadorCommand
 - GetEmpleadorByIdQuery, GetEmpleadoresQuery, SearchEmpleadoresQuery
 - **Tiempo estimado:** 6-8 horas
-- **Archivos Legacy:** Empleador/\*.aspx.cs (páginas de empleador)
+- **Legacy:** Empleador/*.aspx.cs
 
 **LOTE 3 (ALTA):** Contratistas - CRUD + Búsqueda
-
 - CreateContratistaCommand, UpdateContratistaCommand, ActivarPerfilCommand
 - GetContratistaByIdQuery, SearchContratistasQuery, GetServiciosQuery
 - AddServicioCommand, RemoveServicioCommand
 - **Tiempo estimado:** 8-10 horas
-- **Archivos Legacy:** ContratistasService.cs
+- **Legacy:** ContratistasService.cs
 
 **LOTE 4 (MEDIA):** Empleados y Nómina - CRUD + Procesamiento
-
 - CreateEmpleadoCommand, UpdateEmpleadoCommand, DarDeBajaCommand
 - ProcesarPagoCommand, ProcesarPagoContratacionCommand
 - GetEmpleadosQuery, GetRecibosQuery, GetDeduccionesQuery
 - **Tiempo estimado:** 12-15 horas
-- **Archivos Legacy:** EmpleadosService.cs (métodos más complejos)
+- **Legacy:** EmpleadosService.cs (métodos más complejos)
 
 **LOTE 5 (MEDIA):** Suscripciones y Pagos
-
 - CreateSuscripcionCommand, UpdateSuscripcionCommand, ProcesarVentaCommand
 - ProcessPaymentCommand (Cardnet integration)
 - GetPlanesQuery, GetSuscripcionQuery, GetVentasQuery
 - **Tiempo estimado:** 10-12 horas
-- **Archivos Legacy:** SuscripcionesService.cs, PaymentService.cs
+- **Legacy:** SuscripcionesService.cs, PaymentService.cs
 
 **LOTE 6 (BAJA):** Calificaciones y Extras
-
 - CreateCalificacionCommand, UpdateCalificacionCommand
 - GetCalificacionesQuery, GetPromedioQuery
 - EnviarEmailCommand (EmailService)
 - ConsultarPadronCommand (API externa)
 - **Tiempo estimado:** 6-8 horas
-- **Archivos Legacy:** CalificacionesService.cs, EmailService.cs
+- **Legacy:** CalificacionesService.cs, EmailService.cs
 
-**Metodología OBLIGATORIA (CRITICAL):**
+---
 
-⚠️ **REGLA #1:** Antes de implementar CUALQUIER Command/Query, SIEMPRE leer el método correspondiente en Legacy para copiar la lógica exacta.
+### ⚠️ METODOLOGÍA OBLIGATORIA (CRITICAL)
 
-1. ✅ **LEER controlador/servicio en Legacy** (SIEMPRE PRIMERO)
-2. ✅ Identificar métodos públicos (lógica de negocio)
-3. ✅ Crear Command o Query según operación (Write/Read)
-4. ✅ Implementar Handler con **lógica EXACTAMENTE igual al Legacy**
-5. ✅ Crear Validator con FluentValidation (validar inputs)
-6. ✅ Crear DTO para request/response (AutoMapper)
-7. ✅ Crear Controller REST API endpoint
-8. ✅ Probar con Swagger UI
-9. ✅ Documentar en `LOTE_X_CQRS_COMPLETADO.md`
+**REGLA #1:** Antes de implementar CUALQUIER Command/Query, SIEMPRE leer el método correspondiente en Legacy para copiar la lógica exacta.
+
+**Proceso de Implementación:**
+
+1. ✅ **LEER servicio Legacy COMPLETO** (SIEMPRE PRIMERO)
+   - Identificar todos los métodos públicos
+   - Analizar lógica de negocio (validaciones, cálculos, reglas)
+   - Documentar queries EF6 que se convertirán a EF Core
+
+2. ✅ **Mapear a Commands/Queries**
+   - Write operations → Commands
+   - Read operations → Queries
+   - Identificar DTOs y Validators necesarios
+
+3. ✅ **Implementar Handler con lógica EXACTA del Legacy**
+   - Copiar comportamiento 100% (no "mejorar")
+   - Mantener mismos códigos de retorno (ej: 2=success, 0=invalid, -1=inactive)
+   - Mantener mismo orden de operaciones
+   - Preservar estrategias (ej: 2 DbContext si Legacy lo usa)
+
+4. ✅ **Crear Validator con FluentValidation**
+   - Validar inputs antes de Handler
+
+5. ✅ **Crear DTOs para request/response**
+   - Usar AutoMapper cuando sea apropiado
+
+6. ✅ **Crear Controller REST API endpoint**
+   - Documentación Swagger completa
+   - Manejo de errores apropiado
+
+7. ✅ **Probar con Swagger UI**
+   - Comparar resultados con Legacy (inputs idénticos)
+
+8. ✅ **Documentar en `LOTE_X_COMPLETADO.md`**
+
+**🚨 NUNCA:**
+- Inventar lógica nueva sin aprobación
+- "Mejorar" código Legacy durante migración
+- Cambiar códigos de retorno o estructuras de respuesta
+- Saltarse la lectura del método Legacy
 
 #### ⏳ Phase 5: REST API Controllers - PENDIENTE
 

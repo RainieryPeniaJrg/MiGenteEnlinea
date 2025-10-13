@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Interfaces;
 using MiGenteEnLinea.Infrastructure.Identity.Services;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
@@ -45,11 +46,14 @@ public static class DependencyInjection
                 .EnableDetailedErrors(false); // Solo en desarrollo
         });
 
+        // Registrar interfaz para Application Layer
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<MiGenteDbContext>());
+
         // ========================================
         // IDENTITY SERVICES
         // ========================================
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<Application.Common.Interfaces.IPasswordHasher, BCryptPasswordHasher>();
 
         // TODO: Agregar JWT Token Service cuando se implemente
         // services.AddScoped<IJwtTokenService, JwtTokenService>();
