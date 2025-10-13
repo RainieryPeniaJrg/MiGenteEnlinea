@@ -315,6 +315,63 @@ public class Perfile : AggregateRoot
     }
 
     /// <summary>
+    /// Actualiza toda la información básica del perfil en una sola operación
+    /// Réplica de LoginService.actualizarPerfil() del Legacy
+    /// </summary>
+    public void ActualizarInformacionBasica(
+        string nombre,
+        string apellido,
+        string email,
+        string? telefono1 = null,
+        string? telefono2 = null,
+        string? usuario = null)
+    {
+        // Validaciones
+        if (string.IsNullOrWhiteSpace(nombre))
+            throw new ArgumentException("El nombre no puede estar vacío", nameof(nombre));
+        
+        if (nombre.Length > 100)
+            throw new ArgumentException("El nombre no puede exceder 100 caracteres", nameof(nombre));
+
+        if (string.IsNullOrWhiteSpace(apellido))
+            throw new ArgumentException("El apellido no puede estar vacío", nameof(apellido));
+        
+        if (apellido.Length > 100)
+            throw new ArgumentException("El apellido no puede exceder 100 caracteres", nameof(apellido));
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("El email no puede estar vacío", nameof(email));
+        
+        if (email.Length > 100)
+            throw new ArgumentException("El email no puede exceder 100 caracteres", nameof(email));
+
+        if (!string.IsNullOrWhiteSpace(telefono1) && telefono1.Length > 20)
+            throw new ArgumentException("El teléfono 1 no puede exceder 20 caracteres", nameof(telefono1));
+
+        if (!string.IsNullOrWhiteSpace(telefono2) && telefono2.Length > 20)
+            throw new ArgumentException("El teléfono 2 no puede exceder 20 caracteres", nameof(telefono2));
+
+        if (!string.IsNullOrWhiteSpace(usuario) && usuario.Length > 50)
+            throw new ArgumentException("El usuario no puede exceder 50 caracteres", nameof(usuario));
+
+        // Actualizar campos
+        var nombreAnterior = $"{Nombre} {Apellido}";
+        Nombre = nombre;
+        Apellido = apellido;
+        Email = email;
+        Telefono1 = telefono1;
+        Telefono2 = telefono2;
+        Usuario = usuario;
+
+        // Emitir evento de actualización
+        RaiseDomainEvent(new PerfilActualizadoEvent(
+            PerfilId,
+            UserId,
+            nombreAnterior,
+            NombreCompleto));
+    }
+
+    /// <summary>
     /// Verifica si el perfil tiene información de contacto completa
     /// </summary>
     public bool TieneContactoCompleto()

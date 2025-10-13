@@ -9,6 +9,15 @@ namespace MiGenteEnLinea.Application.Common.Interfaces;
 public interface IEmailService
 {
     /// <summary>
+    /// Envía un email de activación de cuenta
+    /// </summary>
+    /// <param name="email">Email destino</param>
+    /// <param name="userId">ID del usuario para generar link de activación</param>
+    /// <param name="host">URL base del host (ej: https://migenteenlinea.com)</param>
+    /// <returns>Task</returns>
+    Task SendActivationEmailAsync(string email, string userId, string host);
+    
+    /// <summary>
     /// Envía un email de bienvenida/registro con link de activación
     /// </summary>
     /// <param name="nombre">Nombre del usuario</param>

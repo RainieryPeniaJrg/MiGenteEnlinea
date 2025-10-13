@@ -32,6 +32,9 @@ public partial class MiGenteDbContext : DbContext, IApplicationDbContext
     // Expone propiedades DbContext con nombres de interfaz para Application Layer
     DbSet<Credencial> IApplicationDbContext.Credenciales => CredencialesRefactored;
     DbSet<VistaPerfil> IApplicationDbContext.VPerfiles => VistasPerfil;
+    DbSet<Domain.Entities.Seguridad.Perfile> IApplicationDbContext.Perfiles => Perfiles;
+    DbSet<Domain.Entities.Contratistas.Contratista> IApplicationDbContext.Contratistas => Contratistas;
+    DbSet<Empleador> IApplicationDbContext.Empleadores => Empleadores;
     // Suscripciones y PlanesEmpleadores ya coinciden con los nombres de interfaz
 
     // ========================================

@@ -1,7 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCredenciales;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfil;
@@ -206,5 +209,173 @@ public class AuthController : ControllerBase
 
         _logger.LogInformation("Contraseña actualizada exitosamente para: {Email}", command.Email);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Registrar nuevo usuario en el sistema
+    /// </summary>
+    /// <param name="command">Datos de registro</param>
+    /// <returns>ID del perfil creado</returns>
+    /// <response code="201">Usuario registrado exitosamente</response>
+    /// <response code="400">Datos inválidos o email ya existe</response>
+    /// <response code="500">Error al procesar el registro</response>
+    /// <remarks>
+    /// Réplica de SuscripcionesService.GuardarPerfil() del Legacy
+    /// 
+    /// Crea:
+    /// - Perfile (Empleador o Contratista según tipo)
+    /// - Credencial con contraseña encriptada (BCrypt)
+    /// - Contratista (solo si tipo=2)
+    /// - Envía email de activación
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/register
+    ///     {
+    ///        "email": "nuevo@example.com",
+    ///        "password": "Password123",
+    ///        "nombre": "Juan",
+    ///        "apellido": "Pérez",
+    ///        "tipo": 1,
+    ///        "telefono1": "809-555-1234",
+    ///        "telefono2": null,
+    ///        "usuario": "juanp"
+    ///     }
+    /// 
+    /// Valores de tipo:
+    /// - 1 = Empleador
+    /// - 2 = Contratista
+    /// </remarks>
+    [HttpPost("register")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<int>> Register([FromBody] RegisterCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/register - Email: {Email}, Tipo: {Tipo}", command.Email, command.Tipo);
+
+        try
+        {
+            var perfilId = await _mediator.Send(command);
+
+            _logger.LogInformation("Usuario registrado exitosamente - PerfilId: {PerfilId}", perfilId);
+
+            return CreatedAtAction(
+                nameof(GetPerfil),
+                new { userId = perfilId.ToString() },
+                new { perfilId, message = "Usuario registrado exitosamente. Por favor revise su correo para activar su cuenta." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning("Registro fallido: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Activar cuenta de usuario
+    /// </summary>
+    /// <param name="command">Datos de activación (UserId y Email)</param>
+    /// <returns>Resultado de la activación</returns>
+    /// <response code="200">Cuenta activada exitosamente</response>
+    /// <response code="400">Datos inválidos o cuenta ya activa</response>
+    /// <response code="404">Usuario no encontrado</response>
+    /// <remarks>
+    /// Réplica de Activar.aspx.cs del Legacy
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/activate
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "email": "usuario@example.com"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("activate")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateAccount([FromBody] ActivateAccountCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/activate - UserId: {UserId}, Email: {Email}", command.UserId, command.Email);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning("Activación fallida - Usuario no encontrado o ya activo: {UserId}", command.UserId);
+                return BadRequest(new { message = "No se pudo activar la cuenta. La cuenta ya está activa o los datos son incorrectos." });
+            }
+
+            _logger.LogInformation("Cuenta activada exitosamente - UserId: {UserId}", command.UserId);
+            return Ok(new { message = "Cuenta activada exitosamente. Ya puede iniciar sesión." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al activar cuenta - UserId: {UserId}", command.UserId);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Actualizar perfil de usuario
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="command">Datos a actualizar</param>
+    /// <returns>Resultado de la actualización</returns>
+    /// <response code="200">Perfil actualizado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Usuario no encontrado</response>
+    /// <remarks>
+    /// Réplica de LoginService.actualizarPerfil() del Legacy
+    /// 
+    /// Sample request:
+    /// 
+    ///     PUT /api/auth/perfil/550e8400-e29b-41d4-a716-446655440000
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "nombre": "Juan Carlos",
+    ///        "apellido": "Pérez González",
+    ///        "email": "juan.perez@example.com",
+    ///        "telefono1": "809-555-1234",
+    ///        "telefono2": "809-555-5678",
+    ///        "usuario": "juancp"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPut("perfil/{userId}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateProfile(string userId, [FromBody] UpdateProfileCommand command)
+    {
+        if (userId != command.UserId)
+        {
+            return BadRequest(new { message = "El UserId del path no coincide con el del body" });
+        }
+
+        _logger.LogInformation("PUT /api/auth/perfil/{UserId} - Email: {Email}", userId, command.Email);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning("Actualización de perfil fallida - Usuario no encontrado: {UserId}", userId);
+                return NotFound(new { message = "Usuario no encontrado" });
+            }
+
+            _logger.LogInformation("Perfil actualizado exitosamente - UserId: {UserId}", userId);
+            return Ok(new { message = "Perfil actualizado exitosamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error de validación al actualizar perfil: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
