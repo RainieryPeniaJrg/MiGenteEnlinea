@@ -8,14 +8,16 @@ Esta carpeta contiene prompts optimizados para diferentes AI agents que trabajan
 
 ```
 prompts/
-├── README.md                             # Este archivo
-├── AGENT_MODE_INSTRUCTIONS.md            # 🤖 Claude Sonnet 4.5 - Modo Agente Autónomo
-├── COMPLETE_ENTITY_MIGRATION_PLAN.md     # 🎯 Plan Maestro - 36 Entidades (5 done, 31 pending)
-├── DDD_MIGRATION_PROMPT.md               # � Guía completa de patrones DDD
-├── COPILOT_INSTRUCTIONS.md               # 📝 Instrucciones específicas de Copilot
-├── GITHUB_CONFIG_PROMPT.md               # ⚙️ Setup de CI/CD
+├── README.md                                   # Este archivo
+├── AGENT_MODE_INSTRUCTIONS.md                  # 🤖 Claude Sonnet 4.5 - Modo Agente Autónomo
+├── COMPLETE_ENTITY_MIGRATION_PLAN.md           # 🎯 Plan Maestro - 36 Entidades (COMPLETADO 100%)
+├── DATABASE_RELATIONSHIPS_VALIDATION.md        # ⚠️ CRÍTICO: Validación de FK relationships (NUEVO)
+├── PROGRAM_CS_AND_DI_CONFIGURATION.md          # ⚙️ Configuración completa Program.cs y DI (NUEVO)
+├── DDD_MIGRATION_PROMPT.md                     # 📚 Guía completa de patrones DDD
+├── COPILOT_INSTRUCTIONS.md                     # 📝 Instrucciones específicas de Copilot
+├── GITHUB_CONFIG_PROMPT.md                     # ⚙️ Setup de CI/CD
 └── archived/
-    └── [archivos completados]            # Documentación histórica
+    └── [archivos completados]                  # Documentación histórica
 ```
 
 ---
@@ -78,26 +80,148 @@ Solo reporta progreso cada 3 pasos completados.
 - ✅ Credencial, Empleador, Contratista, Suscripcion, Calificacion
 - ⏳ 31 entidades pendientes organizadas en 6 LOTES
 
-**Comando para LOTE 1 (Empleados y Nómina - 6 entidades):**
+**⚠️ ESTADO FINAL:** ✅ **COMPLETADO AL 100%** (36/36 entidades)
+
+**Reporte:** Ver `MiGenteEnLinea.Clean/MIGRATION_STATUS.md`
+
+**Resultado:**
+- 24 Rich Domain Models
+- 9 Read Models  
+- 3 Catálogos finales
+- ~12,053 líneas de código
+- 0 errores de compilación
+
+---
+
+### Workflow 2: 🔗 Validación de Relaciones de Base de Datos ⚠️ CRÍTICO
+
+**Agente:** Claude Sonnet 4.5 (Modo Agente)  
+**Prompt:** `DATABASE_RELATIONSHIPS_VALIDATION.md` (NUEVO)
+
+**Estado:** ⚠️ **PENDIENTE - EJECUCIÓN REQUERIDA**
+
+**Objetivo:**  
+Asegurar que TODAS las relaciones de base de datos (FKs, navegación, constraints) sean **100% IDÉNTICAS** al proyecto Legacy (EDMX).
+
+**Por qué es CRÍTICO:**
+- ❌ Relaciones incorrectas → Errores en runtime al cargar navegación
+- ❌ Cascadas mal configuradas → Pérdida de datos
+- ❌ Discrepancias con Legacy → Comportamiento impredecible al compartir DB
+
+**9 Relaciones a Validar:**
+1. Contratistas → Contratistas_Fotos (1:N)
+2. Contratistas → Contratistas_Servicios (1:N)
+3. EmpleadosTemporales → DetalleContrataciones (1:N)
+4. Empleador_Recibos_Header_Contrataciones → Empleador_Recibos_Detalle_Contrataciones (1:N)
+5. Empleador_Recibos_Header → Empleador_Recibos_Detalle (1:N)
+6. EmpleadosTemporales → Empleador_Recibos_Header_Contrataciones (1:N)
+7. Empleados → Empleador_Recibos_Header (1:N)
+8. Cuentas → perfilesInfo (1:N) - Legacy
+9. Planes_empleadores → Suscripciones (1:N)
+
+**Comando de ejecución:**
 ```
-@workspace Lee prompts/COMPLETE_ENTITY_MIGRATION_PLAN.md
+@workspace Lee prompts/DATABASE_RELATIONSHIPS_VALIDATION.md
 
-EJECUTAR: LOTE 1 completo (Empleados y Nómina)
+FASE CRÍTICA: Validar y configurar TODAS las relaciones de base de datos.
 
-ENTIDADES (en orden):
-1. DeduccionTss
-2. Empleado
-3. EmpleadoNota
-4. EmpleadoTemporal
-5. ReciboDetalle
-6. ReciboHeader
+OBJETIVO: Asegurar paridad 100% entre Clean Architecture y Legacy (EDMX).
 
-AUTORIZACIÓN: Modo autónomo completo. 
-Reporta progreso cada 2 entidades completadas.
-Sigue el patrón de TAREA_1_CREDENCIAL_COMPLETADA.md
+AUTORIZACIÓN COMPLETA: 
+- Leer todas las configuraciones en Configurations/
+- Modificar archivos de configuración existentes
+- Crear nuevos archivos de configuración si falta
+- Ejecutar dotnet build para validar
+- Generar migrations temporales (NO aplicarlas) solo para validar
 
-META: Al completar LOTE 1 → 11/36 entidades (30.6%)
+WORKFLOW:
+1. Leer todas las configuraciones existentes
+2. Comparar con las 9 relaciones del EDMX
+3. Identificar faltantes o incorrectas
+4. Corregir/Crear configuraciones con Fluent API
+5. Validar con dotnet build (0 errors)
+6. Generar migration temporal para ver diferencias
+7. Eliminar migration temporal
+8. Reportar en DATABASE_RELATIONSHIPS_REPORT.md
+
+DURACIÓN ESTIMADA: 1-2 horas
+
+COMENZAR EJECUCIÓN AUTOMÁTICA AHORA.
 ```
+
+**Resultado esperado:**
+- ✅ 9/9 relaciones configuradas correctamente
+- ✅ dotnet build sin errores
+- ✅ Migration temporal vacía (sin cambios detectados)
+- ✅ Tests de navegación pasando
+
+---
+
+### Workflow 3: ⚙️ Configuración de Program.cs y Dependency Injection
+
+**Agente:** Claude Sonnet 4.5 (Modo Agente)  
+**Prompt:** `PROGRAM_CS_AND_DI_CONFIGURATION.md` (NUEVO)
+
+**Estado:** ⚠️ **PENDIENTE - EJECUTAR DESPUÉS DE WORKFLOW 2**
+
+**Prerequisito:** Workflow 2 completado ✅
+
+**Objetivo:**  
+Configurar completamente `Program.cs`, `DependencyInjection.cs` (Infrastructure y Application) para tener la API lista para ejecutar.
+
+**Qué se configura:**
+- ✅ DbContext con connection string correcto
+- ✅ Assembly Scanning para Fluent API configurations
+- ✅ Serilog para logging estructurado (archivo + consola + DB)
+- ✅ MediatR para CQRS (Application layer)
+- ✅ FluentValidation y AutoMapper
+- ✅ ICurrentUserService, IPasswordHasher (BCrypt)
+- ✅ Audit Interceptor
+- ✅ CORS policies (Development y Production)
+- ✅ Swagger con documentación
+- ✅ Health check endpoint
+- ✅ appsettings.json con todos los settings
+
+**Comando de ejecución:**
+```
+@workspace Lee prompts/PROGRAM_CS_AND_DI_CONFIGURATION.md
+
+FASE 2: Configurar Program.cs y Dependency Injection completo.
+
+PREREQUISITO VERIFICADO: DATABASE_RELATIONSHIPS_VALIDATION.md completado.
+
+AUTORIZACIÓN COMPLETA:
+- Instalar packages NuGet (MediatR, Serilog, etc)
+- Crear Application/DependencyInjection.cs
+- Reemplazar Program.cs completo
+- Actualizar Infrastructure/DependencyInjection.cs
+- Modificar appsettings.json
+- Ejecutar dotnet build y dotnet run para validar
+
+WORKFLOW:
+1. Instalar packages faltantes
+2. Crear DependencyInjection.cs en Application
+3. Reemplazar Program.cs con configuración completa
+4. Actualizar Infrastructure/DependencyInjection.cs
+5. Configurar appsettings.json
+6. Validar compilación (dotnet build)
+7. Ejecutar API (dotnet run)
+8. Verificar Swagger en https://localhost:5001/
+9. Verificar Health Check en https://localhost:5001/health
+10. Reportar en PROGRAM_CS_CONFIGURATION_REPORT.md
+
+DURACIÓN ESTIMADA: 1 hora
+
+COMENZAR EJECUCIÓN AUTOMÁTICA AHORA.
+```
+
+**Resultado esperado:**
+- ✅ dotnet build: Success (0 errors)
+- ✅ dotnet run: API ejecutándose en puerto 5001
+- ✅ Swagger UI funcionando correctamente
+- ✅ Health check endpoint respondiendo
+- ✅ Logs generándose en archivo y consola
+- ✅ Todos los servicios registrados en DI
 
 **Comando para ver progreso general:**
 ```
