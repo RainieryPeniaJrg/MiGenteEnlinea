@@ -19,6 +19,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; }
     DbSet<Domain.Entities.Contratistas.ContratistaServicio> ContratistasServicios { get; }
     DbSet<Domain.Entities.Empleadores.Empleador> Empleadores { get; }
+    DbSet<Domain.Entities.Empleados.Empleado> Empleados { get; }
     
     // Read Models (Views)
     DbSet<VistaPerfil> VPerfiles { get; }
