@@ -6,6 +6,9 @@ using MiGenteEnLinea.Domain.Interfaces;
 using MiGenteEnLinea.Infrastructure.Identity.Services;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Interceptors;
+using MiGenteEnLinea.Infrastructure.Services;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace MiGenteEnLinea.Infrastructure;
 
@@ -80,6 +83,33 @@ public static class DependencyInjection
         // ========================================
         // EXTERNAL SERVICES
         // ========================================
+        
+        // HttpClient para Padrón Nacional con retry policy
+        services.AddHttpClient("PadronAPI", (serviceProvider, client) =>
+        {
+            var config = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = config["PadronAPI:BaseUrl"];
+            
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        })
+        .AddPolicyHandler(GetRetryPolicy());
+
+        // Memory Cache para Padrón (tokens + consultas)
+        services.AddMemoryCache();
+
+        // Padrón Service
+        services.Configure<PadronSettings>(configuration.GetSection("PadronAPI"));
+        services.AddScoped<IPadronService, PadronService>();
+
+        // Nómina Calculator Service (Nota: Ya está registrado en Application layer DI)
+        // services.AddScoped<INominaCalculatorService, NominaCalculatorService>();
+
         // TODO: Agregar cuando se migren del legacy
         // services.AddScoped<IEmailService, EmailService>();
         // services.AddScoped<ICardnetPaymentService, CardnetPaymentService>();
@@ -87,5 +117,23 @@ public static class DependencyInjection
         // services.AddScoped<IFileStorageService, FileStorageService>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Política de reintentos con backoff exponencial para llamadas HTTP.
+    /// 3 intentos: 0s → 2s → 4s → 8s (máximo 14s total).
+    /// </summary>
+    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError() // 5xx, 408, network failures
+            .WaitAndRetryAsync(
+                retryCount: 3,
+                sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                onRetry: (outcome, timespan, retryAttempt, context) =>
+                {
+                    // Log retry attempts (opcional)
+                    Console.WriteLine($"[Retry {retryAttempt}] Reintenando después de {timespan.TotalSeconds}s...");
+                });
     }
 }

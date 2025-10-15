@@ -27,11 +27,13 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 ## 📁 Entidades Completadas
 
 ### 1️⃣ **Permiso** (Sistema de Autorización Granular)
+
 **Tabla Legacy:** `Permisos`  
 **Tipo:** Aggregate Root  
 **Complejidad:** 🟡 MEDIA
 
-#### Archivos Creados:
+#### Archivos Creados
+
 - ✅ `Domain/Entities/Seguridad/Permiso.cs` (327 líneas)
 - ✅ `Domain/Events/Seguridad/PermisosCreadosEvent.cs`
 - ✅ `Domain/Events/Seguridad/PermisoOtorgadoEvent.cs`
@@ -40,10 +42,11 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 - ✅ `Domain/Events/Seguridad/TodosLosPermisosRevocadosEvent.cs`
 - ✅ `Infrastructure/Persistence/Configurations/PermisoConfiguration.cs`
 
-#### Características:
+#### Características
+
 - **Properties:** `Id`, `UserId`, `Atributos` (flags binarios)
 - **Propósito:** Sistema de autorización basado en flags binarios (bit flags)
-- **Flags Predefinidos:** 
+- **Flags Predefinidos:**
   - `Lectura` = 1 (0001)
   - `Escritura` = 2 (0010)
   - `Eliminacion` = 4 (0100)
@@ -54,7 +57,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
   - `Auditoria` = 128 (10000000)
 - **Validaciones:** Atributos >= 0, UserId requerido
 
-#### Domain Methods (14):
+#### Domain Methods (14)
+
 1. `Crear(userId)` - Factory sin permisos iniciales
 2. `Crear(userId, atributos)` - Factory con permisos específicos
 3. `CrearConPermisosBasicos(userId)` - Factory con permisos de lectura
@@ -70,21 +74,25 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 13. `TieneAlgunPermisoAsignado()` - Verifica si Atributos > 0
 14. `ContarPermisosActivos()` - Cuenta bits activos (algoritmo Brian Kernighan)
 
-#### Domain Events (5):
+#### Domain Events (5)
+
 - `PermisosCreadosEvent` → Notificar creación de permisos
 - `PermisoOtorgadoEvent` → Registrar otorgamiento de permiso
 - `PermisoRevocadoEvent` → Registrar revocación de permiso
 - `PermisosActualizadosEvent` → **CRÍTICO**: Sincronizar cambios masivos
 - `TodosLosPermisosRevocadosEvent` → **CRÍTICO**: Notificar pérdida de acceso
 
-#### Patrón de Diseño Aplicado:
+#### Patrón de Diseño Aplicado
+
 **Bit Flags Pattern** - Usa operaciones binarias para gestionar múltiples permisos de forma eficiente:
+
 - OR (`|`) para agregar permisos
 - AND NOT (`&~`) para quitar permisos
 - AND (`&`) para verificar permisos
 - Permite hasta 32 permisos diferentes en un solo entero (int)
 
-#### Índices de Base de Datos:
+#### Índices de Base de Datos
+
 - `IX_Permisos_UserId` - Búsqueda por usuario
 - `IX_Permisos_Atributos` - Filtrado por permisos
 - `UX_Permisos_UserId` - **ÚNICO**: Un solo registro de permisos por usuario
@@ -92,11 +100,13 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 ---
 
 ### 2️⃣ **Perfile** (Perfiles de Usuario)
+
 **Tabla Legacy:** `Perfiles`  
 **Tipo:** Aggregate Root  
 **Complejidad:** 🟡 MEDIA
 
-#### Archivos Creados:
+#### Archivos Creados
+
 - ✅ `Domain/Entities/Seguridad/Perfile.cs` (372 líneas)
 - ✅ `Domain/Events/Seguridad/PerfilCreadoEvent.cs`
 - ✅ `Domain/Events/Seguridad/PerfilActualizadoEvent.cs`
@@ -105,7 +115,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 - ✅ `Domain/Events/Seguridad/UsuarioPerfilActualizadoEvent.cs`
 - ✅ `Infrastructure/Persistence/Configurations/PerfileConfiguration.cs`
 
-#### Características:
+#### Características
+
 - **Properties:** `PerfilId`, `FechaCreacion`, `UserId`, `Tipo`, `Nombre`, `Apellido`, `Email`, `Telefono1`, `Telefono2`, `Usuario`
 - **Propósito:** Información básica de usuario (Empleador o Contratista)
 - **Tipos de Perfil:**
@@ -113,7 +124,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
   - `2` = Contratista (profesionales independientes)
 - **Validaciones:** Nombre máx 20 caracteres, Apellido máx 50, Email máx 100, Teléfonos máx 20
 
-#### Domain Methods (12):
+#### Domain Methods (12)
+
 1. `CrearPerfilEmpleador(userId, nombre, apellido, email, ...)` - Factory para empleadores
 2. `CrearPerfilContratista(userId, nombre, apellido, email, ...)` - Factory para contratistas
 3. `ActualizarNombreCompleto(nombre, apellido)` - Modifica nombre (levanta evento)
@@ -129,14 +141,16 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
     - `EsEmpleador` - Tipo == 1
     - `EsContratista` - Tipo == 2
 
-#### Domain Events (5):
+#### Domain Events (5)
+
 - `PerfilCreadoEvent` → Notificar nuevo usuario registrado
 - `PerfilActualizadoEvent` → Sincronizar cambios de nombre
 - `EmailPerfilActualizadoEvent` → **CRÍTICO**: Actualizar credenciales
 - `TelefonosPerfilActualizadosEvent` → Actualizar contacto
 - `UsuarioPerfilActualizadoEvent` → Sincronizar username
 
-#### Índices de Base de Datos:
+#### Índices de Base de Datos
+
 - `IX_Perfiles_UserId` - Búsqueda por usuario
 - `IX_Perfiles_Tipo` - Filtrado por tipo (Empleador/Contratista)
 - `IX_Perfiles_Email` - Búsqueda por correo
@@ -146,11 +160,13 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 ---
 
 ### 3️⃣ **PerfilesInfo** (Información Extendida del Perfil)
+
 **Tabla Legacy:** `perfilesInfo`  
 **Tipo:** Aggregate Root  
 **Complejidad:** 🟡 MEDIA
 
-#### Archivos Creados:
+#### Archivos Creados
+
 - ✅ `Domain/Entities/Seguridad/PerfilesInfo.cs` (425 líneas)
 - ✅ `Domain/Events/Seguridad/PerfilesInfoCreadoEvent.cs`
 - ✅ `Domain/Events/Seguridad/IdentificacionActualizadaEvent.cs`
@@ -162,7 +178,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 - ✅ `Domain/Events/Seguridad/InformacionGerenteActualizadaEvent.cs`
 - ✅ `Infrastructure/Persistence/Configurations/PerfilesInfoConfiguration.cs`
 
-#### Características:
+#### Características
+
 - **Properties Principales:**
   - Identificación: `TipoIdentificacion`, `Identificacion`, `NombreComercial`
   - Ubicación: `Direccion`
@@ -175,13 +192,14 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
   - `2` = Pasaporte (extranjeros)
   - `3` = RNC (empresas)
 
-- **Validaciones:** 
+- **Validaciones:**
   - Identificación máx 20 caracteres (requerido)
   - Nombre comercial máx 50 caracteres
   - Nombres/apellidos gerente máx 50 caracteres
   - Dirección gerente máx 250 caracteres
 
-#### Domain Methods (15):
+#### Domain Methods (15)
+
 1. `CrearPerfilPersonaFisica(userId, cedula, ...)` - Factory para personas
 2. `CrearPerfilEmpresa(userId, rnc, nombreComercial, ...)` - Factory para empresas
 3. `AsociarAPerfil(perfilId)` - Vincula con Perfile
@@ -201,7 +219,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
     - `EsEmpresa` - Valida si tiene nombre comercial
     - `TieneInformacionGerente` - Valida si tiene datos del representante
 
-#### Domain Events (8):
+#### Domain Events (8)
+
 - `PerfilesInfoCreadoEvent` → Notificar información extendida creada
 - `IdentificacionActualizadaEvent` → **CRÍTICO**: Validar documentos legales
 - `NombreComercialActualizadoEvent` → Sincronizar razón social
@@ -211,7 +230,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 - `FotoPerfilEliminadaEvent` → Resetear a avatar por defecto
 - `InformacionGerenteActualizadaEvent` → Actualizar representante legal
 
-#### Índices de Base de Datos:
+#### Índices de Base de Datos
+
 - `IX_PerfilesInfo_UserId` - Búsqueda por usuario
 - `IX_PerfilesInfo_PerfilId` - Búsqueda por perfil
 - `IX_PerfilesInfo_Identificacion` - Búsqueda por documento
@@ -219,7 +239,8 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 - `IX_PerfilesInfo_UserId_Identificacion` - Búsqueda compuesta
 - `UX_PerfilesInfo_UserId` - **ÚNICO**: Una sola información extendida por usuario
 
-#### Casos de Uso Principales:
+#### Casos de Uso Principales
+
 1. **Persona Física (Contratista):**
    - Cédula dominicana (11 dígitos)
    - Foto de perfil
@@ -239,6 +260,7 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 ## 📊 Estadísticas del Lote 4
 
 ### Archivos Creados
+
 | Tipo | Cantidad |
 |------|----------|
 | **Entidades Domain** | 3 |
@@ -248,6 +270,7 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 | **Total Archivos** | 21 |
 
 ### Líneas de Código
+
 | Entidad | LOC Entity | LOC Config | LOC Events | Total |
 |---------|------------|------------|------------|-------|
 | Permiso | 327 | 78 | 57 | 462 |
@@ -256,6 +279,7 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 | **TOTAL** | **1,124** | **350** | **266** | **1,740** |
 
 ### Complejidad
+
 - 🔴 **Alta:** 0 entidades
 - 🟡 **Media:** 3 entidades (Permiso, Perfile, PerfilesInfo)
 - 🟢 **Baja:** 0 entidades
@@ -264,12 +288,14 @@ Se ha completado exitosamente la refactorización del **LOTE 4: SEGURIDAD Y PERM
 
 ## 🔧 Cambios en DbContext
 
-### Namespace Agregado:
+### Namespace Agregado
+
 ```csharp
 using MiGenteEnLinea.Domain.Entities.Seguridad;
 ```
 
-### DbSets Agregados (Nuevas Entidades DDD):
+### DbSets Agregados (Nuevas Entidades DDD)
+
 ```csharp
 // Seguridad y perfiles refactorizados
 public virtual DbSet<Domain.Entities.Seguridad.Permiso> Permisos { get; set; }
@@ -277,14 +303,16 @@ public virtual DbSet<Domain.Entities.Seguridad.Perfile> Perfiles { get; set; }
 public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get; set; }
 ```
 
-### Comentado (Entidades Legacy):
+### Comentado (Entidades Legacy)
+
 ```csharp
 // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Permiso> PermisosLegacy { get; set; }
 // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Perfile> PerfilesLegacy { get; set; }
 // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.PerfilesInfo> PerfilesInfosLegacy { get; set; }
 ```
 
-### Mapeos Legacy Comentados:
+### Mapeos Legacy Comentados
+
 ```csharp
 // Legacy Perfile mapping (commented out - using refactored Perfile version)
 // modelBuilder.Entity<Perfile>(entity =>
@@ -303,14 +331,16 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 
 ## ✅ Validación de Compilación
 
-### Resultado:
+### Resultado
+
 ```
 ✅ Compilación correcto con 21 advertencias en 16.7s
 ❌ 0 errores
 ⚠️ 21 advertencias (vulnerabilidades en paquetes NuGet - NO bloquean funcionalidad)
 ```
 
-### Advertencias (No Críticas):
+### Advertencias (No Críticas)
+
 - 1 warning en Credencial.cs (pre-existente de tareas anteriores)
 - 20 advertencias de vulnerabilidades en paquetes NuGet (Azure.Identity, System.Text.Json, etc.)
 - **No Bloquea:** Migración ni funcionalidad core
@@ -320,28 +350,33 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 ## 🎯 Patrones DDD Aplicados
 
 ### 1. Rich Domain Model
+
 - ✅ Lógica de negocio en las entidades
 - ✅ Setters privados para encapsulación
 - ✅ Factory methods para creación
 - ✅ Validaciones en los métodos
 
 ### 2. Aggregate Root Pattern
+
 - ✅ `Permiso`, `Perfile`, `PerfilesInfo` son Aggregate Roots
 - ✅ Todos heredan de `AggregateRoot` (tienen soporte para eventos)
 - ✅ Encapsulan cambios de estado complejos
 
 ### 3. Domain Events
+
 - ✅ 13 eventos creados para comunicación desacoplada
 - ✅ Eventos críticos marcados (PermisosActualizadosEvent, EmailPerfilActualizadoEvent, FotoPerfilActualizadaEvent)
 - ✅ Nombres descriptivos en tiempo pasado
 
 ### 4. Bit Flags Pattern (Permiso)
+
 - ✅ Usa operaciones binarias para permisos múltiples
 - ✅ Eficiente en memoria (1 int para 32 permisos)
 - ✅ Operaciones rápidas (OR, AND, NOT)
 - ✅ Escalable (fácil agregar nuevos permisos)
 
 ### 5. Factory Pattern
+
 - ✅ Factory methods especializados por contexto:
   - `Permiso.CrearAdministrador()` - Todos los permisos
   - `Permiso.CrearConPermisosBasicos()` - Solo lectura
@@ -351,6 +386,7 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
   - `PerfilesInfo.CrearPerfilEmpresa()` - RNC
 
 ### 6. Value Object Pattern (Enumeraciones)
+
 - ✅ `TipoPerfilEnum` (Empleador=1, Contratista=2)
 - ✅ `TipoIdentificacionEnum` (Cedula=1, Pasaporte=2, RNC=3)
 - ✅ `PermisosFlags` (Lectura=1, Escritura=2, Eliminacion=4, etc.)
@@ -384,12 +420,14 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 ## 📖 Próximos Pasos
 
 ### Inmediato (Tarea siguiente)
+
 1. **LOTE 5:** Migrar entidades de Configuración y Catálogos (Provincia, ConfigCorreo, EmpleadorRecibosHeaderContratacione, EmpleadorRecibosDetalleContratacione)
 2. Crear Commands/Queries para Perfiles
 3. Implementar FluentValidation para Commands de perfiles
 4. Crear DTOs para responses de perfiles
 
 ### Corto Plazo
+
 1. Crear `PerfilesController` con endpoints CRUD
 2. Crear `PermisosController` para gestión de autorizaciones
 3. Implementar middleware de autorización usando `Permiso.TienePermiso()`
@@ -397,6 +435,7 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 5. Documentar con Swagger/OpenAPI
 
 ### Medio Plazo
+
 1. Unit tests para entidades (80%+ coverage)
 2. Unit tests para operaciones binarias de Permiso
 3. Integration tests para flujo completo de registro
@@ -408,30 +447,35 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 ## 🎓 Lecciones Aprendidas
 
 ### 1. Bit Flags son Eficientes para Permisos
+
 - Un solo entero puede representar hasta 32 permisos diferentes
 - Operaciones binarias son extremadamente rápidas
 - Fácil agregar nuevos permisos sin cambiar esquema de BD
 - Ideal para sistemas de autorización granular
 
 ### 2. Perfiles con Información Extendida
+
 - Separar información básica (Perfile) de extendida (PerfilesInfo)
 - Permite lazy loading de datos pesados (foto de perfil)
 - Facilita evolución del esquema sin afectar tabla principal
 - PerfilesInfo opcional permite perfiles sin información completa
 
 ### 3. Factory Methods por Contexto
+
 - Facilitan creación correcta según tipo de usuario
 - Previenen estados inválidos desde el inicio
 - Mejoran legibilidad del código cliente
 - Encapsulan lógica de inicialización
 
 ### 4. Índices Únicos para Integridad
+
 - `UX_Permisos_UserId`, `UX_Perfiles_UserId`, `UX_PerfilesInfo_UserId`
 - Garantizan un solo registro por usuario a nivel de BD
 - Previenen duplicados incluso con concurrencia
 - Mejor performance en búsquedas por usuario
 
 ### 5. Eventos para Cambios Críticos
+
 - Email actualizado → Sincronizar con Credencial
 - Foto actualizada → Invalidar cache de avatares
 - Permisos actualizados → Refrescar tokens JWT
@@ -442,6 +486,7 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 ## 📚 Referencias
 
 ### Documentación del Proyecto
+
 - `COMPLETE_ENTITY_MIGRATION_PLAN.md` - Plan maestro de migración
 - `AGENT_MODE_INSTRUCTIONS.md` - Instrucciones para agente autónomo
 - `LOTE_1_EMPLEADOS_NOMINA_COMPLETADO.md` - Referencia del primer lote
@@ -449,11 +494,13 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 - `LOTE_3_CONTRATACIONES_SERVICIOS_COMPLETADO.md` - Referencia del tercer lote
 
 ### Archivos Clave de Referencia
+
 - `Domain/Common/AggregateRoot.cs` - Base para aggregate roots
 - `Domain/Common/DomainEvent.cs` - Base para eventos (abstract class)
 - `Infrastructure/Persistence/Interceptors/AuditableEntityInterceptor.cs` - Auditoría automática
 
 ### Patrones Aplicados
+
 - [Bit Flags Pattern](https://en.wikipedia.org/wiki/Bit_field) - Permisos binarios
 - [Factory Method Pattern](https://refactoring.guru/design-patterns/factory-method) - Creación especializada
 - [Aggregate Root Pattern](https://martinfowler.com/bliki/DDD_Aggregate.html) - DDD boundaries
@@ -463,6 +510,7 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 ## ✅ Checklist de Validación Final
 
 ### Clean Code
+
 - [x] Nombres en español (dominio de negocio dominicano)
 - [x] Métodos descriptivos (verbos de acción)
 - [x] Sin magic numbers o strings (enums para tipos)
@@ -470,6 +518,7 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 - [x] XML documentation en clases y métodos públicos
 
 ### DDD Principles
+
 - [x] Entidades son Aggregate Roots donde corresponde
 - [x] Lógica de negocio en las entidades (Rich Domain Model)
 - [x] Validaciones en la entidad, no en el setter
@@ -477,11 +526,13 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 - [x] Domain events para comunicación entre agregados
 
 ### Auditoría
+
 - [x] Entidades heredan de `AggregateRoot`
 - [x] Campos de auditoría configurados en Fluent API
 - [x] Interceptor registrado en DbContext (de tareas anteriores)
 
 ### Seguridad
+
 - [x] Encapsulación correcta (setters privados)
 - [x] Validación de inputs en todos los métodos públicos
 - [x] Manejo de excepciones apropiado
@@ -489,12 +540,14 @@ public virtual DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get
 - [x] Índices únicos para integridad referencial
 
 ### Performance
+
 - [x] Índices definidos en Fluent API
 - [x] Índices únicos en UserId
 - [x] Índices compuestos donde aplica
 - [x] Bit flags para permisos (eficiencia en memoria)
 
 ### Compilación
+
 - [x] `dotnet build` exitoso
 - [x] 0 errores de compilación
 - [x] Advertencias de vulnerabilidades documentadas (no bloqueantes)
@@ -517,6 +570,7 @@ El **LOTE 4: SEGURIDAD Y PERMISOS** se ha completado exitosamente. Las 3 entidad
 - ✅ Protegen integridad de datos con índices únicos
 
 **Estadísticas Finales:**
+
 - **1,740 líneas de código** de alta calidad
 - **21 archivos nuevos** creados
 - **13 Domain Events** para lógica desacoplada
@@ -524,6 +578,7 @@ El **LOTE 4: SEGURIDAD Y PERMISOS** se ha completado exitosamente. Las 3 entidad
 - **100% compilación exitosa** sin errores
 
 **Progreso General:**
+
 - **Lotes Completados:** 4 de 7 (57.1%)
 - **Entidades Migradas:** 19 de 36 (52.8%)
 - **LOC Generadas:** 8,701 líneas (LOTE 1 + LOTE 2 + LOTE 3 + LOTE 4)
