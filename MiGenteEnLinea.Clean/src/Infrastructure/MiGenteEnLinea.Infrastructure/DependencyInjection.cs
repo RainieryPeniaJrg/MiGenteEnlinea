@@ -3,12 +3,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Interfaces;
+using MiGenteEnLinea.Infrastructure.Identity;
 using MiGenteEnLinea.Infrastructure.Identity.Services;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Interceptors;
 using MiGenteEnLinea.Infrastructure.Services;
 using Polly;
 using Polly.Extensions.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace MiGenteEnLinea.Infrastructure;
 
@@ -55,11 +57,46 @@ public static class DependencyInjection
         // ========================================
         // IDENTITY SERVICES
         // ========================================
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<Application.Common.Interfaces.IPasswordHasher, BCryptPasswordHasher>();
+        
+        // ASP.NET Core Identity Configuration
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            // Password settings (alineadas con Legacy para migración suave)
+            options.Password.RequireDigit = false; // Legacy no requería dígitos
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 6; // Mínimo 6 caracteres (Legacy)
+            
+            // User settings
+            options.User.RequireUniqueEmail = true;
+            
+            // Lockout settings (protección contra brute force)
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+            
+            // Sign-in settings
+            options.SignIn.RequireConfirmedEmail = false; // Legacy: Activo flag en Credenciales
+            options.SignIn.RequireConfirmedPhoneNumber = false;
+        })
+        .AddEntityFrameworkStores<MiGenteDbContext>()
+        .AddDefaultTokenProviders(); // Para reset password, email confirmation, etc.
 
-        // TODO: Agregar JWT Token Service cuando se implemente
-        // services.AddScoped<IJwtTokenService, JwtTokenService>();
+        // JWT Settings Configuration
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        
+        // JWT Token Service
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        
+        // Identity Service (abstracción de UserManager para Application layer)
+        services.AddScoped<IIdentityService, IdentityService>();
+        
+        // Current User Service (obtiene usuario autenticado desde HttpContext)
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        
+        // BCrypt Password Hasher (para Legacy migration - Credenciales table)
+        services.AddScoped<Application.Common.Interfaces.IPasswordHasher, BCryptPasswordHasher>();
 
         // ========================================
         // INTERCEPTORS

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.RefreshToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.RevokeToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCredenciales;
@@ -35,52 +37,75 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Autenticar usuario con email y contraseña
+    /// Autenticar usuario con email y contraseña (JWT)
     /// </summary>
     /// <param name="command">Credenciales de login</param>
-    /// <returns>Resultado de autenticación con datos de sesión</returns>
-    /// <response code="200">Login exitoso - Retorna datos del usuario y su plan</response>
+    /// <returns>Tokens JWT y datos del usuario</returns>
+    /// <response code="200">Login exitoso - Retorna access token, refresh token y datos del usuario</response>
     /// <response code="401">Credenciales inválidas o cuenta inactiva</response>
     /// <response code="400">Datos de entrada inválidos</response>
     /// <remarks>
-    /// Códigos de StatusCode en respuesta:
-    /// - 2: Login exitoso
-    /// - 0: Credenciales inválidas
-    /// - -1: Cuenta inactiva
-    /// 
     /// Sample request:
     /// 
     ///     POST /api/auth/login
     ///     {
     ///        "email": "usuario@example.com",
-    ///        "password": "MiPassword123"
+    ///        "password": "MiPassword123",
+    ///        "ipAddress": "192.168.1.100"
     ///     }
     /// 
+    /// Sample response:
+    /// 
+    ///     {
+    ///        "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    ///        "refreshToken": "a1b2c3d4e5f6...",
+    ///        "accessTokenExpires": "2025-01-15T12:30:00Z",
+    ///        "refreshTokenExpires": "2025-01-22T11:15:00Z",
+    ///        "user": {
+    ///            "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///            "email": "usuario@example.com",
+    ///            "nombreCompleto": "Juan Pérez",
+    ///            "tipo": "1",
+    ///            "planId": 2,
+    ///            "vencimientoPlan": "2025-12-31T00:00:00Z",
+    ///            "roles": ["Empleador"]
+    ///        }
+    ///     }
+    /// 
+    /// IMPORTANTE:
+    /// - El ipAddress se obtiene automáticamente del HttpContext si no se provee
+    /// - El access token expira en 15 minutos
+    /// - El refresh token expira en 7 días
+    /// - Guardar el refresh token de forma segura para renovar el access token
     /// </remarks>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(LoginResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthenticationResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<LoginResult>> Login([FromBody] LoginCommand command)
+    public async Task<ActionResult<AuthenticationResultDto>> Login([FromBody] LoginCommand command)
     {
         _logger.LogInformation("POST /api/auth/login - Email: {Email}", command.Email);
 
-        var result = await _mediator.Send(command);
-
-        if (result.StatusCode == 0)
+        try
         {
-            _logger.LogWarning("Login fallido - Credenciales inválidas para: {Email}", command.Email);
-            return Unauthorized(new { message = "Credenciales inválidas" });
-        }
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
 
-        if (result.StatusCode == -1)
+            // Crear comando con IP
+            var loginCommand = command with { IpAddress = ipAddress };
+
+            var result = await _mediator.Send(loginCommand);
+
+            _logger.LogInformation("Login exitoso - UserId: {UserId}", result.User.UserId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
         {
-            _logger.LogWarning("Login fallido - Cuenta inactiva para: {Email}", command.Email);
-            return Unauthorized(new { message = "Cuenta inactiva. Por favor active su cuenta." });
+            _logger.LogWarning("Login fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
         }
-
-        _logger.LogInformation("Login exitoso - UserId: {UserId}", result.UserId);
-        return Ok(result);
     }
 
     /// <summary>
@@ -376,6 +401,134 @@ public class AuthController : ControllerBase
         {
             _logger.LogWarning("Error de validación al actualizar perfil: {Message}", ex.Message);
             return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Renovar access token usando refresh token (Token Refresh)
+    /// </summary>
+    /// <param name="command">Refresh token actual</param>
+    /// <returns>Nuevos tokens (access token + refresh token)</returns>
+    /// <response code="200">Tokens renovados exitosamente</response>
+    /// <response code="401">Refresh token inválido, expirado o revocado</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <remarks>
+    /// IMPORTANTE: Token Rotation (seguridad)
+    /// - El refresh token viejo se revoca automáticamente
+    /// - Se retorna un nuevo refresh token
+    /// - Cada refresh token solo puede usarse UNA VEZ
+    /// 
+    /// USO:
+    /// - Cuando el access token expira (15 minutos)
+    /// - NO se requieren credenciales nuevamente
+    /// - Experiencia de usuario fluida
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/refresh
+    ///     {
+    ///        "refreshToken": "a1b2c3d4e5f6g7h8...",
+    ///        "ipAddress": "192.168.1.100"
+    ///     }
+    /// 
+    /// Sample response (mismo formato que Login):
+    /// 
+    ///     {
+    ///        "accessToken": "eyJhbGciOiJIUzI1NiIs... (NUEVO)",
+    ///        "refreshToken": "x9y8z7w6v5u4... (NUEVO)",
+    ///        "accessTokenExpires": "2025-01-15T13:00:00Z",
+    ///        "refreshTokenExpires": "2025-01-22T12:45:00Z",
+    ///        "user": { ... }
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(AuthenticationResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthenticationResultDto>> RefreshToken([FromBody] RefreshTokenCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/refresh - IP: {IpAddress}", command.IpAddress);
+
+        try
+        {
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
+
+            // Crear comando con IP
+            var refreshCommand = command with { IpAddress = ipAddress };
+
+            var result = await _mediator.Send(refreshCommand);
+
+            _logger.LogInformation("Refresh token exitoso - UserId: {UserId}", result.User.UserId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Refresh token fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Revocar refresh token (Logout)
+    /// </summary>
+    /// <param name="command">Refresh token a revocar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="204">Token revocado exitosamente</response>
+    /// <response code="401">Refresh token inválido</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <remarks>
+    /// USO:
+    /// - Logout de usuario (invalida el refresh token)
+    /// - Cambio de contraseña (revocar todos los tokens)
+    /// - Revocación por admin (seguridad)
+    /// 
+    /// IMPORTANTE:
+    /// - El refresh token revocado NO puede volver a usarse
+    /// - El access token actual sigue válido hasta que expire (max 15 min)
+    /// - Para logout inmediato, el cliente debe descartar el access token
+    /// - La operación es idempotente (revocar token ya revocado no falla)
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/revoke
+    ///     {
+    ///        "refreshToken": "a1b2c3d4e5f6g7h8...",
+    ///        "ipAddress": "192.168.1.100",
+    ///        "reason": "User logout"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("revoke")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> RevokeToken([FromBody] RevokeTokenCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/revoke - IP: {IpAddress}", command.IpAddress);
+
+        try
+        {
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
+
+            // Crear comando con IP
+            var revokeCommand = command with { IpAddress = ipAddress };
+
+            await _mediator.Send(revokeCommand);
+
+            _logger.LogInformation("Refresh token revocado exitosamente");
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Revoke token fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
         }
     }
 }

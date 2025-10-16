@@ -7,7 +7,9 @@ namespace MiGenteEnLinea.Application.Common.Interfaces;
 /// Interfaz para el DbContext de la aplicación
 /// </summary>
 /// <remarks>
-/// Permite a Application Layer acceder a entidades sin depender de Infrastructure
+/// Permite a Application Layer acceder a entidades sin depender de Infrastructure.
+/// NOTA: RefreshToken NO está expuesto aquí porque es una entidad de infraestructura
+/// (no es parte del dominio de negocio). Se maneja directamente en Infrastructure layer.
 /// </remarks>
 public interface IApplicationDbContext
 {
@@ -25,6 +27,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Nominas.ReciboHeader> RecibosHeader { get; }
     DbSet<Domain.Entities.Nominas.ReciboDetalle> RecibosDetalle { get; }
     DbSet<Domain.Entities.Nominas.DeduccionTss> DeduccionesTss { get; }
+    DbSet<Domain.Entities.Calificaciones.Calificacion> Calificaciones { get; }
     
     // Read Models (Views)
     DbSet<VistaPerfil> VPerfiles { get; }
