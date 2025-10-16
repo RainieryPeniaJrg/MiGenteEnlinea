@@ -7,21 +7,36 @@ var builder = WebApplication.CreateBuilder(args);
 // ========================================
 // CONFIGURACIÓN DE LOGGING CON SERILOG
 // ========================================
-Log.Logger = new LoggerConfiguration()
+var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "MiGenteEnLinea.API")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
     .WriteTo.Console()
-    .WriteTo.File("logs/migente-.txt", rollingInterval: RollingInterval.Day)
-    .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
-        {
-            TableName = "Logs",
-            AutoCreateSqlTable = true
-        })
-    .CreateLogger();
+    .WriteTo.File("logs/migente-.txt", rollingInterval: RollingInterval.Day);
+
+// Intentar agregar SQL Server sink (opcional si DB no está disponible)
+try
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        loggerConfig.WriteTo.MSSqlServer(
+            connectionString: connectionString,
+            sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+            {
+                TableName = "Logs",
+                AutoCreateSqlTable = true
+            });
+        Console.WriteLine("✅ Serilog: SQL Server sink configurado");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"⚠️ Serilog: No se pudo conectar a SQL Server para logs. Continuando con Console y File sinks. Error: {ex.Message}");
+}
+
+Log.Logger = loggerConfig.CreateLogger();
 
 builder.Host.UseSerilog();
 

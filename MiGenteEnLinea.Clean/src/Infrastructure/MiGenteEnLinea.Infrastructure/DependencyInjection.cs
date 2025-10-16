@@ -135,12 +135,20 @@ public static class DependencyInjection
         .AddPolicyHandler(GetRetryPolicy()) // Retry 3 veces
         .AddPolicyHandler(GetCircuitBreakerPolicy()); // Circuit breaker después de 5 fallos
 
-        // Payment Service
-        // TODO: Descomentar cuando CardnetPaymentService esté implementado (Fase 5)
-        // services.AddScoped<IPaymentService, CardnetPaymentService>();
+        // =====================================================================
+        // EMAIL SERVICE (PLAN 1 - Fase 3: DI Registration)
+        // =====================================================================
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.AddScoped<IEmailService, EmailService>();
+
+        // =====================================================================
+        // MOCK SERVICES (TEMPORAL - API Startup Fix)
+        // ⚠️ TODO: Reemplazar con implementaciones reales cuando estén disponibles
+        // =====================================================================
+        services.AddScoped<IPaymentService, MockPaymentService>();
+        services.AddScoped<INominaCalculatorService, MockNominaCalculatorService>();
 
         // TODO: Agregar cuando se migren del legacy
-        // services.AddScoped<IEmailService, EmailService>();
         // services.AddScoped<IPdfGenerationService, PdfGenerationService>();
         // services.AddScoped<IFileStorageService, FileStorageService>();
 

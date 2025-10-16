@@ -152,10 +152,14 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         //         Genera URL: host + "/Activar.aspx?userID=" + userID + "&email=" + email
         try
         {
+            // Nueva firma: SendActivationEmailAsync(toEmail, toName, activationUrl)
+            var nombreCompleto = $"{request.Nombre} {request.Apellido}";
+            var activationUrl = $"{request.Host}/Activar.aspx?userID={userId}&email={request.Email}";
+            
             await _emailService.SendActivationEmailAsync(
-                email: request.Email,
-                userId: userId,
-                host: request.Host
+                toEmail: request.Email,
+                toName: nombreCompleto,
+                activationUrl: activationUrl
             );
 
             _logger.LogInformation("Email de activación enviado a: {Email}", request.Email);
