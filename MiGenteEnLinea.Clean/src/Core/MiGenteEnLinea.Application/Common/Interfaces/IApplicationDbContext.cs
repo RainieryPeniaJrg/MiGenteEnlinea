@@ -15,6 +15,8 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Authentication.Credencial> Credenciales { get; }
     DbSet<Domain.Entities.Suscripciones.Suscripcion> Suscripciones { get; }
     DbSet<Domain.Entities.Suscripciones.PlanEmpleador> PlanesEmpleadores { get; }
+    DbSet<Domain.Entities.Suscripciones.PlanContratista> PlanesContratistas { get; }
+    DbSet<Domain.Entities.Pagos.Venta> Ventas { get; }
     DbSet<Domain.Entities.Seguridad.Perfile> Perfiles { get; }
     DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; }
     DbSet<Domain.Entities.Contratistas.ContratistaServicio> ContratistasServicios { get; }

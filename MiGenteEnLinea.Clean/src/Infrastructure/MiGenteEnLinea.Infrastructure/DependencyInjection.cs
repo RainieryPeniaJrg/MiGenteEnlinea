@@ -110,9 +110,37 @@ public static class DependencyInjection
         // Nómina Calculator Service (Nota: Ya está registrado en Application layer DI)
         // services.AddScoped<INominaCalculatorService, NominaCalculatorService>();
 
+        // ========================================
+        // PAYMENT GATEWAY (CARDNET)
+        // ========================================
+        
+        // Configuración de Cardnet
+        services.Configure<CardnetSettings>(configuration.GetSection("Cardnet"));
+
+        // HttpClient para Cardnet con retry policy y circuit breaker
+        services.AddHttpClient("CardnetAPI", (serviceProvider, client) =>
+        {
+            var config = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = config["Cardnet:BaseUrl"];
+            
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                client.BaseAddress = new Uri(baseUrl);
+            }
+            
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+        })
+        .AddPolicyHandler(GetRetryPolicy()) // Retry 3 veces
+        .AddPolicyHandler(GetCircuitBreakerPolicy()); // Circuit breaker después de 5 fallos
+
+        // Payment Service
+        // TODO: Descomentar cuando CardnetPaymentService esté implementado (Fase 5)
+        // services.AddScoped<IPaymentService, CardnetPaymentService>();
+
         // TODO: Agregar cuando se migren del legacy
         // services.AddScoped<IEmailService, EmailService>();
-        // services.AddScoped<ICardnetPaymentService, CardnetPaymentService>();
         // services.AddScoped<IPdfGenerationService, PdfGenerationService>();
         // services.AddScoped<IFileStorageService, FileStorageService>();
 
@@ -134,6 +162,27 @@ public static class DependencyInjection
                 {
                     // Log retry attempts (opcional)
                     Console.WriteLine($"[Retry {retryAttempt}] Reintenando después de {timespan.TotalSeconds}s...");
+                });
+    }
+
+    /// <summary>
+    /// Circuit Breaker policy para evitar saturar servicios externos con errores.
+    /// Abre el circuito después de 5 fallos consecutivos y lo mantiene abierto por 30 segundos.
+    /// </summary>
+    private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .CircuitBreakerAsync(
+                handledEventsAllowedBeforeBreaking: 5,
+                durationOfBreak: TimeSpan.FromSeconds(30),
+                onBreak: (outcome, duration) =>
+                {
+                    Console.WriteLine($"[Circuit Breaker] Circuito abierto por {duration.TotalSeconds}s debido a múltiples fallos.");
+                },
+                onReset: () =>
+                {
+                    Console.WriteLine("[Circuit Breaker] Circuito cerrado, reanudando llamadas.");
                 });
     }
 }
