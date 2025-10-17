@@ -32,6 +32,9 @@ public class UnitOfWork : IUnitOfWork
     private IContratistaRepository? _contratistas;
     private IEmpleadoRepository? _empleados;
     private ISuscripcionRepository? _suscripciones;
+    private IPlanEmpleadorRepository? _planesEmpleadores;
+    private IPlanContratistaRepository? _planesContratistas;
+    private IVentaRepository? _ventas;
     private ICalificacionRepository? _calificaciones;
 
     // TODO LOTES 1-8: Uncomment as interfaces are added to IUnitOfWork
@@ -89,6 +92,16 @@ public class UnitOfWork : IUnitOfWork
     // Suscripciones
     public ISuscripcionRepository Suscripciones =>
         _suscripciones ??= new SuscripcionRepository(_context);
+    
+    public IPlanEmpleadorRepository PlanesEmpleadores =>
+        _planesEmpleadores ??= new PlanEmpleadorRepository(_context);
+    
+    public IPlanContratistaRepository PlanesContratistas =>
+        _planesContratistas ??= new PlanContratistaRepository(_context);
+
+    // Pagos
+    public IVentaRepository Ventas =>
+        _ventas ??= new VentaRepository(_context);
 
     // Calificaciones
     public ICalificacionRepository Calificaciones =>

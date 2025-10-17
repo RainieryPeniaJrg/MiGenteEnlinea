@@ -76,6 +76,11 @@ public interface IUnitOfWork : IDisposable
 
     // Suscripciones
     Suscripciones.ISuscripcionRepository Suscripciones { get; }
+    Suscripciones.IPlanEmpleadorRepository PlanesEmpleadores { get; }
+    Suscripciones.IPlanContratistaRepository PlanesContratistas { get; }
+
+    // Pagos
+    Pagos.IVentaRepository Ventas { get; }
 
     // Calificaciones
     Calificaciones.ICalificacionRepository Calificaciones { get; }
