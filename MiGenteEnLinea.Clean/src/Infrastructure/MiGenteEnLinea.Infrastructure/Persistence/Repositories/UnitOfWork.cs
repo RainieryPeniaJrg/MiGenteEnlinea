@@ -15,6 +15,7 @@ using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleadores;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleados;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Pagos;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Suscripciones;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Contrataciones;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Repositories;
 
@@ -36,6 +37,8 @@ public class UnitOfWork : IUnitOfWork
     private IPlanContratistaRepository? _planesContratistas;
     private IVentaRepository? _ventas;
     private ICalificacionRepository? _calificaciones;
+    private IContratistaServicioRepository? _contratistasServicios;
+    private Domain.Interfaces.Repositories.Contrataciones.IDetalleContratacionRepository? _detallesContrataciones;
 
     // TODO LOTES 1-8: Uncomment as interfaces are added to IUnitOfWork
     // private IReciboHeaderRepository? _recibosHeader;
@@ -106,6 +109,14 @@ public class UnitOfWork : IUnitOfWork
     // Calificaciones
     public ICalificacionRepository Calificaciones =>
         _calificaciones ??= new CalificacionRepository(_context);
+
+    // Contratistas - Servicios
+    public IContratistaServicioRepository ContratistasServicios =>
+        _contratistasServicios ??= new ContratistaServicioRepository(_context);
+
+    // Contrataciones
+    public Domain.Interfaces.Repositories.Contrataciones.IDetalleContratacionRepository DetallesContrataciones =>
+        _detallesContrataciones ??= new Contrataciones.DetalleContratacionRepository(_context);
 
     // ===========================================
     // TODO LOTES 1-8: Uncomment as added to IUnitOfWork

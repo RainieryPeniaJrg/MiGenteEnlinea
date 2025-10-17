@@ -1,7 +1,6 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.RemoveServicio;
 
@@ -10,14 +9,14 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.RemoveServic
 /// </summary>
 public class RemoveServicioCommandHandler : IRequestHandler<RemoveServicioCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<RemoveServicioCommandHandler> _logger;
 
     public RemoveServicioCommandHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<RemoveServicioCommandHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -27,12 +26,11 @@ public class RemoveServicioCommandHandler : IRequestHandler<RemoveServicioComman
             "Removiendo servicio. ServicioId: {ServicioId}, ContratistaId: {ContratistaId}",
             request.ServicioId, request.ContratistaId);
 
-        // 1. BUSCAR SERVICIO con validación de pertenencia
-        var servicio = await _context.ContratistasServicios
-            .Where(s => s.ServicioId == request.ServicioId && s.ContratistaId == request.ContratistaId)
-            .FirstOrDefaultAsync(cancellationToken);
+        // 1. BUSCAR SERVICIO
+        var servicio = await _unitOfWork.ContratistasServicios
+            .GetByIdAsync(request.ServicioId, cancellationToken);
 
-        if (servicio == null)
+        if (servicio == null || servicio.ContratistaId != request.ContratistaId)
         {
             _logger.LogWarning(
                 "Servicio no encontrado o no pertenece al contratista. ServicioId: {ServicioId}, ContratistaId: {ContratistaId}",
@@ -42,10 +40,10 @@ public class RemoveServicioCommandHandler : IRequestHandler<RemoveServicioComman
         }
 
         // 2. REMOVER SERVICIO (Physical delete - igual que Legacy)
-        _context.ContratistasServicios.Remove(servicio);
+        _unitOfWork.ContratistasServicios.Remove(servicio);
 
         // 3. GUARDAR CAMBIOS
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Servicio removido exitosamente. ServicioId: {ServicioId}, ContratistaId: {ContratistaId}",

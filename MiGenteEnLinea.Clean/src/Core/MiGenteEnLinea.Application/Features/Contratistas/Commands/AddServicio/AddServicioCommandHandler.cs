@@ -1,8 +1,7 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Contratistas;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.AddServicio;
 
@@ -11,14 +10,14 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.AddServicio;
 /// </summary>
 public class AddServicioCommandHandler : IRequestHandler<AddServicioCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AddServicioCommandHandler> _logger;
 
     public AddServicioCommandHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<AddServicioCommandHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -29,10 +28,10 @@ public class AddServicioCommandHandler : IRequestHandler<AddServicioCommand, int
             request.ContratistaId, request.DetalleServicio);
 
         // 1. VALIDAR: Contratista existe
-        var contratistaExiste = await _context.Contratistas
-            .AnyAsync(c => c.Id == request.ContratistaId, cancellationToken);
+        var contratista = await _unitOfWork.Contratistas
+            .GetByIdAsync(request.ContratistaId, cancellationToken);
 
-        if (!contratistaExiste)
+        if (contratista == null)
         {
             _logger.LogWarning("Contratista no encontrado. ContratistaId: {ContratistaId}", request.ContratistaId);
             throw new InvalidOperationException($"No existe un contratista con ID {request.ContratistaId}");
@@ -44,11 +43,11 @@ public class AddServicioCommandHandler : IRequestHandler<AddServicioCommand, int
             detalleServicio: request.DetalleServicio
         );
 
-        // 3. AGREGAR A DBCONTEXT
-        _context.ContratistasServicios.Add(servicio);
+        // 3. AGREGAR AL REPOSITORIO
+        await _unitOfWork.ContratistasServicios.AddAsync(servicio, cancellationToken);
 
         // 4. GUARDAR CAMBIOS
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Servicio agregado exitosamente. ServicioId: {ServicioId}, ContratistaId: {ContratistaId}",

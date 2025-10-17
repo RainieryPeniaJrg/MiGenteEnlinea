@@ -85,10 +85,15 @@ public interface IUnitOfWork : IDisposable
     // Calificaciones
     Calificaciones.ICalificacionRepository Calificaciones { get; }
 
+    // Contratistas - Servicios
+    Contratistas.IContratistaServicioRepository ContratistasServicios { get; }
+
+    // Contrataciones
+    Contrataciones.IDetalleContratacionRepository DetallesContrataciones { get; }
+
     // ========================================
     // TODO LOTE 1-8: Uncomment as repositories are created
     // ========================================
-    // Contratistas.IContratistaServicioRepository ContratistasServicios { get; }
     // Contratistas.IContratistaFotoRepository ContratistasFotos { get; }
     // Empleados.IEmpleadoNotaRepository EmpleadosNotas { get; }
     // Empleados.IReciboHeaderRepository RecibosHeader { get; }

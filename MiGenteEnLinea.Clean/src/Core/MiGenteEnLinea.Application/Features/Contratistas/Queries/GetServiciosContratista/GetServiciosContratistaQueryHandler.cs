@@ -1,8 +1,7 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Contratistas.Common;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.GetServiciosContratista;
 
@@ -11,14 +10,14 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.GetServiciosC
 /// </summary>
 public class GetServiciosContratistaQueryHandler : IRequestHandler<GetServiciosContratistaQuery, List<ServicioContratistaDto>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetServiciosContratistaQueryHandler> _logger;
 
     public GetServiciosContratistaQueryHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<GetServiciosContratistaQueryHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -26,28 +25,27 @@ public class GetServiciosContratistaQueryHandler : IRequestHandler<GetServiciosC
     {
         _logger.LogInformation("Obteniendo servicios del contratista. ContratistaId: {ContratistaId}", request.ContratistaId);
 
-        var servicios = await _context.ContratistasServicios
-            .AsNoTracking()
-            .Where(s => s.ContratistaId == request.ContratistaId)
-            .OrderBy(s => s.Orden)
-            .ThenBy(s => s.ServicioId)
-            .Select(s => new ServicioContratistaDto
-            {
-                ServicioId = s.ServicioId,
-                ContratistaId = s.ContratistaId,
-                DetalleServicio = s.DetalleServicio,
-                Activo = s.Activo,
-                AniosExperiencia = s.AniosExperiencia,
-                TarifaBase = s.TarifaBase,
-                Orden = s.Orden,
-                Certificaciones = s.Certificaciones
-            })
-            .ToListAsync(cancellationToken);
+        // USAR REPOSITORIO: GetByContratistaIdAsync ya devuelve ordenado por Orden
+        var servicios = await _unitOfWork.ContratistasServicios
+            .GetByContratistaIdAsync(request.ContratistaId, cancellationToken);
+
+        // MAPEAR A DTO
+        var serviciosDto = servicios.Select(s => new ServicioContratistaDto
+        {
+            ServicioId = s.ServicioId,
+            ContratistaId = s.ContratistaId,
+            DetalleServicio = s.DetalleServicio,
+            Activo = s.Activo,
+            AniosExperiencia = s.AniosExperiencia,
+            TarifaBase = s.TarifaBase,
+            Orden = s.Orden,
+            Certificaciones = s.Certificaciones
+        }).ToList();
 
         _logger.LogInformation(
             "Servicios obtenidos exitosamente. ContratistaId: {ContratistaId}, Total: {Total}",
-            request.ContratistaId, servicios.Count);
+            request.ContratistaId, serviciosDto.Count);
 
-        return servicios;
+        return serviciosDto;
     }
 }
