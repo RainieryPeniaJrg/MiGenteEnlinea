@@ -1,8 +1,7 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Contratistas.Common;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Contratistas;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.GetContratistaByUserId;
 
@@ -11,14 +10,14 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.GetContratist
 /// </summary>
 public class GetContratistaByUserIdQueryHandler : IRequestHandler<GetContratistaByUserIdQuery, ContratistaDto?>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IContratistaRepository _contratistaRepository;
     private readonly ILogger<GetContratistaByUserIdQueryHandler> _logger;
 
     public GetContratistaByUserIdQueryHandler(
-        IApplicationDbContext context,
+        IContratistaRepository contratistaRepository,
         ILogger<GetContratistaByUserIdQueryHandler> logger)
     {
-        _context = context;
+        _contratistaRepository = contratistaRepository;
         _logger = logger;
     }
 
@@ -26,10 +25,9 @@ public class GetContratistaByUserIdQueryHandler : IRequestHandler<GetContratista
     {
         _logger.LogInformation("Buscando contratista por userId: {UserId}", request.UserId);
 
-        var contratista = await _context.Contratistas
-            .AsNoTracking()
-            .Where(c => c.UserId == request.UserId)
-            .Select(c => new ContratistaDto
+        var contratista = await _contratistaRepository.GetByUserIdProjectedAsync(
+            request.UserId,
+            c => new ContratistaDto
             {
                 ContratistaId = c.Id,
                 UserId = c.UserId,
@@ -64,8 +62,8 @@ public class GetContratistaByUserIdQueryHandler : IRequestHandler<GetContratista
                 PuedeRecibirTrabajos = c.Activo &&
                                        !string.IsNullOrWhiteSpace(c.Telefono1) &&
                                        (!string.IsNullOrWhiteSpace(c.Presentacion) || !string.IsNullOrWhiteSpace(c.Titulo))
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            },
+            cancellationToken);
 
         if (contratista == null)
         {

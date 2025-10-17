@@ -1,8 +1,7 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Contratistas.Common;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Contratistas;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.SearchContratistas;
 
@@ -11,14 +10,14 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Queries.SearchContrat
 /// </summary>
 public class SearchContratistasQueryHandler : IRequestHandler<SearchContratistasQuery, SearchContratistasResult>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IContratistaRepository _contratistaRepository;
     private readonly ILogger<SearchContratistasQueryHandler> _logger;
 
     public SearchContratistasQueryHandler(
-        IApplicationDbContext context,
+        IContratistaRepository contratistaRepository,
         ILogger<SearchContratistasQueryHandler> logger)
     {
-        _context = context;
+        _contratistaRepository = contratistaRepository;
         _logger = logger;
     }
 
@@ -37,58 +36,16 @@ public class SearchContratistasQueryHandler : IRequestHandler<SearchContratistas
         var pageIndex = request.PageIndex;
         if (pageIndex < 1) pageIndex = 1;
 
-        // 1. BASE QUERY
-        var query = _context.Contratistas.AsNoTracking();
-
-        // 2. FILTRO: Solo activos (si se especifica)
-        if (request.SoloActivos)
-        {
-            query = query.Where(c => c.Activo);
-        }
-
-        // 3. FILTRO: Búsqueda por término (case-insensitive, busca en Titulo, Presentacion, Sector)
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
-            var searchTermLower = request.SearchTerm.ToLower();
-            query = query.Where(c =>
-                (c.Titulo != null && c.Titulo.ToLower().Contains(searchTermLower)) ||
-                (c.Presentacion != null && c.Presentacion.ToLower().Contains(searchTermLower)) ||
-                (c.Sector != null && c.Sector.ToLower().Contains(searchTermLower))
-            );
-        }
-
-        // 4. FILTRO: Provincia (si no es "Cualquier Ubicacion")
-        if (!string.IsNullOrWhiteSpace(request.Provincia) && 
-            request.Provincia != "Cualquier Ubicacion")
-        {
-            var provinciaLower = request.Provincia.ToLower();
-            query = query.Where(c => c.Provincia != null && c.Provincia.ToLower() == provinciaLower);
-        }
-
-        // 5. FILTRO: Sector
-        if (!string.IsNullOrWhiteSpace(request.Sector))
-        {
-            var sectorLower = request.Sector.ToLower();
-            query = query.Where(c => c.Sector != null && c.Sector.ToLower() == sectorLower);
-        }
-
-        // 6. FILTRO: Experiencia mínima
-        if (request.ExperienciaMinima.HasValue)
-        {
-            query = query.Where(c => c.Experiencia >= request.ExperienciaMinima.Value);
-        }
-
-        // 7. CONTAR TOTAL DE REGISTROS (antes de paginación)
-        var totalRecords = await query.CountAsync(cancellationToken);
-
-        // 8. ORDENAR: Por fecha de ingreso descendente (más recientes primero)
-        query = query.OrderByDescending(c => c.FechaIngreso ?? DateTime.MinValue);
-
-        // 9. PAGINACIÓN: Skip y Take
-        var contratistas = await query
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .Select(c => new ContratistaDto
+        // BUSCAR usando Repository con proyección DTO
+        var (contratistas, totalRecords) = await _contratistaRepository.SearchProjectedAsync<ContratistaDto>(
+            searchTerm: request.SearchTerm,
+            provincia: request.Provincia,
+            sector: request.Sector,
+            experienciaMinima: request.ExperienciaMinima,
+            soloActivos: request.SoloActivos,
+            pageNumber: pageIndex,
+            pageSize: pageSize,
+            selector: c => new ContratistaDto
             {
                 ContratistaId = c.Id,
                 UserId = c.UserId,
@@ -123,13 +80,13 @@ public class SearchContratistasQueryHandler : IRequestHandler<SearchContratistas
                 PuedeRecibirTrabajos = c.Activo &&
                                        !string.IsNullOrWhiteSpace(c.Telefono1) &&
                                        (!string.IsNullOrWhiteSpace(c.Presentacion) || !string.IsNullOrWhiteSpace(c.Titulo))
-            })
-            .ToListAsync(cancellationToken);
+            },
+            ct: cancellationToken);
 
         _logger.LogInformation(
             "Búsqueda completada. Total: {TotalRecords}, Página: {PageIndex}/{TotalPages}",
             totalRecords, pageIndex, (int)Math.Ceiling(totalRecords / (double)pageSize));
 
-        return new SearchContratistasResult(contratistas, totalRecords, pageIndex, pageSize);
+        return new SearchContratistasResult(contratistas.ToList(), totalRecords, pageIndex, pageSize);
     }
 }

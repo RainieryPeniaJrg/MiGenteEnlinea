@@ -1,7 +1,7 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Contratistas;
 using MiGenteEnLinea.Domain.ValueObjects;
 
 namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.UpdateContratista;
@@ -11,14 +11,17 @@ namespace MiGenteEnLinea.Application.Features.Contratistas.Commands.UpdateContra
 /// </summary>
 public class UpdateContratistaCommandHandler : IRequestHandler<UpdateContratistaCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IContratistaRepository _contratistaRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateContratistaCommandHandler> _logger;
 
     public UpdateContratistaCommandHandler(
-        IApplicationDbContext context,
+        IContratistaRepository contratistaRepository,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateContratistaCommandHandler> logger)
     {
-        _context = context;
+        _contratistaRepository = contratistaRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -26,10 +29,9 @@ public class UpdateContratistaCommandHandler : IRequestHandler<UpdateContratista
     {
         _logger.LogInformation("Actualizando perfil de contratista para userId: {UserId}", request.UserId);
 
-        // 1. BUSCAR CONTRATISTA por userId
-        var contratista = await _context.Contratistas
-            .Where(c => c.UserId == request.UserId)
-            .FirstOrDefaultAsync(cancellationToken);
+        // 1. BUSCAR CONTRATISTA por userId usando Repository
+        var contratista = await _contratistaRepository
+            .GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (contratista == null)
         {
@@ -81,8 +83,8 @@ public class UpdateContratistaCommandHandler : IRequestHandler<UpdateContratista
             );
         }
 
-        // 4. GUARDAR CAMBIOS
-        await _context.SaveChangesAsync(cancellationToken);
+        // 4. GUARDAR CAMBIOS usando UnitOfWork
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Perfil de contratista actualizado exitosamente. ContratistaId: {ContratistaId}, UserId: {UserId}",
