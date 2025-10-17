@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
 
 namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.DeleteEmpleador;
 
@@ -18,14 +20,17 @@ namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.DeleteEmplead
 /// </remarks>
 public sealed class DeleteEmpleadorCommandHandler : IRequestHandler<DeleteEmpleadorCommand, bool>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IEmpleadorRepository _empleadorRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteEmpleadorCommandHandler> _logger;
 
     public DeleteEmpleadorCommandHandler(
-        IApplicationDbContext context,
+        IEmpleadorRepository empleadorRepository,
+        IUnitOfWork unitOfWork,
         ILogger<DeleteEmpleadorCommandHandler> logger)
     {
-        _context = context;
+        _empleadorRepository = empleadorRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -42,8 +47,7 @@ public sealed class DeleteEmpleadorCommandHandler : IRequestHandler<DeleteEmplea
         // ============================================
         // PASO 1: Buscar empleador por userId
         // ============================================
-        var empleador = await _context.Empleadores
-            .FirstOrDefaultAsync(e => e.UserId == request.UserId, cancellationToken);
+        var empleador = await _empleadorRepository.GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (empleador == null)
         {
@@ -54,12 +58,12 @@ public sealed class DeleteEmpleadorCommandHandler : IRequestHandler<DeleteEmplea
         // ============================================
         // PASO 2: Eliminar físicamente
         // ============================================
-        _context.Empleadores.Remove(empleador);
+        _empleadorRepository.Remove(empleador);
 
         // ============================================
         // PASO 3: Guardar cambios
         // ============================================
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Empleador eliminado FÍSICAMENTE. EmpleadorId: {EmpleadorId}, UserId: {UserId}",

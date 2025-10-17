@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
 
 namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.UpdateEmpleador;
 
@@ -10,14 +12,17 @@ namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.UpdateEmplead
 /// </summary>
 public sealed class UpdateEmpleadorCommandHandler : IRequestHandler<UpdateEmpleadorCommand, bool>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IEmpleadorRepository _empleadorRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateEmpleadorCommandHandler> _logger;
 
     public UpdateEmpleadorCommandHandler(
-        IApplicationDbContext context,
+        IEmpleadorRepository empleadorRepository,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateEmpleadorCommandHandler> logger)
     {
-        _context = context;
+        _empleadorRepository = empleadorRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -32,8 +37,7 @@ public sealed class UpdateEmpleadorCommandHandler : IRequestHandler<UpdateEmplea
         // ============================================
         // PASO 1: Buscar empleador por userId
         // ============================================
-        var empleador = await _context.Empleadores
-            .FirstOrDefaultAsync(e => e.UserId == request.UserId, cancellationToken);
+        var empleador = await _empleadorRepository.GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (empleador == null)
         {
@@ -57,7 +61,7 @@ public sealed class UpdateEmpleadorCommandHandler : IRequestHandler<UpdateEmplea
         // ============================================
         // PASO 3: Guardar cambios
         // ============================================
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Empleador actualizado exitosamente. EmpleadorId: {EmpleadorId}, UserId: {UserId}",

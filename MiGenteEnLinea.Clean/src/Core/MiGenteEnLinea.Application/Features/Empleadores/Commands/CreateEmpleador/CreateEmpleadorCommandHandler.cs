@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Empleadores;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
 
 namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.CreateEmpleador;
 
@@ -11,14 +13,20 @@ namespace MiGenteEnLinea.Application.Features.Empleadores.Commands.CreateEmplead
 /// </summary>
 public sealed class CreateEmpleadorCommandHandler : IRequestHandler<CreateEmpleadorCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IApplicationDbContext _context; // Temporary for Credenciales validation
+    private readonly IEmpleadorRepository _empleadorRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateEmpleadorCommandHandler> _logger;
 
     public CreateEmpleadorCommandHandler(
         IApplicationDbContext context,
+        IEmpleadorRepository empleadorRepository,
+        IUnitOfWork unitOfWork,
         ILogger<CreateEmpleadorCommandHandler> logger)
     {
         _context = context;
+        _empleadorRepository = empleadorRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -46,8 +54,7 @@ public sealed class CreateEmpleadorCommandHandler : IRequestHandler<CreateEmplea
         // PASO 2: Validar que NO exista empleador para ese userId
         // ============================================
         // BUSINESS RULE: Un userId puede ser empleador O contratista (relación 1:1)
-        var existeEmpleador = await _context.Empleadores
-            .AnyAsync(e => e.UserId == request.UserId, cancellationToken);
+        var existeEmpleador = await _empleadorRepository.ExistsByUserIdAsync(request.UserId, cancellationToken);
 
         if (existeEmpleador)
         {
@@ -66,14 +73,14 @@ public sealed class CreateEmpleadorCommandHandler : IRequestHandler<CreateEmplea
         );
 
         // ============================================
-        // PASO 4: Agregar a DbContext
+        // PASO 4: Agregar a repositorio
         // ============================================
-        _context.Empleadores.Add(empleador);
+        await _empleadorRepository.AddAsync(empleador, cancellationToken);
 
         // ============================================
         // PASO 5: Guardar cambios
         // ============================================
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Empleador creado exitosamente. EmpleadorId: {EmpleadorId}, UserId: {UserId}",

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleadores.DTOs;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
 
 namespace MiGenteEnLinea.Application.Features.Empleadores.Queries.GetEmpleadorByUserId;
 
@@ -11,14 +12,14 @@ namespace MiGenteEnLinea.Application.Features.Empleadores.Queries.GetEmpleadorBy
 /// </summary>
 public sealed class GetEmpleadorByUserIdQueryHandler : IRequestHandler<GetEmpleadorByUserIdQuery, EmpleadorDto?>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IEmpleadorRepository _empleadorRepository;
     private readonly ILogger<GetEmpleadorByUserIdQueryHandler> _logger;
 
     public GetEmpleadorByUserIdQueryHandler(
-        IApplicationDbContext context,
+        IEmpleadorRepository empleadorRepository,
         ILogger<GetEmpleadorByUserIdQueryHandler> logger)
     {
-        _context = context;
+        _empleadorRepository = empleadorRepository;
         _logger = logger;
     }
 
@@ -29,13 +30,9 @@ public sealed class GetEmpleadorByUserIdQueryHandler : IRequestHandler<GetEmplea
     {
         _logger.LogInformation("Buscando empleador por userId: {UserId}", request.UserId);
 
-        // ============================================
-        // Query con AsNoTracking para optimizar lectura
-        // ============================================
-        var empleador = await _context.Empleadores
-            .AsNoTracking()
-            .Where(e => e.UserId == request.UserId)
-            .Select(e => new EmpleadorDto
+        var empleador = await _empleadorRepository.GetByUserIdProjectedAsync(
+            request.UserId,
+            e => new EmpleadorDto
             {
                 EmpleadorId = e.Id,
                 UserId = e.UserId,
@@ -46,8 +43,8 @@ public sealed class GetEmpleadorByUserIdQueryHandler : IRequestHandler<GetEmplea
                 TieneFoto = e.Foto != null && e.Foto.Length > 0,
                 CreatedAt = e.CreatedAt,
                 UpdatedAt = e.UpdatedAt
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            },
+            cancellationToken);
 
         if (empleador == null)
         {

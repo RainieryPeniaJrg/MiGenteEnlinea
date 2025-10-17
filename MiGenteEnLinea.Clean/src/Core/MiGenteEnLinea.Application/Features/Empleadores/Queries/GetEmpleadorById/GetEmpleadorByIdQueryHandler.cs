@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleadores.DTOs;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
 
 namespace MiGenteEnLinea.Application.Features.Empleadores.Queries.GetEmpleadorById;
 
@@ -11,14 +12,14 @@ namespace MiGenteEnLinea.Application.Features.Empleadores.Queries.GetEmpleadorBy
 /// </summary>
 public sealed class GetEmpleadorByIdQueryHandler : IRequestHandler<GetEmpleadorByIdQuery, EmpleadorDto?>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IEmpleadorRepository _empleadorRepository;
     private readonly ILogger<GetEmpleadorByIdQueryHandler> _logger;
 
     public GetEmpleadorByIdQueryHandler(
-        IApplicationDbContext context,
+        IEmpleadorRepository empleadorRepository,
         ILogger<GetEmpleadorByIdQueryHandler> logger)
     {
-        _context = context;
+        _empleadorRepository = empleadorRepository;
         _logger = logger;
     }
 
@@ -26,10 +27,9 @@ public sealed class GetEmpleadorByIdQueryHandler : IRequestHandler<GetEmpleadorB
     {
         _logger.LogInformation("Buscando empleador por EmpleadorId: {EmpleadorId}", request.EmpleadorId);
 
-        var empleador = await _context.Empleadores
-            .AsNoTracking()
-            .Where(e => e.Id == request.EmpleadorId)
-            .Select(e => new EmpleadorDto
+        var empleador = await _empleadorRepository.GetByIdProjectedAsync(
+            request.EmpleadorId,
+            e => new EmpleadorDto
             {
                 EmpleadorId = e.Id,
                 UserId = e.UserId,
@@ -40,8 +40,8 @@ public sealed class GetEmpleadorByIdQueryHandler : IRequestHandler<GetEmpleadorB
                 TieneFoto = e.Foto != null && e.Foto.Length > 0,
                 CreatedAt = e.CreatedAt,
                 UpdatedAt = e.UpdatedAt
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            },
+            cancellationToken);
 
         if (empleador == null)
         {
