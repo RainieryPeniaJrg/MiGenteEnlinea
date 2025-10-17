@@ -1,8 +1,8 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Suscripciones;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetPlanesEmpleadores;
 
@@ -17,14 +17,14 @@ namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetPlanesEmp
 /// </remarks>
 public class GetPlanesEmpleadoresQueryHandler : IRequestHandler<GetPlanesEmpleadoresQuery, List<PlanEmpleador>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetPlanesEmpleadoresQueryHandler> _logger;
 
     public GetPlanesEmpleadoresQueryHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<GetPlanesEmpleadoresQueryHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -34,23 +34,14 @@ public class GetPlanesEmpleadoresQueryHandler : IRequestHandler<GetPlanesEmplead
             "Obteniendo planes de empleadores. SoloActivos: {SoloActivos}",
             request.SoloActivos);
 
-        var query = _context.PlanesEmpleadores.AsQueryable();
-
-        // Filtrar solo activos si se solicita
-        if (request.SoloActivos)
-        {
-            query = query.Where(p => p.Activo);
-        }
-
-        // Ordenar por precio ascendente (del más barato al más caro)
-        var planes = await query
-            .OrderBy(p => p.Precio)
-            .ToListAsync(cancellationToken);
+        var planes = request.SoloActivos
+            ? await _unitOfWork.PlanesEmpleadores.GetActivosAsync(cancellationToken)
+            : await _unitOfWork.PlanesEmpleadores.GetAllOrderedByPrecioAsync(cancellationToken);
 
         _logger.LogInformation(
             "Se encontraron {Count} planes de empleadores",
-            planes.Count);
+            planes.Count());
 
-        return planes;
+        return planes.ToList();
     }
 }

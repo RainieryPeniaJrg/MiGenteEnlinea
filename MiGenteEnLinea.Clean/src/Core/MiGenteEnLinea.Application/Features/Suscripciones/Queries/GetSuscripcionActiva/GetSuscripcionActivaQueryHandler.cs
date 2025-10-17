@@ -1,8 +1,8 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Suscripciones;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetSuscripcionActiva;
 
@@ -21,14 +21,14 @@ namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetSuscripci
 /// </remarks>
 public class GetSuscripcionActivaQueryHandler : IRequestHandler<GetSuscripcionActivaQuery, Suscripcion?>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetSuscripcionActivaQueryHandler> _logger;
 
     public GetSuscripcionActivaQueryHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<GetSuscripcionActivaQueryHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -40,10 +40,8 @@ public class GetSuscripcionActivaQueryHandler : IRequestHandler<GetSuscripcionAc
 
         // Buscar suscripción no cancelada
         // El método EstaActiva() del dominio valida que no esté vencida
-        var suscripcion = await _context.Suscripciones
-            .Where(s => s.UserId == request.UserId && !s.Cancelada)
-            .OrderByDescending(s => s.FechaInicio)
-            .FirstOrDefaultAsync(cancellationToken);
+        var suscripcion = await _unitOfWork.Suscripciones
+            .GetActivaByUserIdAsync(request.UserId, cancellationToken);
 
         if (suscripcion == null)
         {

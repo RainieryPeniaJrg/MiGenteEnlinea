@@ -1,10 +1,10 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Exceptions;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Suscripciones;
 using MiGenteEnLinea.Domain.Entities.Pagos;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Suscripciones.Commands.ProcesarVentaSinPago;
 
@@ -20,14 +20,14 @@ namespace MiGenteEnLinea.Application.Features.Suscripciones.Commands.ProcesarVen
 /// </remarks>
 public class ProcesarVentaSinPagoCommandHandler : IRequestHandler<ProcesarVentaSinPagoCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ProcesarVentaSinPagoCommandHandler> _logger;
 
     public ProcesarVentaSinPagoCommandHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<ProcesarVentaSinPagoCommandHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -40,11 +40,8 @@ public class ProcesarVentaSinPagoCommandHandler : IRequestHandler<ProcesarVentaS
             request.Motivo ?? "No especificado");
 
         // PASO 1: Validar que el plan existe
-        var planEmpleador = await _context.PlanesEmpleadores
-            .FirstOrDefaultAsync(p => p.PlanId == request.PlanId, cancellationToken);
-
-        var planContratista = await _context.PlanesContratistas
-            .FirstOrDefaultAsync(p => p.PlanId == request.PlanId, cancellationToken);
+        var planEmpleador = await _unitOfWork.PlanesEmpleadores.GetByIdAsync(request.PlanId, cancellationToken);
+        var planContratista = await _unitOfWork.PlanesContratistas.GetByIdAsync(request.PlanId, cancellationToken);
 
         if (planEmpleador == null && planContratista == null)
         {
@@ -77,12 +74,11 @@ public class ProcesarVentaSinPagoCommandHandler : IRequestHandler<ProcesarVentaS
             ultimosDigitosTarjeta: null,
             comentario: request.Motivo ?? "Plan gratuito");
 
-        _context.Ventas.Add(venta);
+        await _unitOfWork.Ventas.AddAsync(venta, cancellationToken);
 
         // PASO 3: Crear o renovar suscripción
-        var suscripcionExistente = await _context.Suscripciones
-            .Where(s => s.UserId == request.UserId && !s.Cancelada)
-            .FirstOrDefaultAsync(cancellationToken);
+        var suscripcionExistente = await _unitOfWork.Suscripciones
+            .GetNoCanceladaByUserIdAsync(request.UserId, cancellationToken);
 
         if (suscripcionExistente != null)
         {
@@ -108,11 +104,11 @@ public class ProcesarVentaSinPagoCommandHandler : IRequestHandler<ProcesarVentaS
                 planId: request.PlanId,
                 duracionMeses: duracionMeses);
 
-            _context.Suscripciones.Add(nuevaSuscripcion);
+            await _unitOfWork.Suscripciones.AddAsync(nuevaSuscripcion, cancellationToken);
         }
 
         // PASO 4: Guardar cambios
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Venta gratuita {VentaId} procesada exitosamente para usuario {UserId}",

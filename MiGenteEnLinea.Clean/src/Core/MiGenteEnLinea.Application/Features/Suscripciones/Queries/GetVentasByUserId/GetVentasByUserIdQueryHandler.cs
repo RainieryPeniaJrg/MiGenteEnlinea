@@ -1,8 +1,8 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Entities.Pagos;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetVentasByUserId;
 
@@ -16,14 +16,14 @@ namespace MiGenteEnLinea.Application.Features.Suscripciones.Queries.GetVentasByU
 /// </remarks>
 public class GetVentasByUserIdQueryHandler : IRequestHandler<GetVentasByUserIdQuery, List<Venta>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetVentasByUserIdQueryHandler> _logger;
 
     public GetVentasByUserIdQueryHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<GetVentasByUserIdQueryHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -42,31 +42,23 @@ public class GetVentasByUserIdQueryHandler : IRequestHandler<GetVentasByUserIdQu
             pageSize = 100;
         }
 
-        var query = _context.Ventas
-            .Where(v => v.UserId == request.UserId);
+        // Obtener ventas según filtro
+        var todasVentas = request.SoloAprobadas
+            ? await _unitOfWork.Ventas.GetAprobadasByUserIdAsync(request.UserId, cancellationToken)
+            : await _unitOfWork.Ventas.GetByUserIdAsync(request.UserId, cancellationToken);
 
-        // Filtrar solo aprobadas si se solicita (Estado = 2)
-        if (request.SoloAprobadas)
-        {
-            query = query.Where(v => v.Estado == 2);
-        }
-
-        // Ordenar por fecha descendente (más reciente primero)
-        // Paginar resultados
-        var ventas = await query
-            .OrderByDescending(v => v.FechaTransaccion)
+        // Aplicar paginación en memoria (las ventas ya están ordenadas por FechaTransaccion DESC)
+        var ventas = todasVentas
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         _logger.LogInformation(
             "Se encontraron {Count} ventas para el usuario {UserId} en la página {PageNumber}",
             ventas.Count, request.UserId, pageNumber);
 
         // Log de totales (para debugging)
-        var totalVentas = await _context.Ventas
-            .Where(v => v.UserId == request.UserId)
-            .CountAsync(cancellationToken);
+        var totalVentas = todasVentas.Count();
         
         _logger.LogInformation(
             "Total de ventas del usuario {UserId}: {Total}. Páginas disponibles: {TotalPaginas}",
