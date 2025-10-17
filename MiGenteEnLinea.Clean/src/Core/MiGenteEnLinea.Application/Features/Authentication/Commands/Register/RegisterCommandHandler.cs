@@ -7,27 +7,36 @@ using MiGenteEnLinea.Domain.Entities.Authentication;
 using MiGenteEnLinea.Domain.Entities.Contratistas;
 using MiGenteEnLinea.Domain.Entities.Seguridad;
 using MiGenteEnLinea.Domain.Entities.Suscripciones;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Authentication;
 
 namespace MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
 
 /// <summary>
 /// Handler para RegisterCommand
 /// Réplica EXACTA de SuscripcionesService.GuardarPerfil() del Legacy
+/// LOTE 1: Refactorizado para usar ICredencialRepository
 /// </summary>
 public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IApplicationDbContext _context; // Temporal: otras entidades (Perfiles, Contratistas)
+    private readonly ICredencialRepository _credencialRepository; // LOTE 1: Repository pattern
+    private readonly IUnitOfWork _unitOfWork; // LOTE 1: Transaction management
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailService _emailService;
     private readonly ILogger<RegisterCommandHandler> _logger;
 
     public RegisterCommandHandler(
         IApplicationDbContext context,
+        ICredencialRepository credencialRepository,
+        IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
         IEmailService emailService,
         ILogger<RegisterCommandHandler> logger)
     {
         _context = context;
+        _credencialRepository = credencialRepository;
+        _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
         _logger = logger;
@@ -36,12 +45,10 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
     public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         // ================================================================================
-        // PASO 1: VALIDAR QUE EL EMAIL NO EXISTA
+        // PASO 1: VALIDAR QUE EL EMAIL NO EXISTA (LOTE 1: Usando repositorio)
         // ================================================================================
         // Legacy usa Cuentas.Email, Clean usa Credenciales.Email (mismo objetivo)
-        var emailLower = request.Email.ToLowerInvariant();
-        var emailExists = await _context.Credenciales
-            .AnyAsync(c => c.Email.Value.ToLowerInvariant() == emailLower, cancellationToken);
+        var emailExists = await _credencialRepository.ExistsByEmailAsync(request.Email, cancellationToken);
 
         if (emailExists)
         {
@@ -88,7 +95,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         await _context.Perfiles.AddAsync(perfil, cancellationToken);
 
         // ================================================================================
-        // PASO 3: CREAR CREDENCIAL CON PASSWORD HASHEADO
+        // PASO 3: CREAR CREDENCIAL CON PASSWORD HASHEADO (LOTE 1: Usando repositorio)
         // ================================================================================
         // Legacy: guardarCredenciales() crea registro en Credenciales con password encriptado
         // Clean: Usamos BCrypt en lugar de Crypt.Encrypt()
@@ -96,11 +103,11 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         var email = Domain.ValueObjects.Email.Create(request.Email);
         var credencial = Credencial.Create(
             userId: userId,
-            email: email,
+            email: email!,
             passwordHash: _passwordHasher.HashPassword(request.Password)
         );
 
-        await _context.Credenciales.AddAsync(credencial, cancellationToken);
+        await _credencialRepository.AddAsync(credencial, cancellationToken);
 
         // ================================================================================
         // PASO 4: CREAR CONTRATISTA SI ES TIPO 2
@@ -137,9 +144,10 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         */
 
         // ================================================================================
-        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS
+        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS (LOTE 1: Usando UnitOfWork)
         // ================================================================================
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken); // Temporal: Perfiles, Contratistas
+        await _unitOfWork.SaveChangesAsync(cancellationToken); // LOTE 1: Credenciales via repository
 
         _logger.LogInformation(
             "Usuario registrado exitosamente. UserId: {UserId}, Email: {Email}, Tipo: {Tipo}",
