@@ -3,10 +3,26 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Domain.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Authentication;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Calificaciones;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Contratistas;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleadores;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Empleados;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Pagos;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Suscripciones;
 using MiGenteEnLinea.Infrastructure.Identity;
 using MiGenteEnLinea.Infrastructure.Identity.Services;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Interceptors;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Authentication;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Calificaciones;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Contratistas;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleadores;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleados;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Pagos;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Suscripciones;
 using MiGenteEnLinea.Infrastructure.Services;
 using Polly;
 using Polly.Extensions.Http;
@@ -104,18 +120,52 @@ public static class DependencyInjection
         services.AddScoped<AuditableEntityInterceptor>();
 
         // ========================================
-        // REPOSITORIES (Generic Repository Pattern)
+        // REPOSITORIES (Generic Repository Pattern) - LOTE 0 SIMPLIFIED
         // ========================================
-        // TODO: Descomentar cuando se implementen los repositorios
-        // services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        // services.AddScoped<IUnitOfWork, UnitOfWork>();
+        // LOTE 0 Foundation: Base Repository + Unit of Work
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Repositorios específicos
-        // services.AddScoped<ICredencialRepository, CredencialRepository>();
-        // services.AddScoped<IEmpleadorRepository, EmpleadorRepository>();
-        // services.AddScoped<IContratistaRepository, ContratistaRepository>();
-        // services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
-        // services.AddScoped<ISuscripcionRepository, SuscripcionRepository>();
+        // LOTE 0: Only core Rich Domain Model repositories (6 total)
+        // Authentication
+        services.AddScoped<ICredencialRepository, CredencialRepository>();
+        // Empleadores
+        services.AddScoped<IEmpleadorRepository, EmpleadorRepository>();
+        // Contratistas
+        services.AddScoped<IContratistaRepository, ContratistaRepository>();
+        // Empleados
+        services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+        // Suscripciones
+        services.AddScoped<ISuscripcionRepository, SuscripcionRepository>();
+        // Calificaciones
+        services.AddScoped<ICalificacionRepository, CalificacionRepository>();
+
+        // TODO LOTES 1-8: Uncomment as they're added to IUnitOfWork
+        // services.AddScoped<IReciboHeaderRepository, ReciboHeaderRepository>();
+        // services.AddScoped<IReciboDetalleRepository, ReciboDetalleRepository>();
+        // services.AddScoped<IConceptoNominaRepository, ConceptoNominaRepository>();
+        // services.AddScoped<IDeduccionTssRepository, DeduccionTssRepository>();
+        // services.AddScoped<IPlanEmpleadorRepository, PlanEmpleadorRepository>();
+        // services.AddScoped<IPlanContratistaRepository, PlanContratistaRepository>();
+        // services.AddScoped<IVentaRepository, VentaRepository>();
+        // services.AddScoped<ITransaccionRepository, TransaccionRepository>();
+        // services.AddScoped<IContratacionRepository, ContratacionRepository>();
+        // services.AddScoped<IContratoServicioRepository, ContratoServicioRepository>();
+        // services.AddScoped<IServicioOfertadoRepository, ServicioOfertadoRepository>();
+        // services.AddScoped<IRolRepository, RolRepository>();
+        // services.AddScoped<IPermisoRepository, PermisoRepository>();
+        // services.AddScoped<INacionalidadRepository, NacionalidadRepository>();
+        // services.AddScoped<IProvinciaRepository, ProvinciaRepository>();
+        // services.AddScoped<IMunicipioRepository, MunicipioRepository>();
+        // services.AddScoped<ISectorRepository, SectorRepository>();
+        // services.AddScoped<ITipoServicioRepository, TipoServicioRepository>();
+        // services.AddScoped<IEstadoCivilRepository, EstadoCivilRepository>();
+        // services.AddScoped<INivelAcademicoRepository, NivelAcademicoRepository>();
+        // services.AddScoped<ITipoCuentaRepository, TipoCuentaRepository>();
+        // services.AddScoped<IBancoRepository, BancoRepository>();
+        // services.AddScoped<ITipoIdentificacionRepository, TipoIdentificacionRepository>();
+        // services.AddScoped<IConfiguracionSistemaRepository, ConfiguracionSistemaRepository>();
+        // services.AddScoped<IParametroSistemaRepository, ParametroSistemaRepository>();
 
         // ========================================
         // EXTERNAL SERVICES
