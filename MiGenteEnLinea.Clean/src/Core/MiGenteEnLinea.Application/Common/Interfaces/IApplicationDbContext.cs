@@ -28,6 +28,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Nominas.ReciboDetalle> RecibosDetalle { get; }
     DbSet<Domain.Entities.Nominas.DeduccionTss> DeduccionesTss { get; }
     DbSet<Domain.Entities.Calificaciones.Calificacion> Calificaciones { get; }
+    DbSet<Domain.Entities.Contrataciones.DetalleContratacion> DetalleContrataciones { get; }
     
     // Read Models (Views)
     DbSet<VistaPerfil> VPerfiles { get; }
