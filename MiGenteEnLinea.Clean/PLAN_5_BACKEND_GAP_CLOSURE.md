@@ -11,6 +11,7 @@
 ### Análisis de Brechas (Legacy vs Clean)
 
 **Estado Actual:**
+
 - ✅ **Domain Layer:** 100% completo (36 entidades)
 - ✅ **Repository Pattern:** 100% completo (29 repositorios - PLAN 4)
 - ⚠️ **Application Layer:** 83% completo (5/6 módulos core)
@@ -36,6 +37,7 @@
 ## 🎯 OBJETIVOS DEL PLAN 5
 
 ### Objetivo General
+
 Alcanzar **100% de paridad funcional** entre Legacy y Clean Architecture, asegurando que toda la lógica de negocio esté migrada al patrón CQRS.
 
 ### Objetivos Específicos
@@ -71,6 +73,7 @@ Alcanzar **100% de paridad funcional** entre Legacy y Clean Architecture, asegur
 #### Problema Identificado
 
 **BLOCKER ACTUAL:**
+
 ```csharp
 // RegisterCommandHandler.cs línea 58
 await _emailService.SendActivationEmailAsync(
@@ -82,6 +85,7 @@ await _emailService.SendActivationEmailAsync(
 ```
 
 **DependencyInjection.cs línea 23:**
+
 ```csharp
 // services.AddScoped<IEmailService, EmailService>(); // ❌ COMENTADO
 ```
@@ -89,6 +93,7 @@ await _emailService.SendActivationEmailAsync(
 #### Análisis de Legacy
 
 **EmailService.cs (15 líneas):**
+
 ```csharp
 public class EmailService
 {
@@ -107,6 +112,7 @@ public class EmailService
 3. `SendEmailReset(name, to, subject, url)` - Email de reseteo de contraseña
 
 **Templates HTML existentes:**
+
 - `/MailTemplates/confirmacionRegistro.html`
 - `/MailTemplates/checkout.html`
 - `/MailTemplates/recuperarPass.html`
@@ -116,15 +122,19 @@ public class EmailService
 **FASE 1: Infrastructure Setup (3-4 horas)**
 
 1. **Crear EmailSettings Options Pattern**
+
    ```
    Infrastructure/Options/EmailSettings.cs (~40 líneas)
    ```
+
    - Propiedades: FromName, FromEmail, SmtpServer, SmtpPort, UseSsl, Username, Password
 
 2. **Implementar IEmailService en Infrastructure**
+
    ```
    Infrastructure/Services/EmailService.cs (~250 líneas)
    ```
+
    - `SendActivationEmailAsync(email, userId, token)`
    - `SendPasswordResetEmailAsync(email, userId, token)`
    - `SendWelcomeEmailAsync(email, nombre)`
@@ -133,6 +143,7 @@ public class EmailService
    - Helper: `LoadEmailTemplate(templateName, replacements)`
 
 3. **Migrar Email Templates**
+
    ```
    Infrastructure/Templates/
    ├── ActivationEmail.html
@@ -143,6 +154,7 @@ public class EmailService
    ```
 
 4. **Configurar appsettings.json**
+
    ```json
    {
      "EmailSettings": {
@@ -158,12 +170,14 @@ public class EmailService
    ```
 
 5. **Instalar NuGet Package**
+
    ```bash
    cd src/Infrastructure/MiGenteEnLinea.Infrastructure
    dotnet add package MailKit --version 4.3.0
    ```
 
 6. **Registrar en DI (DependencyInjection.cs)**
+
    ```csharp
    services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
    services.AddScoped<IEmailService, EmailService>();
@@ -193,9 +207,11 @@ public class EmailService
 #### Archivos a Crear (Total: 12 archivos, ~600 líneas)
 
 **Application Layer:**
+
 - `Application/Common/Interfaces/IEmailService.cs` (~60 líneas)
 
 **Infrastructure Layer:**
+
 - `Infrastructure/Options/EmailSettings.cs` (~40 líneas)
 - `Infrastructure/Services/EmailService.cs` (~250 líneas)
 - `Infrastructure/Templates/ActivationEmail.html` (~50 líneas)
@@ -205,9 +221,11 @@ public class EmailService
 - `Infrastructure/Templates/ContractNotificationEmail.html` (~50 líneas)
 
 **Tests:**
+
 - `Tests/Infrastructure.Tests/Services/EmailServiceTests.cs` (~150 líneas)
 
 **Documentation:**
+
 - `LOTE_5_1_EMAIL_SERVICE_COMPLETADO.md` (~800 líneas)
 
 #### Métricas de Éxito
@@ -247,6 +265,7 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 ```
 
 **Páginas Legacy que usan calificaciones:**
+
 - `/Empleador/CalificacionDePerfiles.aspx` - Empleador califica contratista
 - `/Contratista/MisCalificaciones.aspx` - Contratista ve sus reviews
 
@@ -255,6 +274,7 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 **FASE 1: Commands (1 día, 9 archivos, ~600 líneas)**
 
 1. **CreateCalificacionCommand**
+
    ```
    Features/Calificaciones/Commands/CreateCalificacion/
    ├── CreateCalificacionCommand.cs (~30 líneas)
@@ -262,11 +282,13 @@ public Calificaciones calificarPerfil(Calificaciones cal)
    ├── CreateCalificacionCommandValidator.cs (~60 líneas)
    └── CreateCalificacionCommandTests.cs (~100 líneas)
    ```
+
    - Validaciones: Rating (1-5), Comentario (max 500 chars), ContratistaId o EmpleadoId required
    - Business Logic: Solo puede calificar si hay contratación completada
    - Evento: CalificacionCreada (para actualizar promedio de contratista)
 
 2. **UpdateCalificacionCommand**
+
    ```
    Features/Calificaciones/Commands/UpdateCalificacion/
    ├── UpdateCalificacionCommand.cs (~30 líneas)
@@ -274,43 +296,51 @@ public Calificaciones calificarPerfil(Calificaciones cal)
    ├── UpdateCalificacionCommandValidator.cs (~50 líneas)
    └── UpdateCalificacionCommandTests.cs (~80 líneas)
    ```
+
    - Validaciones: Solo puede editar propia calificación, dentro de 30 días de creación
    - Business Logic: Re-calcular promedio de contratista
 
 3. **DeleteCalificacionCommand**
+
    ```
    Features/Calificaciones/Commands/DeleteCalificacion/
    ├── DeleteCalificacionCommand.cs (~20 líneas)
    ├── DeleteCalificacionCommandHandler.cs (~60 líneas)
    └── DeleteCalificacionCommandTests.cs (~60 líneas)
    ```
+
    - Soft delete (cambiar Activo = false)
    - Business Logic: Re-calcular promedio de contratista
 
 **FASE 2: Queries (1 día, 8 archivos, ~500 líneas)**
 
 1. **GetCalificacionesByContratistaQuery**
+
    ```
    Features/Calificaciones/Queries/GetCalificacionesByContratista/
    ├── GetCalificacionesByContratistaQuery.cs (~30 líneas)
    ├── GetCalificacionesByContratistaQueryHandler.cs (~80 líneas)
    └── GetCalificacionesByContratistaQueryTests.cs (~100 líneas)
    ```
+
    - Paginación (PageNumber, PageSize)
    - Ordenamiento por fecha descendente
    - Incluir datos del empleador que calificó
 
 2. **GetCalificacionesByEmpleadoQuery**
+
    ```
    Features/Calificaciones/Queries/GetCalificacionesByEmpleado/
    ├── GetCalificacionesByEmpleadoQuery.cs (~30 líneas)
    ├── GetCalificacionesByEmpleadoQueryHandler.cs (~70 líneas)
    └── GetCalificacionesByEmpleadoQueryTests.cs (~80 líneas)
    ```
+
    - Similar a GetCalificacionesByContratista
    - Filtrado por EmpleadoId
 
 3. **GetCalificacionByIdQuery**
+
    ```
    Features/Calificaciones/Queries/GetCalificacionById/
    ├── GetCalificacionByIdQuery.cs (~20 líneas)
@@ -319,35 +349,43 @@ public Calificaciones calificarPerfil(Calificaciones cal)
    ```
 
 4. **GetPromedioCalificacionQuery**
+
    ```
    Features/Calificaciones/Queries/GetPromedioCalificacion/
    ├── GetPromedioCalificacionQuery.cs (~30 líneas)
    ├── GetPromedioCalificacionQueryHandler.cs (~100 líneas)
    └── GetPromedioCalificacionQueryTests.cs (~80 líneas)
    ```
+
    - Calcular promedio, total reviews, distribución por estrellas (1★-5★)
    - Retornar PromedioCalificacionDto
 
 **FASE 3: DTOs & Controller (4 horas, 3 archivos, ~300 líneas)**
 
 1. **CalificacionDto**
+
    ```
    Features/Calificaciones/DTOs/CalificacionDto.cs (~80 líneas)
    ```
+
    - Propiedades calculadas: FechaRelativa (hace 2 días), EsReciente (< 7 días)
 
 2. **PromedioCalificacionDto**
+
    ```
    Features/Calificaciones/DTOs/PromedioCalificacionDto.cs (~50 líneas)
    ```
+
    - Promedio (decimal)
    - TotalReviews (int)
    - Distribucion (Dictionary<int, int>: {5: 10, 4: 5, 3: 2, 2: 1, 1: 0})
 
 3. **CalificacionesController**
+
    ```
    Presentation/Controllers/CalificacionesController.cs (~170 líneas)
    ```
+
    - `POST /api/calificaciones` - Crear calificación ✅
    - `PUT /api/calificaciones/{id}` - Editar calificación ✅
    - `DELETE /api/calificaciones/{id}` - Eliminar calificación ✅
@@ -365,17 +403,21 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 #### Archivos a Crear (Total: 20 archivos, ~1,400 líneas)
 
 **Application Layer (17 archivos):**
+
 - 3 Commands + 3 Handlers + 3 Validators = 9 archivos
 - 4 Queries + 4 Handlers = 8 archivos
 - 2 DTOs
 
 **Presentation Layer (1 archivo):**
+
 - CalificacionesController.cs
 
 **Tests (10+ archivos):**
+
 - Command tests, Query tests, Controller integration tests
 
 **Documentation:**
+
 - LOTE_5_2_CALIFICACIONES_COMPLETADO.md
 
 #### Métricas de Éxito
@@ -405,6 +447,7 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 2. `ConvertHtmlToPdf(string htmlContent)` - Convertir HTML a PDF usando iText
 
 **Uso Actual:**
+
 - Generación de contratos PDF
 - Generación de recibos de pago PDF
 - Renderización de imágenes en reportes
@@ -414,22 +457,27 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 **FASE 1: PDF Generation Service (3-4 horas)**
 
 1. **Crear IPdfService**
+
    ```
    Application/Common/Interfaces/IPdfService.cs (~40 líneas)
    ```
+
    - `ConvertHtmlToPdfAsync(htmlContent, outputPath?)`
    - `GenerateContractPdfAsync(contratacion)`
    - `GeneratePayrollReceiptPdfAsync(recibo)`
 
 2. **Implementar PdfService**
+
    ```
    Infrastructure/Services/PdfService.cs (~200 líneas)
    ```
+
    - Usar iText 8.0.5 (ya instalado en Legacy)
    - Métodos: ConvertHtmlToPdf, GenerateContractPdf, GeneratePayrollReceiptPdf
    - Templates: Cargar desde Infrastructure/Templates/Pdf/
 
 3. **Crear PDF Templates**
+
    ```
    Infrastructure/Templates/Pdf/
    ├── ContratoTemplate.html
@@ -442,18 +490,22 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 **FASE 2: Image Utilities (2-3 horas)**
 
 1. **Crear IImageService**
+
    ```
    Application/Common/Interfaces/IImageService.cs (~30 líneas)
    ```
+
    - `ConvertToDataUrlAsync(imageBytes, mimeType)`
    - `ConvertToBase64Async(imageBytes)`
    - `ResizeImageAsync(imageBytes, width, height)`
    - `ValidateImageAsync(imageBytes, maxSizeKb, allowedFormats)`
 
 2. **Implementar ImageService**
+
    ```
    Infrastructure/Services/ImageService.cs (~150 líneas)
    ```
+
    - Usar System.Drawing o ImageSharp
    - Validar formatos (JPEG, PNG, WebP)
    - Validar tamaños (max 5MB)
@@ -462,16 +514,20 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 **FASE 3: Other Utilities (1-2 horas)**
 
 1. **Migrar NumeroEnLetras.cs** (si aún no migrado)
+
    ```
    Infrastructure/Utilities/NumberToWordsConverter.cs (~100 líneas)
    ```
+
    - Convertir números a letras (para contratos/recibos)
    - Idioma: Español (República Dominicana)
 
 2. **Crear DateTimeExtensions**
+
    ```
    Application/Common/Extensions/DateTimeExtensions.cs (~80 líneas)
    ```
+
    - `ToRelativeDateString()` - "Hace 2 días", "Hace 3 meses"
    - `ToShortDateString()` - Formato dominicano
    - `IsBusinessDay()` - Excluir fines de semana y feriados
@@ -479,11 +535,13 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 #### Archivos a Crear (Total: 10 archivos, ~700 líneas)
 
 **Application Layer:**
+
 - `Common/Interfaces/IPdfService.cs` (~40 líneas)
 - `Common/Interfaces/IImageService.cs` (~30 líneas)
 - `Common/Extensions/DateTimeExtensions.cs` (~80 líneas)
 
 **Infrastructure Layer:**
+
 - `Services/PdfService.cs` (~200 líneas)
 - `Services/ImageService.cs` (~150 líneas)
 - `Utilities/NumberToWordsConverter.cs` (~100 líneas)
@@ -491,6 +549,7 @@ public Calificaciones calificarPerfil(Calificaciones cal)
 - `Templates/Pdf/ReciboTemplate.html` (~100 líneas)
 
 **Tests:**
+
 - `Tests/Infrastructure.Tests/Services/PdfServiceTests.cs` (~80 líneas)
 - `Tests/Infrastructure.Tests/Services/ImageServiceTests.cs` (~60 líneas)
 
@@ -530,9 +589,11 @@ public class BotServices
 ```
 
 **Página Legacy:**
+
 - `/abogadoVirtual.aspx` - Chat con "abogado virtual" usando OpenAI GPT
 
 **Contexto de Negocio:**
+
 - Asistente legal especializado en leyes laborales de República Dominicana
 - Responde preguntas sobre TSS, contratos, derechos laborales
 - NO es funcionalidad crítica para MVP
@@ -589,6 +650,7 @@ public class BotServices
    - Asignar contratista a trabajo temporal
 
 **Entidades Involucradas:**
+
 - `DetalleContrataciones` (ya migrada en PLAN 4)
 - `Contrataciones` (ya migrada)
 - Estados: Pendiente (1), Aceptada (2), En Progreso (3), Completada (4), Cancelada (5), Rechazada (6)
@@ -596,10 +658,12 @@ public class BotServices
 #### Gap Identificado
 
 **Funcionalidad Existente en Clean:**
+
 - ✅ `CreateDetalleContratacionCommand` (existe pero básico)
 - ✅ Repository pattern completo (PLAN 4 - LOTE 5)
 
 **Funcionalidad Faltante:**
+
 - ❌ `ChangeContratacionStatusCommand` - Cambiar estado de contratación
 - ❌ `AcceptContratacionCommand` - Contratista acepta trabajo
 - ❌ `RejectContratacionCommand` - Contratista rechaza trabajo
@@ -623,6 +687,7 @@ public class BotServices
 6. **CancelContratacionCommand** (Cualquier estado → Cancelada)
 
 **Business Rules:**
+
 - Solo empleador puede cancelar
 - Solo contratista puede aceptar/rechazar
 - Solo puede completar si está en progreso
@@ -652,17 +717,21 @@ public class BotServices
 #### Archivos a Crear (Total: 23 archivos, ~1,750 líneas)
 
 **Application Layer:**
+
 - 6 Commands + 6 Handlers + 6 Validators = 18 archivos
 - 4 Queries + 4 Handlers = 8 archivos
 - 3 DTOs
 
 **Presentation Layer:**
+
 - ContratacionesController.cs (actualizar o crear)
 
 **Tests:**
+
 - Command tests, Query tests, Controller tests
 
 **Documentation:**
+
 - LOTE_5_5_CONTRATACIONES_AVANZADAS_COMPLETADO.md
 
 #### Métricas de Éxito
@@ -685,6 +754,7 @@ public class BotServices
 #### Análisis de Legacy
 
 **Página Legacy:**
+
 - `/Empleador/nomina.aspx` (~300 líneas C#)
   - Procesar nómina masiva (múltiples empleados)
   - Calcular deducciones TSS automáticamente
@@ -692,10 +762,12 @@ public class BotServices
   - Exportar nómina a Excel
 
 **Funcionalidad Actual en Clean:**
+
 - ✅ `ProcesarPagoCommand` - Procesar pago individual (LOTE 4)
 - ✅ Cálculo de deducciones TSS básico
 
 **Funcionalidad Faltante:**
+
 - ❌ `ProcesarNominaLoteCommand` - Procesar múltiples empleados
 - ❌ `GenerarRecibosPdfCommand` - Generar PDFs en lote
 - ❌ `ExportNominaToExcelQuery` - Exportar a Excel
@@ -738,17 +810,21 @@ public class BotServices
 #### Archivos a Crear (Total: 10 archivos, ~900 líneas)
 
 **Application Layer:**
+
 - 2 Commands + 2 Handlers + 2 Validators = 6 archivos
 - 3 Queries + 3 Handlers = 6 archivos
 - 2 DTOs (ResumenNominaDto, NominaLoteResultDto)
 
 **Presentation Layer:**
+
 - Actualizar NominasController con 4 endpoints
 
 **Tests:**
+
 - Command tests, Query tests
 
 **Documentation:**
+
 - LOTE_5_6_NOMINA_AVANZADA_COMPLETADO.md
 
 #### NuGet Packages
@@ -779,6 +855,7 @@ dotnet add package ClosedXML --version 0.102.1
 #### Análisis de Legacy
 
 **Páginas Legacy:**
+
 - `/comunidad.aspx` - Dashboard de empleador (~100 líneas C#)
 - `/Dashboard.aspx` - Dashboard general (~100 líneas C#)
 - `/Contratista/index_contratista.aspx` - Dashboard de contratista (~100 líneas C#)
@@ -786,6 +863,7 @@ dotnet add package ClosedXML --version 0.102.1
 **Datos mostrados en Dashboard:**
 
 **Empleador:**
+
 - Total empleados activos
 - Total nómina mensual
 - Empleados dados de alta este mes
@@ -794,6 +872,7 @@ dotnet add package ClosedXML --version 0.102.1
 - Estado de suscripción
 
 **Contratista:**
+
 - Total calificaciones
 - Promedio de rating
 - Contrataciones activas
@@ -836,16 +915,20 @@ dotnet add package ClosedXML --version 0.102.1
 #### Archivos a Crear (Total: 11 archivos, ~800 líneas)
 
 **Application Layer:**
+
 - 4 Queries + 4 Handlers = 8 archivos
 - 4 DTOs
 
 **Presentation Layer:**
+
 - DashboardController.cs
 
 **Tests:**
+
 - Query tests, Controller tests
 
 **Documentation:**
+
 - LOTE_5_7_DASHBOARD_REPORTS_COMPLETADO.md
 
 #### Métricas de Éxito
@@ -874,6 +957,7 @@ dotnet add package ClosedXML --version 0.102.1
 | 5.7 | Dashboard | 🟡 MEDIA | 1-2 días | 11 | ~800 | ❌ |
 
 **Total (sin Bot):**
+
 - **Tiempo:** 11-16 días (~88-128 horas)
 - **Archivos:** 86 archivos
 - **Líneas:** ~6,150 líneas
