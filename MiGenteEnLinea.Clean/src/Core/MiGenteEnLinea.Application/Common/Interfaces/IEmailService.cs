@@ -47,6 +47,21 @@ public interface IEmailService
         string transactionId);
 
     /// <summary>
+    /// Enviar notificación de contratación (nueva, aceptada, rechazada, etc.)
+    /// </summary>
+    /// <param name="toEmail">Email del destinatario</param>
+    /// <param name="toName">Nombre del destinatario</param>
+    /// <param name="contractTitle">Título de la contratación</param>
+    /// <param name="status">Estado de la contratación</param>
+    /// <param name="message">Mensaje adicional</param>
+    Task SendContractNotificationEmailAsync(
+        string toEmail,
+        string toName,
+        string contractTitle,
+        string status,
+        string message);
+
+    /// <summary>
     /// Enviar email genérico (para casos no cubiertos por plantillas)
     /// </summary>
     /// <param name="toEmail">Email del destinatario</param>

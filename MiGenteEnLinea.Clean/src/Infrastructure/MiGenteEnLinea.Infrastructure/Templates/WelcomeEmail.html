@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Bienvenido a MiGente En Línea!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 200px;
+        }
+        .features {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .features ul {
+            padding-left: 20px;
+        }
+        .features li {
+            padding: 5px 0;
+        }
+        @media only screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+                border-radius: 0;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .logo img {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="http://platform.migenteenlinea.do/Images/logoMiGene.png" alt="MiGente En Línea" />
+        </div>
+        <h1>¡Bienvenido {{UserName}}!</h1>
+        <p>Tu cuenta ha sido activada exitosamente. Ahora eres parte de <strong>MiGente En Línea</strong>, la plataforma que conecta empleadores y contratistas en República Dominicana.</p>
+        
+        <div class="features">
+            <h3 style="margin-top: 0; color: #333;">Como {{UserType}}, ahora puedes:</h3>
+            <ul>
+                <li>✓ Gestionar tu perfil profesional</li>
+                <li>✓ {{FeaturesList}}</li>
+                <li>✓ Acceder a reportes y estadísticas</li>
+                <li>✓ Recibir notificaciones importantes</li>
+            </ul>
+        </div>
+
+        <p style="text-align: center;">
+            <a href="http://platform.migenteenlinea.do/login" class="button">Iniciar Sesión</a>
+        </p>
+
+        <p>Si tienes alguna pregunta o necesitas ayuda, nuestro equipo de soporte está disponible para asistirte.</p>
+        
+        <p>¡Esperamos que disfrutes de tu experiencia en MiGente En Línea!</p>
+        
+        <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #999999; text-align: center;">
+            Este es un correo automático, por favor no respondas a este mensaje.
+        </p>
+    </div>
+</body>
+</html>

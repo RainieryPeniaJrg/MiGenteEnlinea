@@ -99,6 +99,28 @@ public class EmailService : IEmailService
     }
 
     /// <summary>
+    /// Enviar notificación de contratación (nueva, aceptada, rechazada, etc.)
+    /// </summary>
+    public async Task SendContractNotificationEmailAsync(
+        string toEmail,
+        string toName,
+        string contractTitle,
+        string status,
+        string message)
+    {
+        _logger.LogInformation(
+            "Enviando notificación de contratación a: {Email}, Estado: {Status}",
+            toEmail,
+            status);
+
+        var subject = $"Actualización de Contratación: {status}";
+        var htmlBody = GetContractNotificationEmailTemplate(toName, contractTitle, status, message);
+        var plainText = $"Hola {toName},\n\nActualización de tu contratación '{contractTitle}'.\nEstado: {status}\n\n{message}\n\nSaludos,\nMiGente En Línea";
+
+        await SendEmailAsync(toEmail, toName, subject, htmlBody, plainText);
+    }
+
+    /// <summary>
     /// Enviar email genérico
     /// </summary>
     public async Task SendEmailAsync(
@@ -465,6 +487,69 @@ public class EmailService : IEmailService
     <div style=""text-align: center; padding: 20px; color: #999; font-size: 12px;"">
         <p>&copy; 2025 MiGente En Línea. Todos los derechos reservados.</p>
         <p>¿Tienes preguntas? <a href=""mailto:soporte@migenteenlinea.com"" style=""color: #11998e;"">Contáctanos</a></p>
+    </div>
+</body>
+</html>";
+    }
+
+    /// <summary>
+    /// Template: Email de notificación de contratación
+    /// </summary>
+    private static string GetContractNotificationEmailTemplate(
+        string toName,
+        string contractTitle,
+        string status,
+        string message)
+    {
+        // Determinar color según estado
+        var (color, emoji) = status.ToLower() switch
+        {
+            "pendiente" => ("#ffc107", "⏳"),
+            "aceptada" => ("#17a2b8", "✓"),
+            "en progreso" => ("#ff9800", "🚀"),
+            "completada" => ("#28a745", "✓"),
+            "rechazada" => ("#dc3545", "✗"),
+            "cancelada" => ("#6c757d", "✗"),
+            _ => ("#007bff", "ℹ️")
+        };
+
+        return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=""utf-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Notificación de Contratación</title>
+</head>
+<body style=""font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;"">
+    <div style=""background: {color}; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;"">
+        <h1 style=""color: white; margin: 0; font-size: 28px;"">{emoji} Actualización de Contratación</h1>
+    </div>
+    
+    <div style=""background: white; padding: 40px; border: 1px solid #e0e0e0; border-top: none;"">
+        <h2 style=""color: {color};"">Hola {toName},</h2>
+        
+        <p>Hay una actualización en tu contratación:</p>
+        
+        <div style=""background: #f8f9fa; border-left: 4px solid {color}; padding: 20px; margin: 20px 0;"">
+            <h3 style=""margin-top: 0; color: #333;"">{contractTitle}</h3>
+            <p style=""margin: 10px 0;"">
+                <strong style=""color: {color};"">Estado: {status}</strong>
+            </p>
+            <p style=""margin: 10px 0; color: #666;"">{message}</p>
+        </div>
+        
+        <div style=""text-align: center; margin: 30px 0;"">
+            <a href=""https://migenteenlinea.com/contrataciones"" style=""background: {color}; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;"">
+                Ver Detalles
+            </a>
+        </div>
+        
+        <p style=""color: #666; font-size: 14px;"">Puedes revisar todos los detalles ingresando a tu cuenta.</p>
+    </div>
+    
+    <div style=""text-align: center; padding: 20px; color: #999; font-size: 12px;"">
+        <p>&copy; 2025 MiGente En Línea. Todos los derechos reservados.</p>
     </div>
 </body>
 </html>";
