@@ -9,15 +9,18 @@
 ## 📋 RESUMEN EJECUTIVO
 
 **LOTE 6 - Seguridad & Permisos:**
+
 - ✅ 3 repositorios creados (Permiso, Perfile, PerfilesInfo)
 - ✅ 2 handlers refactorizados (UpdateProfile, Register)
 
 **LOTE 7 - Views (Read-Only):**
+
 - ✅ 1 base class creada (IReadOnlyRepository<T>, ReadOnlyRepository<T>)
 - ✅ 9 repositorios read-only creados para vistas
 - ✅ 0 handlers (views son solo consultas, no tienen commands)
 
 **Build:**
+
 - ✅ 0 errores
 - ✅ 0 warnings
 
@@ -31,6 +34,7 @@
 
 **Ubicación:** `Domain/Interfaces/Repositories/Seguridad/` + `Infrastructure/Persistence/Repositories/Seguridad/`  
 **Métodos:**
+
 - `GetByUserIdAsync(string userId)` - Permisos de un usuario específico
 - `GetByRolAsync(string rol)` - Permisos por rol (Empleador/Contratista)
 - `GetActivosAsync()` - Solo permisos activos del sistema
@@ -38,6 +42,7 @@
 #### 2. IPerfileRepository + PerfileRepository
 
 **Métodos:**
+
 - `GetByUsuarioAsync(string usuario)` - Buscar perfil por usuario/alias
 - `GetByEmailAsync(string email)` - Buscar perfil por email
 - `GetByTipoAsync(int tipo)` - Filtrar por tipo (1=Empleador, 2=Contratista)
@@ -46,6 +51,7 @@
 #### 3. IPerfilesInfoRepository + PerfilesInfoRepository
 
 **Métodos:**
+
 - `GetByPerfilIdAsync(int perfilId)` - Info extendida por PerfilId
 - `GetByIdentificacionAsync(string identificacion)` - Búsqueda por cédula/RNC
 - `GetEmpresasAsync()` - Perfiles con NombreComercial (empresas)
@@ -55,12 +61,14 @@
 #### 1. ✅ UpdateProfileCommandHandler
 
 **ANTES:**
+
 ```csharp
 private readonly IApplicationDbContext _context;
 var perfil = await _context.Perfiles.FindAsync(...);
 ```
 
 **DESPUÉS:**
+
 ```csharp
 private readonly IUnitOfWork _unitOfWork;
 var perfil = await _unitOfWork.Perfiles.GetByIdAsync(...);
@@ -69,6 +77,7 @@ var perfil = await _unitOfWork.Perfiles.GetByIdAsync(...);
 #### 2. ✅ RegisterCommandHandler
 
 **ANTES:**
+
 ```csharp
 private readonly IApplicationDbContext _context;
 private readonly IUnitOfWork _unitOfWork;  // Mezclaba ambos
@@ -79,6 +88,7 @@ _context.Perfiles.Add(perfil);
 ```
 
 **DESPUÉS:**
+
 ```csharp
 private readonly IUnitOfWork _unitOfWork;  // Solo UnitOfWork
 
@@ -103,6 +113,7 @@ await _unitOfWork.Empleadores.AddAsync(empleador);
 **Propósito:** Interfaz base para repositorios de vistas (solo lectura)
 
 **Métodos:**
+
 ```csharp
 Task<T?> GetByIdAsync(int id);
 Task<IEnumerable<T>> GetAllAsync();
@@ -116,6 +127,7 @@ Task<bool> AnyAsync();
 ```
 
 **Diferencia con IRepository<T>:**
+
 - ❌ NO tiene: Add, AddRange, Update, UpdateRange, Remove, RemoveRange
 - ✅ Solo operaciones READ
 
@@ -142,12 +154,14 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Combina `Perfiles` + `PerfilesInfo`
 
 **Métodos Específicos:**
+
 - `GetByUserIdAsync(string userId)` - Perfil por UserId
 - `GetByTipoAsync(int tipo)` - Filtrar por tipo (Empleador/Contratista)
 - `GetByEmailAsync(string email)` - Buscar por email
 - `SearchByNombreAsync(string searchTerm)` - Búsqueda parcial nombre/apellido
 
 **Campos Clave:**
+
 - PerfilId, UserId, Tipo, Nombre, Apellido, Email, Telefono1/2
 - Identificacion, TipoIdentificacion, Direccion, FotoPerfil
 - NombreComercial, CedulaGerente (para empresas)
@@ -159,6 +173,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Información completa de empleados
 
 **Métodos Específicos:**
+
 - `GetByEmpleadorIdAsync(string userId)` - Todos los empleados de un empleador
 - `GetActivosByEmpleadorIdAsync(string userId)` - Solo empleados activos
 - `GetByIdentificacionAsync(string identificacion)` - Buscar por cédula
@@ -166,6 +181,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 - `GetByPeriodoPagoAsync(string userId, int periodoPago)` - Filtrar por periodo (Semanal/Quincenal/Mensual)
 
 **Campos Clave:**
+
 - EmpleadoId, UserId, Identificacion, Nombre, Nacimiento
 - Salario, PeriodoPago, Activo, Posicion
 - RemuneracionExtra1/2/3, MontoExtra1/2/3
@@ -178,6 +194,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Contratistas con calificaciones promedio
 
 **Métodos Específicos:**
+
 - `GetActivosByProvinciaAsync(string provincia)` - Contratistas por provincia
 - `GetNivelNacionalAsync()` - Contratistas que trabajan nacionalmente
 - `GetBySectorAsync(string sector)` - Filtrar por sector/industria
@@ -186,6 +203,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 - `GetByUserIdAsync(string userId)` - Perfil de contratista específico
 
 **Campos Clave:**
+
 - ContratistaId, UserId, Titulo, Tipo, Identificacion
 - Nombre, Apellido, Sector, Experiencia, Presentacion
 - Provincia, NivelNacional
@@ -201,10 +219,12 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Calificaciones con datos del perfil evaluado
 
 **Métodos Específicos:**
+
 - `GetByContratistaIdAsync(int contratistaId)` - Calificaciones recibidas (⚠️ limitado por estructura)
 - `GetByUsuarioIdAsync(string userId)` - Calificaciones hechas por usuario
 
 **Campos Clave:**
+
 - CalificacionId, Fecha, UserId, Tipo, Identificacion, Nombre
 - **Puntualidad**, **Cumplimiento**, **Conocimientos**, **Recomendacion** (1-5 cada uno)
 - PerfilId, Email, Telefono1/2
@@ -218,9 +238,11 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Promedio de calificaciones por contratista
 
 **Métodos Específicos:**
+
 - `GetByContratistaIdAsync(int contratistaId)` - Promedio de un contratista (⚠️ limitado)
 
 **Campos Clave:**
+
 - **Identificacion** (string) - Cédula/RNC del contratista
 - **CalificacionPromedio** (decimal) - Promedio calculado (Puntualidad + Cumplimiento + Conocimientos + Recomendación) / 4
 - **TotalRegistros** (int) - Cantidad de calificaciones recibidas
@@ -234,15 +256,18 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancella
 **Vista:** Suscripciones con nombre del plan
 
 **Métodos Específicos:**
+
 - `GetByUserIdAsync(string userId)` - Todas las suscripciones de un usuario (ordenadas por más reciente)
 - `GetActivaByUserIdAsync(string userId)` - Suscripción activa (Vencimiento >= hoy)
 
 **Campos Clave:**
+
 - SuscripcionId, UserId, PlanId
 - **Vencimiento** (DateOnly), **FechaInicio** (DateOnly)
 - Nombre (nombre del plan), ProximoPago
 
 **Lógica Activa:**
+
 ```csharp
 var hoy = DateOnly.FromDateTime(DateTime.Now);
 return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
@@ -255,10 +280,12 @@ return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
 **Vista:** Pagos a empleados permanentes
 
 **Métodos Específicos:**
+
 - `GetByUserIdAsync(string userId)` - Pagos de un empleador (ordenados por fecha desc)
 - `GetByFechaRangoAsync(DateTime fechaInicio, DateTime fechaFin)` - Pagos en rango de fechas
 
 **Campos Clave:**
+
 - PagoId, UserId, EmpleadoId
 - **FechaRegistro**, **FechaPago** (DateTime)
 - **Monto** (decimal) - Total del pago
@@ -270,10 +297,12 @@ return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
 **Vista:** Pagos a contratistas temporales
 
 **Métodos Específicos:**
+
 - `GetByEmpleadorIdAsync(string userId)` - Pagos hechos por un empleador
 - `GetByContratistaIdAsync(int contratistaId)` - Pagos recibidos (⚠️ usa ContratacionId)
 
 **Campos Clave:**
+
 - PagoId, UserId, **ContratacionId** (int)
 - FechaRegistro, **FechaPago** (DateTime)
 - **Monto** (decimal)
@@ -287,11 +316,13 @@ return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
 **Vista:** Contrataciones con detalles completos
 
 **Métodos Específicos:**
+
 - `GetByEmpleadorIdAsync(string userId)` - Contrataciones de un empleador
 - `GetByContratistaIdAsync(int contratistaId)` - Contrataciones de un contratista (⚠️ limitado)
 - `GetActivasAsync()` - Contrataciones en progreso (Estatus = 3)
 
 **Campos Clave:**
+
 - ContratacionId, UserId, FechaRegistro, Tipo
 - NombreComercial, Rnc, Identificacion, Nombre, Apellido
 - DetalleId, DescripcionCorta, DescripcionAmpliada
@@ -316,6 +347,7 @@ return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
 | **TOTAL** | | | **~300** | **6 archivos** |
 
 **Handlers Refactorizados:**
+
 - UpdateProfileCommandHandler (62 → 56 líneas, -9.7%)
 - RegisterCommandHandler (150 → 140 líneas, -6.7%)
 
@@ -348,12 +380,14 @@ return await _dbSet.Where(s => s.UserId == userId && s.Vencimiento >= hoy)...
 **Decisión:** Crear interfaz separada para vistas
 
 **Razón:**
+
 - Vistas de BD son read-only por naturaleza
 - Evita exponer métodos `Add/Update/Remove` que no tienen sentido
 - Más seguro: compilador previene escrituras accidentales
 - Más semántico: código auto-documenta que es read-only
 
 **Alternativa Rechazada:**
+
 - Usar `IRepository<T>` y lanzar `NotSupportedException` en métodos de escritura
 - ❌ Error en runtime vs. compile-time
 - ❌ API engañosa
@@ -374,6 +408,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(...)
 ```
 
 **Razón:**
+
 - 🚀 Mejor performance (no rastrea cambios)
 - 💾 Menor uso de memoria
 - 🔒 Evita side effects (entidades no se modifican)
@@ -386,6 +421,7 @@ public virtual async Task<IEnumerable<T>> GetAllAsync(...)
 **Decisión:** Crear métodos específicos con nombres descriptivos
 
 **Ejemplo:**
+
 ```csharp
 // ✅ CORRECTO: Método específico con nombre descriptivo
 Task<IEnumerable<VistaContratista>> GetActivosByProvinciaAsync(string provincia);
@@ -395,6 +431,7 @@ Task<IEnumerable<VistaContratista>> GetActivosByProvinciaAsync(string provincia)
 ```
 
 **Razón:**
+
 - Más legible en handlers
 - Encapsula lógica de negocio (ej: ordenar por calificación)
 - Más fácil de testear (mock método específico)
@@ -407,6 +444,7 @@ Task<IEnumerable<VistaContratista>> GetActivosByProvinciaAsync(string provincia)
 **Problema:** Algunas vistas usan `Identificacion` en lugar de `ContratistaId`
 
 **Ejemplo:**
+
 ```csharp
 public async Task<VistaPromedioCalificacion?> GetByContratistaIdAsync(int contratistaId, ...)
 {
@@ -419,6 +457,7 @@ public async Task<VistaPromedioCalificacion?> GetByContratistaIdAsync(int contra
 **Decisión:** Mantener firma del método por consistencia de API, documentar limitación
 
 **Razón:**
+
 - Interfaz uniforme para consumidores
 - Documentación clara de la limitación
 - Posibilidad de JOIN adicional en futuro si es necesario
@@ -438,6 +477,7 @@ public async Task<VistaSuscripcion?> GetActivaByUserIdAsync(string userId, ...)
 ```
 
 **Razón:**
+
 - Tipo moderno .NET 8 para fechas sin hora
 - Evita problemas de comparación con tiempo (00:00:00 vs 23:59:59)
 - Más semántico que `DateTime.Date`
@@ -454,6 +494,7 @@ public async Task<VistaSuscripcion?> GetActivaByUserIdAsync(string userId, ...)
 3. **Uso directo desde DI** - Se inyectan directamente en handlers
 
 **Patrón de Uso:**
+
 ```csharp
 // ✅ WRITE operations: Usar UnitOfWork
 public class CreateEmpleadoHandler
@@ -504,6 +545,7 @@ Time Elapsed 00:00:10.43
 #### ❌ Error 1-11: Propiedades inexistentes en vistas
 
 **Errores:**
+
 - `VistaCalificacion.ContratistaId` → No existe, usa `Identificacion`
 - `VistaPromedioCalificacion.ContratistaId` → No existe, usa `Identificacion`
 - `VistaSuscripcion.Activo` → No existe, usa comparación con `Vencimiento`
@@ -563,6 +605,7 @@ var hoy = DateOnly.FromDateTime(DateTime.Now);
 ### Inmediato: Commits Separados
 
 **Commit LOTE 6:**
+
 ```bash
 git add src/Core/MiGenteEnLinea.Domain/Interfaces/Repositories/Seguridad/
 git add src/Infrastructure/MiGenteEnLinea.Infrastructure/Persistence/Repositories/Seguridad/
@@ -587,6 +630,7 @@ Progress: 6/8 LOTES (75%)"
 ```
 
 **Commit LOTE 7:**
+
 ```bash
 git add src/Core/MiGenteEnLinea.Domain/Interfaces/Repositories/IReadOnlyRepository.cs
 git add src/Core/MiGenteEnLinea.Domain/Interfaces/Repositories/Views/
@@ -630,12 +674,14 @@ Progress: 7/8 LOTES (87.5%)"
 **Estimación:** 3-4 horas
 
 **Scope:**
+
 - Repositorios para catálogos (Provincias, Municipios, Sectores, etc.)
 - Repositorios de configuración (Config_Correo, etc.)
 - Handlers pendientes de refactorización (~10)
 - Cierre de PLAN 4 (Repository Pattern)
 
 **Entidades Pendientes:**
+
 - `Catalogos.Provincia` (catálogo)
 - `Catalogos.Municipio` (catálogo)
 - `Catalogos.Sector` (catálogo)
@@ -669,6 +715,7 @@ Progress: 7/8 LOTES (87.5%)"
 ## ✅ CHECKLIST DE VALIDACIÓN
 
 ### LOTE 6
+
 - [x] 3 repositorios creados (Permiso, Perfile, PerfilesInfo)
 - [x] 2 handlers refactorizados (UpdateProfile, Register)
 - [x] IUnitOfWork actualizado con nuevas propiedades
@@ -678,6 +725,7 @@ Progress: 7/8 LOTES (87.5%)"
 - [ ] Commit realizado (PENDING)
 
 ### LOTE 7
+
 - [x] IReadOnlyRepository<T> creado
 - [x] ReadOnlyRepository<T> base creado
 - [x] 9 repositorios read-only creados

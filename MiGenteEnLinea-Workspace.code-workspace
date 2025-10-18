@@ -129,7 +129,8 @@
     "chat.mcp.assisted.nuget.enabled": true,
     "chat.edits2.enabled": true,
     "chat.emptyState.history.enabled": true,
-    "chat.checkpoints.showFileChanges": true
+    "chat.checkpoints.showFileChanges": true,
+    "dotnet.defaultSolution": "🚀 MiGente Clean Architecture/MiGenteEnLinea.Clean.sln"
   },
   "extensions": {
     "recommendations": [
