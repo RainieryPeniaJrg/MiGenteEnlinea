@@ -91,32 +91,33 @@ public interface IUnitOfWork : IDisposable
     // Contrataciones
     Contrataciones.IDetalleContratacionRepository DetallesContrataciones { get; }
 
+    // LOTE 6: Seguridad & Permisos
+    Seguridad.IPerfileRepository Perfiles { get; }
+    Seguridad.IPermisoRepository Permisos { get; }
+    Seguridad.IPerfilesInfoRepository PerfilesInfo { get; }
+
+    // LOTE 8: Catálogos & Configuración
+    Catalogos.IProvinciaRepository Provincias { get; }
+    Catalogos.ISectorRepository Sectores { get; }
+    Catalogos.IServicioRepository Servicios { get; }
+    Configuracion.IConfigCorreoRepository ConfiguracionCorreo { get; }
+
     // ========================================
-    // TODO LOTE 1-8: Uncomment as repositories are created
+    // TODO LOTE 9+: Future repositories (optional)
     // ========================================
     // Contratistas.IContratistaFotoRepository ContratistasFotos { get; }
     // Empleados.IEmpleadoNotaRepository EmpleadosNotas { get; }
     // Empleados.IReciboHeaderRepository RecibosHeader { get; }
     // Empleados.IReciboDetalleRepository RecibosDetalle { get; }
     // Nominas.IDeduccionTssRepository DeduccionesTss { get; }
-    // Suscripciones.IPlanEmpleadorRepository PlanesEmpleadores { get; }
-    // Suscripciones.IPlanContratistaRepository PlanesContratistas { get; }
-    // Pagos.IVentaRepository Ventas { get; }
     // Pagos.ITransaccionRepository Transacciones { get; }
     // Pagos.IPaymentGatewayRepository Pagos { get; }
     // Pagos.IEmpleadorRecibosHeaderContratacioneRepository RecibosHeaderContrataciones { get; }
     // Pagos.IEmpleadorRecibosDetalleContratacioneRepository RecibosDetalleContrataciones { get; }
-    // Seguridad.IPerfileRepository Perfiles { get; }
-    // Seguridad.IPermisoRepository Permisos { get; }
     // Contrataciones.IContratacionRepository Contrataciones { get; }
     // Contrataciones.IContratoServicioRepository ContratosServicio { get; }
     // Contrataciones.IServicioOfertadoRepository ServiciosOfertados { get; }
     // Contrataciones.IEmpleadoTemporalRepository EmpleadosTemporales { get; }
-    // Contrataciones.IDetalleContratacionRepository DetallesContrataciones { get; }
-    // Catalogos.IProvinciaRepository Provincias { get; }
-    // Catalogos.ISectorRepository Sectores { get; }
-    // Catalogos.IServicioRepository Servicios { get; }
-    // Configuracion.IConfigCorreoRepository ConfiguracionCorreo { get; }
 
     // ========================================
     // TRANSACTION MANAGEMENT

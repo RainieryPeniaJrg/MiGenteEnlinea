@@ -1,41 +1,32 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Domain.Entities.Authentication;
 using MiGenteEnLinea.Domain.Entities.Contratistas;
 using MiGenteEnLinea.Domain.Entities.Seguridad;
-using MiGenteEnLinea.Domain.Entities.Suscripciones;
 using MiGenteEnLinea.Domain.Interfaces.Repositories;
-using MiGenteEnLinea.Domain.Interfaces.Repositories.Authentication;
 
 namespace MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
 
 /// <summary>
 /// Handler para RegisterCommand
 /// Réplica EXACTA de SuscripcionesService.GuardarPerfil() del Legacy
-/// LOTE 1: Refactorizado para usar ICredencialRepository
+/// LOTE 6: Refactorizado completamente para usar IUnitOfWork
 /// </summary>
 public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
-    private readonly IApplicationDbContext _context; // Temporal: otras entidades (Perfiles, Contratistas)
-    private readonly ICredencialRepository _credencialRepository; // LOTE 1: Repository pattern
-    private readonly IUnitOfWork _unitOfWork; // LOTE 1: Transaction management
+    private readonly IUnitOfWork _unitOfWork; // LOTE 6: Todas las entidades via repository pattern
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailService _emailService;
     private readonly ILogger<RegisterCommandHandler> _logger;
 
     public RegisterCommandHandler(
-        IApplicationDbContext context,
-        ICredencialRepository credencialRepository,
         IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
         IEmailService emailService,
         ILogger<RegisterCommandHandler> logger)
     {
-        _context = context;
-        _credencialRepository = credencialRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
@@ -45,10 +36,10 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
     public async Task<RegisterResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         // ================================================================================
-        // PASO 1: VALIDAR QUE EL EMAIL NO EXISTA (LOTE 1: Usando repositorio)
+        // PASO 1: VALIDAR QUE EL EMAIL NO EXISTA
         // ================================================================================
         // Legacy usa Cuentas.Email, Clean usa Credenciales.Email (mismo objetivo)
-        var emailExists = await _credencialRepository.ExistsByEmailAsync(request.Email, cancellationToken);
+        var emailExists = await _unitOfWork.Credenciales.ExistsByEmailAsync(request.Email, cancellationToken);
 
         if (emailExists)
         {
@@ -92,10 +83,10 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             );
         }
         
-        await _context.Perfiles.AddAsync(perfil, cancellationToken);
+        await _unitOfWork.Perfiles.AddAsync(perfil, cancellationToken);
 
         // ================================================================================
-        // PASO 3: CREAR CREDENCIAL CON PASSWORD HASHEADO (LOTE 1: Usando repositorio)
+        // PASO 3: CREAR CREDENCIAL CON PASSWORD HASHEADO
         // ================================================================================
         // Legacy: guardarCredenciales() crea registro en Credenciales con password encriptado
         // Clean: Usamos BCrypt en lugar de Crypt.Encrypt()
@@ -107,7 +98,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             passwordHash: _passwordHasher.HashPassword(request.Password)
         );
 
-        await _credencialRepository.AddAsync(credencial, cancellationToken);
+        await _unitOfWork.Credenciales.AddAsync(credencial, cancellationToken);
 
         // ================================================================================
         // PASO 4: CREAR CONTRATISTA SI ES TIPO 2
@@ -123,7 +114,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
                 telefono1: request.Telefono1
             );
 
-            await _context.Contratistas.AddAsync(contratista, cancellationToken);
+            await _unitOfWork.Contratistas.AddAsync(contratista, cancellationToken);
         }
 
         // ================================================================================
@@ -140,14 +131,13 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             duracionMeses: 1
         );
 
-        await _context.Suscripciones.AddAsync(suscripcion, cancellationToken);
+        await _unitOfWork.Suscripciones.AddAsync(suscripcion, cancellationToken);
         */
 
         // ================================================================================
-        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS (LOTE 1: Usando UnitOfWork)
+        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS (UN SOLO SaveChanges)
         // ================================================================================
-        await _context.SaveChangesAsync(cancellationToken); // Temporal: Perfiles, Contratistas
-        await _unitOfWork.SaveChangesAsync(cancellationToken); // LOTE 1: Credenciales via repository
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Usuario registrado exitosamente. UserId: {UserId}, Email: {Email}, Tipo: {Tipo}",

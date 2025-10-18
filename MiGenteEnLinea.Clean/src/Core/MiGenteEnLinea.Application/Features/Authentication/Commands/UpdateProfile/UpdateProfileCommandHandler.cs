@@ -1,7 +1,6 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
 
@@ -11,14 +10,14 @@ namespace MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProf
 /// </summary>
 public sealed class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand, bool>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateProfileCommandHandler> _logger;
 
     public UpdateProfileCommandHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateProfileCommandHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -29,9 +28,8 @@ public sealed class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileC
         // ================================================================================
         // Legacy: actualizarPerfil(info, cuenta) - actualiza dos tablas separadas
         // Clean: Perfil es una sola entidad que contiene toda la info
-        var perfil = await _context.Perfiles
-            .Where(p => p.UserId == request.UserId)
-            .FirstOrDefaultAsync(cancellationToken);
+        var perfil = await _unitOfWork.Perfiles
+            .GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (perfil == null)
         {
@@ -53,9 +51,10 @@ public sealed class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileC
         );
 
         // ================================================================================
-        // PASO 3: GUARDAR CAMBIOS
+        // PASO 3: MARCAR COMO MODIFICADO Y GUARDAR CAMBIOS
         // ================================================================================
-        await _context.SaveChangesAsync(cancellationToken);
+        _unitOfWork.Perfiles.Update(perfil);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Perfil actualizado exitosamente. UserId: {UserId}, Email: {Email}",

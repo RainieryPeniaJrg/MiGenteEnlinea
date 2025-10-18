@@ -16,6 +16,12 @@ using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleados;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Pagos;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Suscripciones;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Contrataciones;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Seguridad;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Seguridad;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Catalogos;
+using MiGenteEnLinea.Domain.Interfaces.Repositories.Configuracion;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Catalogos;
+using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Configuracion;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Repositories;
 
@@ -40,7 +46,18 @@ public class UnitOfWork : IUnitOfWork
     private IContratistaServicioRepository? _contratistasServicios;
     private Domain.Interfaces.Repositories.Contrataciones.IDetalleContratacionRepository? _detallesContrataciones;
 
-    // TODO LOTES 1-8: Uncomment as interfaces are added to IUnitOfWork
+    // LOTE 6: Seguridad & Permisos
+    private IPerfileRepository? _perfiles;
+    private IPermisoRepository? _permisos;
+    private IPerfilesInfoRepository? _perfilesInfo;
+
+    // LOTE 8: Catálogos & Configuración
+    private IProvinciaRepository? _provincias;
+    private ISectorRepository? _sectores;
+    private IServicioRepository? _servicios;
+    private IConfigCorreoRepository? _configuracionCorreo;
+
+    // TODO LOTES 9+: Future repositories (optional)
     // private IReciboHeaderRepository? _recibosHeader;
     // private IReciboDetalleRepository? _recibosDetalle;
     // private IConceptoNominaRepository? _conceptosNomina;
@@ -118,8 +135,31 @@ public class UnitOfWork : IUnitOfWork
     public Domain.Interfaces.Repositories.Contrataciones.IDetalleContratacionRepository DetallesContrataciones =>
         _detallesContrataciones ??= new Contrataciones.DetalleContratacionRepository(_context);
 
+    // LOTE 6: Seguridad & Permisos
+    public IPerfileRepository Perfiles =>
+        _perfiles ??= new PerfileRepository(_context);
+
+    public IPermisoRepository Permisos =>
+        _permisos ??= new PermisoRepository(_context);
+
+    public IPerfilesInfoRepository PerfilesInfo =>
+        _perfilesInfo ??= new PerfilesInfoRepository(_context);
+
+    // LOTE 8: Catálogos & Configuración
+    public IProvinciaRepository Provincias =>
+        _provincias ??= new ProvinciaRepository(_context);
+
+    public ISectorRepository Sectores =>
+        _sectores ??= new SectorRepository(_context);
+
+    public IServicioRepository Servicios =>
+        _servicios ??= new ServicioRepository(_context);
+
+    public IConfigCorreoRepository ConfiguracionCorreo =>
+        _configuracionCorreo ??= new ConfigCorreoRepository(_context);
+
     // ===========================================
-    // TODO LOTES 1-8: Uncomment as added to IUnitOfWork
+    // TODO LOTES 9+: Future repositories (optional)
     // ===========================================
     // public IReciboHeaderRepository RecibosHeader =>
     //     _recibosHeader ??= new ReciboHeaderRepository(_context);
