@@ -223,10 +223,28 @@ public static class DependencyInjection
         .AddPolicyHandler(GetCircuitBreakerPolicy()); // Circuit breaker después de 5 fallos
 
         // =====================================================================
-        // EMAIL SERVICE (PLAN 1 - Fase 3: DI Registration)
+        // EMAIL SERVICE (PLAN 5 - LOTE 5.1)
         // =====================================================================
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.AddScoped<IEmailService, EmailService>();
+
+        // =====================================================================
+        // PDF SERVICE (PLAN 5 - LOTE 5.3)
+        // Generación de PDFs desde HTML (contratos, recibos, autorizaciones TSS)
+        // =====================================================================
+        services.AddScoped<IPdfService, PdfService>();
+
+        // =====================================================================
+        // IMAGE SERVICE (PLAN 5 - LOTE 5.3)
+        // Procesamiento de imágenes (resize, compress, convert format)
+        // =====================================================================
+        services.AddScoped<IImageService, ImageService>();
+
+        // =====================================================================
+        // NUMBER TO WORDS CONVERTER (PLAN 5 - LOTE 5.3)
+        // Nota: Es una clase estática (extension method), no requiere registro DI
+        // Uso: decimal salario = 5250.50m; string texto = salario.ConvertirALetras();
+        // =====================================================================
 
         // =====================================================================
         // MOCK SERVICES (TEMPORAL - API Startup Fix)
@@ -236,7 +254,6 @@ public static class DependencyInjection
         services.AddScoped<INominaCalculatorService, MockNominaCalculatorService>();
 
         // TODO: Agregar cuando se migren del legacy
-        // services.AddScoped<IPdfGenerationService, PdfGenerationService>();
         // services.AddScoped<IFileStorageService, FileStorageService>();
 
         return services;
