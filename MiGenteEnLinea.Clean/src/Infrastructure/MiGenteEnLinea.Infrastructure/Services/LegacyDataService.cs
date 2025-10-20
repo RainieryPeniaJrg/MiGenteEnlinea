@@ -134,5 +134,23 @@ public class LegacyDataService : ILegacyDataService
 
         return true;
     }
+
+    public async Task<bool> CancelarTrabajoAsync(
+        int contratacionId,
+        int detalleId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy:
+        // detalle.estatus = 3;
+        // db.SaveChanges();
+
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE DetalleContrataciones SET estatus = 3 " +
+            "WHERE contratacionID = {0} AND detalleID = {1}",
+            [contratacionId, detalleId],
+            cancellationToken);
+
+        return true;
+    }
 }
 

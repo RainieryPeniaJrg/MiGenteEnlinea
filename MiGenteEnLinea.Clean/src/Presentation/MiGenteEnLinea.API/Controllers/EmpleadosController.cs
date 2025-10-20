@@ -16,6 +16,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.DeleteRemuneracion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.DarDeBajaEmpleado;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CancelarTrabajo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -200,6 +201,38 @@ public class EmpleadosController : ControllerBase
         var result = await _mediator.Send(command);
 
         _logger.LogInformation("Empleado dado de baja exitosamente: {EmpleadoId}", empleadoId);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Cancelar un trabajo temporal (establece estatus = 3 en DetalleContrataciones).
+    /// Migrado desde: EmpleadosService.cancelarTrabajo(int contratacionID, int detalleID)
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="detalleId">ID del detalle a cancelar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Trabajo cancelado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPut("contrataciones/{contratacionId}/detalle/{detalleId}/cancelar")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> CancelarTrabajo(int contratacionId, int detalleId)
+    {
+        _logger.LogInformation(
+            "Cancelando trabajo temporal: ContratacionId={ContratacionId}, DetalleId={DetalleId}",
+            contratacionId,
+            detalleId);
+
+        var command = new CancelarTrabajoCommand(contratacionId, detalleId);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation(
+            "Trabajo temporal cancelado: ContratacionId={ContratacionId}, DetalleId={DetalleId}",
+            contratacionId,
+            detalleId);
 
         return Ok(result);
     }

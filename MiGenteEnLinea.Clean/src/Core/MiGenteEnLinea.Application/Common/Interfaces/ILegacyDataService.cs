@@ -42,4 +42,10 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.darDeBaja
     /// </summary>
     Task<bool> DarDeBajaEmpleadoAsync(int empleadoId, string userId, DateTime fechaBaja, decimal prestaciones, string motivo, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Cancela un trabajo temporal (establece estatus = 3 en DetalleContrataciones)
+    /// Migrado de: EmpleadosService.cancelarTrabajo
+    /// </summary>
+    Task<bool> CancelarTrabajoAsync(int contratacionId, int detalleId, CancellationToken cancellationToken = default);
 }
