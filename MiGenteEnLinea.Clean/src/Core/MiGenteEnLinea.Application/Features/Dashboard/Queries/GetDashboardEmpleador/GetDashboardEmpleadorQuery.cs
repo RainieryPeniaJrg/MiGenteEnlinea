@@ -157,6 +157,28 @@ public class DashboardEmpleadorDto
     /// Mostrado en sección "Historial de Pagos" del dashboard legacy.
     /// </summary>
     public List<PagoRecienteDto> UltimosPagos { get; set; } = new();
+
+    // ========================================
+    // 📈 SECCIÓN: DATOS PARA GRÁFICOS
+    // ========================================
+
+    /// <summary>
+    /// Evolución de la nómina mensual en los últimos 6 meses.
+    /// Usado para gráfico de línea/barras.
+    /// </summary>
+    public List<NominaEvolucionDto> EvolucionNomina { get; set; } = new();
+
+    /// <summary>
+    /// Top 5 deducciones más comunes.
+    /// Usado para gráfico de barras horizontales.
+    /// </summary>
+    public List<DeduccionTopDto> TopDeducciones { get; set; } = new();
+
+    /// <summary>
+    /// Distribución de empleados por posición/cargo.
+    /// Usado para gráfico de pastel (pie chart).
+    /// </summary>
+    public List<EmpleadosDistribucionDto> DistribucionEmpleados { get; set; } = new();
 }
 
 /// <summary>
@@ -193,4 +215,90 @@ public class PagoRecienteDto
     /// Estado del pago (ej: "Completado", "Pendiente", "Anulado").
     /// </summary>
     public string Estado { get; set; } = "Completado";
+}
+
+/// <summary>
+/// DTO para representar la evolución de nómina mensual.
+/// Usado en gráfico de línea/barras para mostrar tendencia.
+/// </summary>
+public class NominaEvolucionDto
+{
+    /// <summary>
+    /// Mes en formato "Ene 2025", "Feb 2025", etc.
+    /// </summary>
+    public string Mes { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Año del mes (para ordenamiento y agrupación).
+    /// </summary>
+    public int Ano { get; set; }
+
+    /// <summary>
+    /// Número del mes (1-12) para ordenamiento.
+    /// </summary>
+    public int NumeroMes { get; set; }
+
+    /// <summary>
+    /// Total de nómina procesada en ese mes.
+    /// </summary>
+    public decimal TotalNomina { get; set; }
+
+    /// <summary>
+    /// Cantidad de recibos procesados en ese mes.
+    /// </summary>
+    public int CantidadRecibos { get; set; }
+}
+
+/// <summary>
+/// DTO para representar las deducciones más comunes.
+/// Usado en gráfico de barras horizontales.
+/// </summary>
+public class DeduccionTopDto
+{
+    /// <summary>
+    /// Descripción de la deducción (ej: "TSS", "AFP", "SFS", "Préstamo", "Otros").
+    /// </summary>
+    public string Descripcion { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Total acumulado de esta deducción.
+    /// </summary>
+    public decimal Total { get; set; }
+
+    /// <summary>
+    /// Cantidad de veces que se ha aplicado esta deducción.
+    /// </summary>
+    public int Frecuencia { get; set; }
+
+    /// <summary>
+    /// Porcentaje respecto al total de deducciones.
+    /// </summary>
+    public decimal Porcentaje { get; set; }
+}
+
+/// <summary>
+/// DTO para representar la distribución de empleados por posición/cargo.
+/// Usado en gráfico de pastel (pie chart).
+/// </summary>
+public class EmpleadosDistribucionDto
+{
+    /// <summary>
+    /// Posición o cargo del empleado (ej: "Gerente", "Supervisor", "Operario", "Administrativo").
+    /// </summary>
+    public string Posicion { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Cantidad de empleados en esta posición.
+    /// </summary>
+    public int Cantidad { get; set; }
+
+    /// <summary>
+    /// Porcentaje respecto al total de empleados.
+    /// </summary>
+    public decimal Porcentaje { get; set; }
+
+    /// <summary>
+    /// Salario promedio de empleados en esta posición.
+    /// </summary>
+    public decimal SalarioPromedio { get; set; }
 }

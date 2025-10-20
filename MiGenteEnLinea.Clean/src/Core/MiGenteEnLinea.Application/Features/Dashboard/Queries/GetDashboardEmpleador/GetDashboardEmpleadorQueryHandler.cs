@@ -50,14 +50,24 @@ public class GetDashboardEmpleadorQueryHandler : IRequestHandler<GetDashboardEmp
             var suscripcionTask = ObtenerInfoSuscripcion(request.UserId, fechaReferencia, cancellationToken);
             var actividadTask = ObtenerMetricasActividad(request.UserId, inicioMes, finMes, cancellationToken);
             var pagosTask = ObtenerUltimosPagos(request.UserId, cancellationToken);
+            
+            // Queries para gráficos
+            var evolucionTask = ObtenerEvolucionNomina(request.UserId, fechaReferencia, cancellationToken);
+            var deduccionesTask = ObtenerTopDeducciones(request.UserId, cancellationToken);
+            var distribucionTask = ObtenerDistribucionEmpleados(request.UserId, cancellationToken);
 
-            await Task.WhenAll(empleadosTask, nominaTask, suscripcionTask, actividadTask, pagosTask);
+            await Task.WhenAll(
+                empleadosTask, nominaTask, suscripcionTask, actividadTask, pagosTask,
+                evolucionTask, deduccionesTask, distribucionTask);
 
             var empleados = await empleadosTask;
             var nomina = await nominaTask;
             var suscripcion = await suscripcionTask;
             var actividad = await actividadTask;
             var pagos = await pagosTask;
+            var evolucion = await evolucionTask;
+            var deducciones = await deduccionesTask;
+            var distribucion = await distribucionTask;
 
             var dashboard = new DashboardEmpleadorDto
             {
@@ -87,7 +97,12 @@ public class GetDashboardEmpleadorQueryHandler : IRequestHandler<GetDashboardEmp
                 CalificacionesCompletadas = actividad.CalificacionesCompletadas,
 
                 // Historial
-                UltimosPagos = pagos
+                UltimosPagos = pagos,
+
+                // Gráficos
+                EvolucionNomina = evolucion,
+                TopDeducciones = deducciones,
+                DistribucionEmpleados = distribucion
             };
 
             _logger.LogInformation(
@@ -310,5 +325,128 @@ public class GetDashboardEmpleadorQueryHandler : IRequestHandler<GetDashboardEmp
             .ToListAsync(cancellationToken);
 
         return ultimosPagos;
+    }
+
+    // ========================================
+    // 📈 EVOLUCIÓN DE NÓMINA (GRÁFICO)
+    // ========================================
+
+    private async Task<List<NominaEvolucionDto>> ObtenerEvolucionNomina(
+        string userId,
+        DateTime fechaReferencia,
+        CancellationToken cancellationToken)
+    {
+        // Calcular los últimos 6 meses
+        var mesesAtras = 6;
+        var fechaInicio = fechaReferencia.AddMonths(-mesesAtras);
+
+        var evolucion = await _context.RecibosHeader
+            .Where(r => r.UserId == userId && r.FechaPago.HasValue && r.FechaPago.Value >= fechaInicio)
+            .GroupBy(r => new
+            {
+                Ano = r.FechaPago!.Value.Year,
+                Mes = r.FechaPago!.Value.Month
+            })
+            .Select(g => new
+            {
+                g.Key.Ano,
+                g.Key.Mes,
+                TotalNomina = g.Sum(r => r.NetoPagar),
+                CantidadRecibos = g.Count()
+            })
+            .OrderBy(x => x.Ano)
+            .ThenBy(x => x.Mes)
+            .ToListAsync(cancellationToken);
+
+        // Mapear a DTOs con nombres de meses en español
+        var mesesNombres = new[] { "", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic" };
+
+        var resultado = evolucion.Select(e => new NominaEvolucionDto
+        {
+            Mes = $"{mesesNombres[e.Mes]} {e.Ano}",
+            Ano = e.Ano,
+            NumeroMes = e.Mes,
+            TotalNomina = e.TotalNomina,
+            CantidadRecibos = e.CantidadRecibos
+        }).ToList();
+
+        return resultado;
+    }
+
+    // ========================================
+    // 📊 TOP DEDUCCIONES (GRÁFICO)
+    // ========================================
+
+    private async Task<List<DeduccionTopDto>> ObtenerTopDeducciones(
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        // Obtener todas las deducciones del usuario (TipoConcepto = 2)
+        var deducciones = await _context.RecibosDetalle
+            .Where(rd => _context.RecibosHeader
+                .Any(rh => rh.PagoId == rd.PagoId && rh.UserId == userId) &&
+                rd.TipoConcepto == 2) // Solo deducciones
+            .GroupBy(rd => rd.Concepto ?? "Otros")
+            .Select(g => new
+            {
+                Descripcion = g.Key,
+                Total = g.Sum(rd => rd.Monto),
+                Frecuencia = g.Count()
+            })
+            .OrderByDescending(x => x.Total)
+            .Take(5)
+            .ToListAsync(cancellationToken);
+
+        // Calcular total para porcentajes
+        var totalGeneral = deducciones.Sum(d => d.Total);
+
+        var resultado = deducciones.Select(d => new DeduccionTopDto
+        {
+            Descripcion = d.Descripcion,
+            Total = d.Total,
+            Frecuencia = d.Frecuencia,
+            Porcentaje = totalGeneral > 0 ? (d.Total / totalGeneral) * 100 : 0
+        }).ToList();
+
+        return resultado;
+    }
+
+    // ========================================
+    // 🏢 DISTRIBUCIÓN EMPLEADOS (GRÁFICO)
+    // ========================================
+
+    private async Task<List<EmpleadosDistribucionDto>> ObtenerDistribucionEmpleados(
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        // Obtener empleados agrupados por posición
+        var empleados = await _context.Empleados
+            .Where(e => e.UserId == userId && e.Activo)
+            .ToListAsync(cancellationToken);
+
+        // Agrupar por Posicion
+        var distribucion = empleados
+            .GroupBy(e => string.IsNullOrWhiteSpace(e.Posicion) ? "Sin Posición" : e.Posicion)
+            .Select(g => new
+            {
+                Posicion = g.Key,
+                Cantidad = g.Count(),
+                SalarioPromedio = g.Average(e => e.Salario)
+            })
+            .OrderByDescending(x => x.Cantidad)
+            .ToList();
+
+        // Calcular total para porcentajes
+        var totalEmpleados = empleados.Count;
+
+        var resultado = distribucion.Select(d => new EmpleadosDistribucionDto
+        {
+            Posicion = d.Posicion,
+            Cantidad = d.Cantidad,
+            Porcentaje = totalEmpleados > 0 ? ((decimal)d.Cantidad / totalEmpleados) * 100 : 0,
+            SalarioPromedio = d.SalarioPromedio
+        }).ToList();
+
+        return resultado;
     }
 }
