@@ -240,19 +240,19 @@ public class DashboardController : ControllerBase
         return Ok(new
         {
             service = "Dashboard API",
-            version = "2.0.0",
+            version = "3.0.0",
             timestamp = DateTime.UtcNow,
             features = new[]
             {
                 "Empleador Dashboard (Metrics + Charts)",
                 "Contratista Dashboard (Ratings + Income + Jobs)",
-                "Real-time Statistics",
+                "Real-time Activity Tracking",
                 "6-month Evolution Charts",
-                "Top Services Analysis",
-                "Rating Distribution",
+                "Top Services & Top Users Analysis",
+                "Rating Distribution Analytics",
                 "Response Time Metrics",
-                "Payment History",
-                "Subscription Tracking"
+                "Payment History & Revenue Tracking",
+                "Subscription Management"
             },
             endpoints = new[]
             {
