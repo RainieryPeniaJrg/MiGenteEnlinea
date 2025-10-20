@@ -1,6 +1,7 @@
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
@@ -100,5 +101,13 @@ public interface ILegacyDataService
     /// </summary>
     Task<int> CreateDetalleContratacionAsync(
         CreateDetalleContratacionCommand command,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Actualiza un DetalleContrataciones existente
+    /// Migrado de: EmpleadosService.actualizarContratacion(DetalleContrataciones det)
+    /// </summary>
+    Task<bool> UpdateDetalleContratacionAsync(
+        UpdateDetalleContratacionCommand command,
         CancellationToken cancellationToken = default);
 }

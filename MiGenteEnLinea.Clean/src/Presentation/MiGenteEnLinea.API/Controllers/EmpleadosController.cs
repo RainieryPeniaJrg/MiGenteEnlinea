@@ -21,6 +21,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -406,6 +407,39 @@ public class EmpleadosController : ControllerBase
     {
         var detalleId = await _mediator.Send(command);
         return Ok(detalleId);
+    }
+
+    /// <summary>
+    /// Actualiza un detalle de contratación existente.
+    /// Migrado de: EmpleadosService.actualizarContratacion
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación a actualizar</param>
+    /// <param name="command">Datos actualizados del detalle de contratación</param>
+    /// <returns>True si se actualizó exitosamente, False si no se encontró</returns>
+    /// <response code="200">Detalle de contratación actualizado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    /// <response code="404">Contratación no encontrada</response>
+    [HttpPut("contrataciones/detalles/{contratacionId}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> UpdateDetalleContratacion(int contratacionId, [FromBody] UpdateDetalleContratacionCommand command)
+    {
+        if (contratacionId != command.ContratacionId)
+        {
+            return BadRequest("El ContratacionId de la ruta no coincide con el del comando");
+        }
+
+        var success = await _mediator.Send(command);
+        
+        if (!success)
+        {
+            return NotFound($"No se encontró el detalle de contratación con ContratacionId: {contratacionId}");
+        }
+
+        return Ok(success);
     }
 
     /// <summary>

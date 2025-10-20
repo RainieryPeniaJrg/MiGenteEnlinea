@@ -3,6 +3,7 @@ using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
@@ -386,6 +387,33 @@ public class LegacyDataService : ILegacyDataService
         await _context.SaveChangesAsync(cancellationToken);
 
         return detalle.DetalleId;
+    }
+
+    public async Task<bool> UpdateDetalleContratacionAsync(
+        UpdateDetalleContratacionCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Find by contratacionID and update fields
+        var detalle = await _context
+            .Set<DetalleContratacione>()
+            .Where(x => x.ContratacionId == command.ContratacionId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (detalle == null)
+            return false;
+
+        // Update all fields from command
+        detalle.DescripcionCorta = command.DescripcionCorta;
+        detalle.DescripcionAmpliada = command.DescripcionAmpliada;
+        detalle.FechaInicio = command.FechaInicio.HasValue ? DateOnly.FromDateTime(command.FechaInicio.Value) : detalle.FechaInicio;
+        detalle.FechaFinal = command.FechaFin.HasValue ? DateOnly.FromDateTime(command.FechaFin.Value) : detalle.FechaFinal;
+        detalle.MontoAcordado = command.MontoAcordado ?? detalle.MontoAcordado;
+        detalle.EsquemaPagos = command.EsquemaPagos;
+        detalle.Estatus = command.Estatus ?? detalle.Estatus;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }
 
