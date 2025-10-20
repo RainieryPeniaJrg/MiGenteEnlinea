@@ -251,5 +251,46 @@ public class LegacyDataService : ILegacyDataService
 
         return dto;
     }
+
+    public async Task<bool> EliminarEmpleadoTemporalAsync(
+        int contratacionId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Complex cascade delete using multiple DbContexts
+        // 1. Get EmpleadoTemporal with receipts
+        // 2. For each receipt: delete Detalle → Header
+        // 3. Delete EmpleadoTemporal
+
+        // Step 1: Get all receipt IDs for this empleadoTemporal
+        var reciboIds = await _context
+            .Set<EmpleadorRecibosHeaderContratacione>()
+            .Where(r => r.ContratacionId == contratacionId)
+            .Select(r => r.PagoId)
+            .ToListAsync(cancellationToken);
+
+        // Step 2: For each receipt, delete Detalle → Header
+        foreach (var pagoId in reciboIds)
+        {
+            // Delete details first
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM Empleador_Recibos_Detalle_Contrataciones WHERE pagoID = {0}",
+                [pagoId],
+                cancellationToken);
+
+            // Then delete header
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM Empleador_Recibos_Header_Contrataciones WHERE pagoID = {0}",
+                [pagoId],
+                cancellationToken);
+        }
+
+        // Step 3: Delete EmpleadoTemporal
+        await _context.Database.ExecuteSqlRawAsync(
+            "DELETE FROM EmpleadosTemporales WHERE contratacionID = {0}",
+            [contratacionId],
+            cancellationToken);
+
+        return true;
+    }
 }
 

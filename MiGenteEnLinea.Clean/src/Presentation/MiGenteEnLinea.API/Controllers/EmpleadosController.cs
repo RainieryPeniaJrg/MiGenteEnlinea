@@ -18,6 +18,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateRemuneracione
 using MiGenteEnLinea.Application.Features.Empleados.Commands.DarDeBajaEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CancelarTrabajo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarRecibo;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -316,6 +317,31 @@ public class EmpleadosController : ControllerBase
         }
 
         return Ok(recibo);
+    }
+
+    /// <summary>
+    /// Eliminar un empleado temporal y todos sus recibos asociados (cascade delete).
+    /// Migrado desde: EmpleadosService.eliminarEmpleadoTemporal(int contratacionID)
+    /// </summary>
+    /// <param name="contratacionId">ID del empleado temporal a eliminar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Empleado temporal eliminado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpDelete("temporales/{contratacionId}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> EliminarEmpleadoTemporal(int contratacionId)
+    {
+        _logger.LogWarning("Eliminando empleado temporal: ContratacionId={ContratacionId}", contratacionId);
+
+        var command = new EliminarEmpleadoTemporalCommand(contratacionId);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Empleado temporal eliminado: ContratacionId={ContratacionId}", contratacionId);
+
+        return Ok(result);
     }
 
     /// <summary>

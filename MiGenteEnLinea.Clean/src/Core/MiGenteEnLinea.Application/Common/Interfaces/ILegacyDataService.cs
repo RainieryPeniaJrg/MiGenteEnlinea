@@ -66,4 +66,14 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.GetContratacion_ReciboByPagoID(int pagoID)
     /// </summary>
     Task<ReciboContratacionDto?> GetReciboContratacionAsync(int pagoId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Elimina un empleado temporal con todos sus recibos asociados (cascade delete)
+    /// Migrado de: EmpleadosService.eliminarEmpleadoTemporal(int contratacionID)
+    /// Orden de eliminación:
+    /// 1. Empleador_Recibos_Detalle_Contrataciones (para cada recibo)
+    /// 2. Empleador_Recibos_Header_Contrataciones (para cada recibo)
+    /// 3. EmpleadosTemporales (el empleado temporal)
+    /// </summary>
+    Task<bool> EliminarEmpleadoTemporalAsync(int contratacionId, CancellationToken cancellationToken = default);
 }
