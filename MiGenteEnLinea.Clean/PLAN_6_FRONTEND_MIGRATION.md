@@ -1,57 +1,1042 @@
-# 🎨 PLAN 6: FRONTEND MIGRATION - UI Migration + API Integration
+# 🎨 PLAN 6: FRONTEND MIGRATION - Web Forms → ASP.NET Core MVC
 
 **Fecha de Creación:** 2025-01-18  
-**Estado:** 📋 **PLANIFICACIÓN**  
-**Objetivo:** Migrar TODAS las vistas Legacy (ASP.NET Web Forms) a frontend moderno conectado al Clean Architecture API
+**Fecha de Revisión:** 2025-10-20  
+**Estado:** 🚀 **LISTO PARA EJECUTAR**  
+**Estrategia:** ✅ **MIGRACIÓN (NO reimplementación)**  
+**Objetivo:** Migrar TODAS las vistas Legacy (ASP.NET Web Forms) a ASP.NET Core MVC manteniendo diseño y lógica EXACTOS
 
 ---
 
-## 📊 RESUMEN EJECUTIVO
+## 🎯 PRINCIPIOS FUNDAMENTALES DE MIGRACIÓN
 
-### Análisis del Frontend Legacy
+### ⚠️ REGLAS CRÍTICAS
 
-**Tecnología Actual:**
-- ASP.NET Web Forms (.NET Framework 4.7.2)
-- DevExpress v23.1 (Commercial UI components)
-- Bootstrap 4.x
-- jQuery 3.x
-- Mezcla de C# code-behind + JavaScript
+1. **MISMO DISEÑO** - Copiar HTML/CSS exacto del Legacy (pixel-perfect)
+2. **MISMA LÓGICA** - Preservar comportamiento 100% idéntico
+3. **MISMA SOLUCIÓN** - Agregar proyecto MVC a `MiGenteEnLinea.Clean.sln`
+4. **MISMO DEPLOYMENT** - Un solo `dotnet publish`
+5. **MISMA TECNOLOGÍA** - ASP.NET actualizado (no React/Angular/Vue)
+6. **CONSUMIR API LIMPIA** - Controllers → MediatR (no código duplicado)
 
-**Páginas Identificadas:**
+### 🚫 NO HACER
 
-| Módulo | Páginas | Total |
-|--------|---------|-------|
-| **Público** | Login, Registrar, Activar, FAQ, Dashboard | 5 |
-| **Empleador** | 9 páginas (colaboradores, nómina, checkout, perfil, etc.) | 9 |
-| **Contratista** | 4 páginas (index, calificaciones, perfil, checkout) | 4 |
-| **Admin** | N/A (no identificado aún) | 0? |
-| **TOTAL** | | **18 páginas** |
+- ❌ Reimplementar en React/Angular/Vue
+- ❌ Crear solución separada
+- ❌ Cambiar diseño visual
+- ❌ "Mejorar" la UX sin aprobación
+- ❌ Duplicar lógica de negocio en controllers
+- ❌ Deployment separado
 
-**Assets Visuales:**
-- DevExpress themes y estilos
-- Custom CSS en `/assets/css/`
-- Imágenes en `/assets/img/`
-- Iconos (probablemente Font Awesome)
+---
 
-### Propuesta de Stack Moderno
+## 📊 ANÁLISIS DEL LEGACY
 
-**Opción A: React + TypeScript (RECOMENDADO)**
-- ✅ Component-based architecture (reutilización)
-- ✅ TypeScript para type safety
-- ✅ Ecosystem maduro (React Router, React Query, etc.)
-- ✅ DevExpress tiene librería para React
-- ✅ Fácil integración con API REST
-- ⚠️ Curva de aprendizaje moderada
+### Tecnología Actual (A Migrar)
 
-**Opción B: Blazor WebAssembly**
-- ✅ C# en frontend (mismo lenguaje que backend)
-- ✅ Componentización con Razor Components
-- ✅ Integración natural con .NET backend
-- ✅ DevExpress tiene librería para Blazor
-- ⚠️ Performance inferior a React en apps grandes
+| Componente | Legacy (.NET Framework 4.7.2) | Migrado (.NET 8.0) |
+|------------|-------------------------------|---------------------|
+| **Framework** | ASP.NET Web Forms | ASP.NET Core MVC 8.0 |
+| **Vistas** | `.aspx` + code-behind | `.cshtml` (Razor Pages) |
+| **Master Pages** | `.Master` files | `_Layout.cshtml` |
+| **UI Components** | DevExpress v23.1 (Web Forms) | DevExpress v23.2 (MVC) |
+| **CSS Framework** | Bootstrap 4.x | Bootstrap 5.3 |
+| **JavaScript** | jQuery 3.x | jQuery 3.7 (mantener) |
+| **Autenticación** | FormsAuthentication + Cookies | ASP.NET Core Identity + JWT |
+| **Data Access** | Controllers → Services → EF6 | Controllers → MediatR → EF Core |
+| **Deployment** | IIS + Web.config | Kestrel + appsettings.json |
+
+### Páginas Identificadas (18 Total)
+
+#### Módulo Público (5 páginas)
+
+| Legacy (.aspx) | Migrado (MVC) | Prioridad |
+|----------------|---------------|-----------|
+| `Login.aspx` | `Account/Login.cshtml` | 🔴 CRÍTICA |
+| `Registrar.aspx` | `Account/Register.cshtml` | 🔴 CRÍTICA |
+| `Activar.aspx` | `Account/Activate.cshtml` | 🔴 CRÍTICA |
+| `Dashboard.aspx` | `Home/Index.cshtml` | 🟡 MEDIA |
+| `FAQ.aspx` | `Home/Faq.cshtml` | 🟢 BAJA |
+
+#### Módulo Empleador (9 páginas)
+
+| Legacy (.aspx) | Migrado (MVC) | API Consumida | Prioridad |
+|----------------|---------------|---------------|-----------|
+| `comunidad.aspx` | `Empleador/Dashboard.cshtml` | `/api/dashboard/empleador` | 🔴 CRÍTICA |
+| `colaboradores.aspx` | `Empleador/Empleados/Index.cshtml` | `/api/empleados` | 🟠 ALTA |
+| `fichaEmpleado.aspx` | `Empleador/Empleados/Details.cshtml` | `/api/empleados/{id}` | 🟠 ALTA |
+| `nomina.aspx` | `Empleador/Nominas/Index.cshtml` | `/api/nominas` | 🟠 ALTA |
+| `MiPerfilEmpleador.aspx` | `Empleador/Perfil.cshtml` | `/api/empleadores/{id}` | 🟡 MEDIA |
+| `AdquirirPlanEmpleador.aspx` | `Empleador/Suscripciones/Planes.cshtml` | `/api/planes` | 🟡 MEDIA |
+| `Checkout.aspx` | `Empleador/Suscripciones/Checkout.cshtml` | `/api/pagos` | 🟡 MEDIA |
+| `CalificacionDePerfiles.aspx` | `Empleador/Calificaciones.cshtml` | `/api/calificaciones` | 🟢 BAJA |
+| `detalleContratacion.aspx` | `Empleador/Contrataciones/Details.cshtml` | `/api/contrataciones/{id}` | 🟢 BAJA |
+
+#### Módulo Contratista (4 páginas)
+
+| Legacy (.aspx) | Migrado (MVC) | API Consumida | Prioridad |
+|----------------|---------------|---------------|-----------|
+| `index_contratista.aspx` | `Contratista/Dashboard.cshtml` | `/api/dashboard/contratista` | 🔴 CRÍTICA |
+| `MisCalificaciones.aspx` | `Contratista/Calificaciones.cshtml` | `/api/calificaciones` | 🟡 MEDIA |
+| `AdquirirPlanContratista.aspx` | `Contratista/Suscripciones/Planes.cshtml` | `/api/planes` | 🟡 MEDIA |
+| *(Perfil)* | `Contratista/Perfil.cshtml` | `/api/contratistas/{id}` | 🟡 MEDIA |
+
+---
+
+## 🏗️ ARQUITECTURA DE LA MIGRACIÓN
+
+### Estructura de la Solución (Actualizada)
+
+```
+MiGenteEnLinea.Clean.sln                    # ← Solución existente
+│
+├── src/
+│   ├── Core/
+│   │   ├── MiGenteEnLinea.Domain/          # ✅ YA EXISTE (100%)
+│   │   └── MiGenteEnLinea.Application/     # ✅ YA EXISTE (100%)
+│   │
+│   ├── Infrastructure/
+│   │   └── MiGenteEnLinea.Infrastructure/  # ✅ YA EXISTE (100%)
+│   │
+│   └── Presentation/
+│       ├── MiGenteEnLinea.API/             # ✅ YA EXISTE (REST API)
+│       │   ├── Controllers/                # REST endpoints
+│       │   ├── Program.cs
+│       │   └── appsettings.json
+│       │
+│       └── MiGenteEnLinea.Web/             # ← NUEVO PROYECTO MVC
+│           ├── Controllers/                # MVC Controllers
+│           │   ├── AccountController.cs    # Login, Register, Activate
+│           │   ├── HomeController.cs       # Dashboard, FAQ
+│           │   ├── EmpleadorController.cs  # Módulo Empleador
+│           │   └── ContratistaController.cs# Módulo Contratista
+│           │
+│           ├── Views/                      # Razor Views (.cshtml)
+│           │   ├── Shared/
+│           │   │   ├── _Layout.cshtml      # Platform.Master migrado
+│           │   │   ├── _LayoutEmpleador.cshtml  # Comunity1.Master
+│           │   │   └── _LayoutContratista.cshtml # ContratistaM.Master
+│           │   ├── Account/
+│           │   │   ├── Login.cshtml        # Login.aspx migrado
+│           │   │   ├── Register.cshtml     # Registrar.aspx migrado
+│           │   │   └── Activate.cshtml     # Activar.aspx migrado
+│           │   ├── Empleador/
+│           │   │   ├── Dashboard.cshtml    # comunidad.aspx migrado
+│           │   │   ├── Empleados/
+│           │   │   │   ├── Index.cshtml    # colaboradores.aspx
+│           │   │   │   └── Details.cshtml  # fichaEmpleado.aspx
+│           │   │   └── Nominas/
+│           │   │       └── Index.cshtml    # nomina.aspx
+│           │   └── Contratista/
+│           │       └── Dashboard.cshtml    # index_contratista.aspx
+│           │
+│           ├── wwwroot/                    # Assets estáticos
+│           │   ├── css/                    # ← COPIAR desde Legacy
+│           │   ├── js/                     # ← COPIAR desde Legacy
+│           │   ├── images/                 # ← COPIAR desde Legacy
+│           │   └── lib/                    # Bootstrap, jQuery, DevExpress
+│           │
+│           ├── Models/                     # ViewModels (DTOs para vistas)
+│           │   ├── Account/
+│           │   │   ├── LoginViewModel.cs
+│           │   │   └── RegisterViewModel.cs
+│           │   └── Empleador/
+│           │       └── DashboardViewModel.cs
+│           │
+│           ├── Services/                   # Application Services
+│           │   └── ViewModelMapper.cs      # DTO → ViewModel
+│           │
+│           ├── Program.cs                  # Startup
+│           ├── appsettings.json            # Config (misma DB que API)
+│           └── MiGenteEnLinea.Web.csproj
+│
+└── tests/
+    └── MiGenteEnLinea.Web.Tests/           # ← NUEVO (Tests de vistas)
+```
+
+### Flujo de Datos (Sin HTTP Overhead)
+
+```
+Usuario → Browser
+    ↓
+[MiGenteEnLinea.Web]
+    ↓
+EmpleadorController.Dashboard()
+    ↓
+_mediator.Send(new GetDashboardEmpleadorQuery { EmpleadorId = 123 })
+    ↓
+[MiGenteEnLinea.Application]
+    ↓
+GetDashboardEmpleadorQueryHandler
+    ↓
+[MiGenteEnLinea.Infrastructure]
+    ↓
+MiGenteDbContext (EF Core)
+    ↓
+SQL Server
+    ↓
+Response DTO
+    ↓
+ViewModel (mapping)
+    ↓
+Dashboard.cshtml (Razor View)
+    ↓
+HTML → Browser
+```
+
+**✅ VENTAJAS DE ESTE ENFOQUE:**
+
+- No hay overhead HTTP (llamadas internas)
+- Reutilización 100% de Application Layer
+- Un solo deployment (`dotnet publish`)
+- Misma base de datos, misma configuración
+- Performance óptimo (sin serialización JSON extra)
+
+---
+
+## 📦 LOTES DE MIGRACIÓN
+
+### 🔐 LOTE 6.1: Setup + Autenticación (8-10 horas)
+
+**Objetivo:** Crear proyecto MVC + migrar login, register, activate
+
+#### Tareas
+
+**1. Crear Proyecto MVC (1 hora)**
+
+```bash
+cd MiGenteEnLinea.Clean/src/Presentation
+dotnet new mvc -n MiGenteEnLinea.Web -f net8.0
+cd MiGenteEnLinea.Web
+dotnet add reference ../../Core/MiGenteEnLinea.Application
+dotnet add reference ../../Infrastructure/MiGenteEnLinea.Infrastructure
+```
+
+**2. Configurar NuGet Packages (30 min)**
+
+```bash
+# DevExpress para .NET 8 (MVC)
+dotnet add package DevExpress.AspNetCore.Bootstrap -v 23.2.3
+
+# MediatR (ya incluido vía Application)
+# AutoMapper (ya incluido vía Application)
+
+# Adicionales para MVC
+dotnet add package Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation -v 8.0.0
+```
+
+**3. Configurar Program.cs (1 hora)**
+
+```csharp
+// Program.cs
+using MiGenteEnLinea.Application;
+using MiGenteEnLinea.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add MVC + Razor runtime compilation (dev only)
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation(); // Hot reload en desarrollo
+
+// Add Application Layer (MediatR, FluentValidation, AutoMapper)
+builder.Services.AddApplicationServices();
+
+// Add Infrastructure Layer (DbContext, Repositories, Services)
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// Add Session (para migración gradual desde cookies)
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add Authentication
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireEmpleadorRole", policy => 
+        policy.RequireRole("Empleador"));
+    options.AddPolicy("RequireContratistaRole", policy => 
+        policy.RequireRole("Contratista"));
+});
+
+// Add DevExpress
+builder.Services.AddDevExpressControls();
+
+var app = builder.Build();
+
+// Configure middleware pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseSession();
+app.UseAuthentication();
+app.UseAuthorization();
+
+// DevExpress resources
+app.UseDevExpressControls();
+
+// MVC Routes
+app.MapControllerRoute(
+    name: "empleador",
+    pattern: "Empleador/{controller=Dashboard}/{action=Index}/{id?}",
+    defaults: new { area = "Empleador" });
+
+app.MapControllerRoute(
+    name: "contratista",
+    pattern: "Contratista/{controller=Dashboard}/{action=Index}/{id?}",
+    defaults: new { area = "Contratista" });
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+```
+
+**4. Copiar Assets desde Legacy (30 min)**
+
+```bash
+# Desde Codigo Fuente Mi Gente/MiGente_Front/
+# Copiar a MiGenteEnLinea.Web/wwwroot/
+
+cp -r assets/css/* wwwroot/css/
+cp -r assets/js/* wwwroot/js/
+cp -r Images/* wwwroot/images/
+```
+
+**5. Migrar Master Pages a Layouts (2 horas)**
+
+**_Layout.cshtml** (Platform.Master migrado)
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MiGente En Línea</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- DevExpress CSS -->
+    <link href="~/lib/devextreme/dist/css/dx.light.css" rel="stylesheet" />
+    
+    <!-- Custom CSS (desde Legacy) -->
+    <link href="~/css/site.css" rel="stylesheet" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <img src="~/images/logo.png" alt="MiGente" height="40" />
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">Hola, @User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">Cerrar Sesión</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Registrarse</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main role="main">
+        @RenderBody()
+    </main>
+    
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - MiGente En Línea - <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
+        </div>
+    </footer>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/devextreme/dist/js/dx.all.js"></script>
+    <script src="~/js/site.js"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+```
+
+**_LayoutEmpleador.cshtml** (Comunity1.Master migrado)
+
+```html
+@{
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (desde Comunity1.Master) -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" 
+                           asp-area="Empleador" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Empleador" asp-controller="Empleados" asp-action="Index">
+                            <i class="fas fa-users"></i> Colaboradores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Empleador" asp-controller="Nominas" asp-action="Index">
+                            <i class="fas fa-money-bill-wave"></i> Nómina
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Empleador" asp-controller="Perfil" asp-action="Index">
+                            <i class="fas fa-user"></i> Mi Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="Empleador" asp-controller="Suscripciones" asp-action="Index">
+                            <i class="fas fa-credit-card"></i> Mi Suscripción
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main role="main" class="col-md-10 ml-sm-auto px-4">
+            @RenderBody()
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
+```
+
+**6. Migrar Login.aspx → AccountController.cs + Login.cshtml (2 horas)**
+
+**AccountController.cs**
+
+```csharp
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
+using MiGenteEnLinea.Web.Models.Account;
+
+namespace MiGenteEnLinea.Web.Controllers
+{
+    public class AccountController : Controller
+    {
+        private readonly IMediator _mediator;
+        private readonly ILogger<AccountController> _logger;
+
+        public AccountController(IMediator mediator, ILogger<AccountController> logger)
+        {
+            _mediator = mediator;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public IActionResult Login(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                // LÓGICA EXACTA DEL LEGACY LoginService.login()
+                var command = new LoginCommand
+                {
+                    Email = model.Email,
+                    Password = model.Password
+                };
+
+                var result = await _mediator.Send(command);
+
+                if (result.Codigo == 2) // Success (mismo código que Legacy)
+                {
+                    // Crear claims (misma info que cookies del Legacy)
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()),
+                        new Claim(ClaimTypes.Email, result.Email),
+                        new Claim(ClaimTypes.Name, result.Nombre),
+                        new Claim(ClaimTypes.Role, result.Tipo), // "Empleador" o "Contratista"
+                        new Claim("PlanID", result.PlanID.ToString()),
+                        new Claim("VencimientoPlan", result.VencimientoPlan?.ToString("yyyy-MM-dd") ?? "")
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = model.RememberMe,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                    };
+
+                    await HttpContext.SignInAsync("CookieAuth", 
+                        new ClaimsPrincipal(claimsIdentity), 
+                        authProperties);
+
+                    _logger.LogInformation("Usuario {Email} inició sesión exitosamente", model.Email);
+
+                    // Redirigir según tipo (MISMA LÓGICA QUE LEGACY)
+                    if (result.Tipo == "1") // Empleador
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Empleador" });
+                    }
+                    else if (result.Tipo == "2") // Contratista
+                    {
+                        return RedirectToAction("Index", "Dashboard", new { area = "Contratista" });
+                    }
+
+                    return Redirect(returnUrl ?? "/");
+                }
+                else if (result.Codigo == 0) // Credenciales inválidas
+                {
+                    ModelState.AddModelError(string.Empty, "Correo electrónico o contraseña incorrectos");
+                }
+                else if (result.Codigo == -1) // Usuario inactivo
+                {
+                    ModelState.AddModelError(string.Empty, "Usuario inactivo. Revise su correo para activar su cuenta.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error al iniciar sesión. Intente nuevamente.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en login para usuario {Email}", model.Email);
+                ModelState.AddModelError(string.Empty, "Error del servidor. Intente más tarde.");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("CookieAuth");
+            _logger.LogInformation("Usuario cerró sesión");
+            return RedirectToAction("Login");
+        }
+    }
+}
+```
+
+**Models/Account/LoginViewModel.cs**
+
+```csharp
+using System.ComponentModel.DataAnnotations;
+
+namespace MiGenteEnLinea.Web.Models.Account
+{
+    public class LoginViewModel
+    {
+        [Required(ErrorMessage = "El correo electrónico es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
+        [Display(Name = "Correo Electrónico")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Contraseña")]
+        public string Password { get; set; } = string.Empty;
+
+        [Display(Name = "Recordarme")]
+        public bool RememberMe { get; set; }
+    }
+}
+```
+
+**Views/Account/Login.cshtml** (copiar HTML EXACTO de Login.aspx)
+
+```html
+@model MiGenteEnLinea.Web.Models.Account.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "_Layout";
+}
+
+<!-- COPIAR HTML EXACTO DE Login.aspx aquí -->
+<!-- Mantener clases CSS, estructura, imágenes, todo igual -->
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Iniciar Sesión</h2>
+                    
+                    @if (!string.IsNullOrEmpty(ViewBag.Message))
+                    {
+                        <div class="alert alert-info">@ViewBag.Message</div>
+                    }
+                    
+                    <form asp-controller="Account" asp-action="Login" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Email"></label>
+                            <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="Password"></label>
+                            <input asp-for="Password" class="form-control" placeholder="********" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <a asp-action="ForgotPassword">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <div class="text-center mt-2">
+                        <span>¿No tienes cuenta?</span>
+                        <a asp-action="Register">Regístrate aquí</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+```
+
+**7. Migrar Register.aspx → Register.cshtml (2 horas)**
+
+- Copiar HTML exacto
+- Controller action con MediatR → RegisterCommand
+- ViewModels con DataAnnotations
+- Validación cliente + servidor (misma que Legacy)
+
+---
+
+### 📊 LOTE 6.2: Dashboard Empleador (10-12 horas)
+
+**Objetivo:** Migrar `comunidad.aspx` → `Empleador/Dashboard/Index.cshtml`
+
+#### Tareas
+
+**1. Crear Area Empleador**
+
+```bash
+mkdir -p Areas/Empleador/Controllers
+mkdir -p Areas/Empleador/Views/Dashboard
+```
+
+**2. DashboardController.cs**
+
+```csharp
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Features.Dashboard.Queries.GetDashboardEmpleador;
+using MiGenteEnLinea.Web.Models.Empleador;
+
+namespace MiGenteEnLinea.Web.Areas.Empleador.Controllers
+{
+    [Area("Empleador")]
+    [Authorize(Policy = "RequireEmpleadorRole")]
+    public class DashboardController : Controller
+    {
+        private readonly IMediator _mediator;
+        private readonly ILogger<DashboardController> _logger;
+
+        public DashboardController(IMediator mediator, ILogger<DashboardController> logger)
+        {
+            _mediator = mediator;
+            _logger = logger;
+        }
+
+        public async Task<IActionResult> Index(DateTime? fechaReferencia = null)
+        {
+            try
+            {
+                // Obtener ID del empleador desde claims
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    return RedirectToAction("Login", "Account", new { area = "" });
+                }
+
+                // TODO: Obtener EmpleadorId desde UserId (agregar query si no existe)
+                // Por ahora asumimos que userId == empleadorId
+                var empleadorId = userId;
+
+                var query = new GetDashboardEmpleadorQuery
+                {
+                    EmpleadorId = empleadorId,
+                    FechaReferencia = fechaReferencia ?? DateTime.Today
+                };
+
+                var dashboard = await _mediator.Send(query);
+
+                // Mapear a ViewModel (agregar propiedades de UI si es necesario)
+                var viewModel = new DashboardEmpleadorViewModel
+                {
+                    Metricas = dashboard.Metricas,
+                    Nomina = dashboard.Nomina,
+                    Empleados = dashboard.Empleados,
+                    ChartEvolucionNomina = dashboard.ChartEvolucionNomina,
+                    ChartDeducciones = dashboard.ChartDeducciones,
+                    ChartDistribucionEmpleados = dashboard.ChartDistribucionEmpleados,
+                    TopEmpleadosPorSalario = dashboard.TopEmpleadosPorSalario,
+                    EmpleadosRecientes = dashboard.EmpleadosRecientes
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar dashboard del empleador");
+                TempData["ErrorMessage"] = "Error al cargar el dashboard. Intente nuevamente.";
+                return View(new DashboardEmpleadorViewModel());
+            }
+        }
+    }
+}
+```
+
+**3. Index.cshtml** (copiar HTML de comunidad.aspx)
+
+```html
+@model MiGenteEnLinea.Web.Models.Empleador.DashboardEmpleadorViewModel
+@{
+    ViewData["Title"] = "Dashboard - Empleador";
+    Layout = "~/Views/Shared/_LayoutEmpleador.cshtml";
+}
+
+<!-- COPIAR HTML EXACTO DE comunidad.aspx -->
+<!-- Reemplazar controles DevExpress Web Forms por DevExpress MVC -->
+
+<div class="dashboard-empleador">
+    <h1 class="mb-4">Bienvenido, @User.Identity?.Name</h1>
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    
+    <!-- Métricas Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Empleados</h5>
+                    <h2>@Model.Metricas.TotalEmpleadosActivos</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Nómina Actual</h5>
+                    <h2>$@Model.Metricas.NominaMesActual.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Promedio Salario</h5>
+                    <h2>$@Model.Metricas.PromedioSalario.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Deducciones Total</h5>
+                    <h2>$@Model.Metricas.DeduccionesTotales.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts (DevExpress Charts para MVC) -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Evolución Nómina (Últimos 6 Meses)</h5>
+                </div>
+                <div class="card-body">
+                    @* DevExpress Chart - Línea *@
+                    @Html.DevExpress().Chart(settings => {
+                        settings.Name = "chartEvolucionNomina";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Height = 300;
+                        
+                        settings.DataSource = Model.ChartEvolucionNomina;
+                        
+                        settings.SeriesDataMember = "Mes";
+                        settings.ArgumentField = "Mes";
+                        
+                        settings.Series.Add(series => {
+                            series.ValueField = "Total";
+                            series.SeriesType = DevExpress.XtraCharts.SeriesType.Line;
+                        });
+                    }).GetHtml()
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Distribución Deducciones</h5>
+                </div>
+                <div class="card-body">
+                    @* DevExpress Chart - Barras *@
+                    @Html.DevExpress().Chart(settings => {
+                        settings.Name = "chartDeducciones";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        settings.Height = 300;
+                        
+                        settings.DataSource = Model.ChartDeducciones;
+                        
+                        settings.SeriesTemplate.ArgumentDataMember = "Tipo";
+                        settings.SeriesTemplate.ValueDataMembersSerializable = "Monto";
+                        settings.SeriesTemplate.SeriesDataMember = "Mes";
+                        
+                        settings.SeriesTemplate.View = new DevExpress.XtraCharts.Web.StackedBarSeriesView();
+                    }).GetHtml()
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabla Empleados Recientes (DevExpress GridView) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Empleados Recientes</h5>
+                </div>
+                <div class="card-body">
+                    @Html.DevExpress().GridView(settings => {
+                        settings.Name = "gridEmpleadosRecientes";
+                        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                        
+                        settings.DataSource = Model.EmpleadosRecientes;
+                        
+                        settings.Columns.Add("NombreCompleto", "Nombre");
+                        settings.Columns.Add("Cargo", "Cargo");
+                        settings.Columns.Add(column => {
+                            column.FieldName = "Salario";
+                            column.Caption = "Salario";
+                            column.PropertiesEdit.DisplayFormatString = "c2";
+                        });
+                        settings.Columns.Add(column => {
+                            column.FieldName = "FechaIngreso";
+                            column.Caption = "Fecha Ingreso";
+                            column.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy";
+                        });
+                        
+                        settings.Settings.ShowFooter = true;
+                        settings.Settings.ShowFilterRow = true;
+                        settings.SettingsPager.PageSize = 10;
+                    }).GetHtml()
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript desde comunidad.aspx (si existe)
+    </script>
+}
+```
+
+---
+
+### 👥 LOTE 6.3: Gestión de Empleados (12-15 horas)
+
+**Migrar:**
+
+- `colaboradores.aspx` → `Empleador/Empleados/Index.cshtml`
+- `fichaEmpleado.aspx` → `Empleador/Empleados/Details.cshtml` + `Edit.cshtml`
+
+**Controllers:** EmpleadosController con acciones Index, Details, Create, Edit, Delete  
+**Lógica:** Todos los métodos llaman a MediatR commands/queries  
+**DevExpress:** ASPxGridView Web Forms → DevExpress.Mvc.GridView
+
+---
+
+### 💰 LOTE 6.4: Gestión de Nómina (12-15 horas)
+
+**Migrar:**
+
+- `nomina.aspx` → `Empleador/Nominas/Index.cshtml`
+- Procesar nómina, generar PDFs, enviar emails, exportar CSV
+
+**Componentes DevExpress:**
+
+- GridView para recibos
+- Button con callbacks AJAX
+- Export to CSV directo desde GridView
+
+---
+
+### 📦 LOTE 6.5: Módulo Contratista (8-10 horas)
+
+**Migrar:**
+
+- `index_contratista.aspx` → `Contratista/Dashboard/Index.cshtml`
+- `MisCalificaciones.aspx` → `Contratista/Calificaciones/Index.cshtml`
+
+---
+
+### 🔄 LOTE 6.6: Suscripciones y Checkout (8-10 horas)
+
+**Migrar:**
+
+- `AdquirirPlanEmpleador.aspx` → `Empleador/Suscripciones/Planes.cshtml`
+- `Checkout.aspx` → `Empleador/Suscripciones/Checkout.cshtml`
+- Integración Cardnet (mantener lógica exacta)
+
+---
+
+### 🧪 LOTE 6.7: Testing y Deployment (6-8 horas)
+
+1. Unit tests para Controllers
+2. Integration tests (UI + API)
+3. Manual testing completo (cada página vs Legacy)
+4. Configurar CI/CD para deployment conjunto
+5. Migración gradual (proxy URLs Legacy → MVC hasta 100%)
+
+---
+
+## 🚀 ESTRATEGIA DE DEPLOYMENT
+
+### Opción A: Proxy Gradual (RECOMENDADO)
+
+```
+Usuario → Browser
+    ↓
+IIS/Nginx (Reverse Proxy)
+    ↓
+/Empleador/Dashboard → MiGenteEnLinea.Web (MVC) ✅ MIGRADO
+/colaboradores.aspx → Legacy (Web Forms) ⏳ PENDIENTE
+    ↓
+Mismo SQL Server, misma DB
+```
+
+**Ventajas:**
+
+- Migración incremental sin downtime
+- Rollback inmediato si hay problemas
+- Testing en producción página por página
+
+### Opción B: Big Bang (Deploy todo junto)
+
+```bash
+# Build ambos proyectos
+dotnet publish MiGenteEnLinea.Web -c Release -o ./publish/web
+dotnet publish MiGenteEnLinea.API -c Release -o ./publish/api
+
+# Deploy
+# - Web en IIS en /migente-web
+# - API en IIS en /migente-api
+# - O unificar en mismo host con rutas diferentes
+```
+
+---
+
+## ✅ CHECKLIST DE INICIO (AHORA SÍ CORRECTO)
+
+### Setup Inicial (2 horas)
+
+- [ ] Crear proyecto MVC: `dotnet new mvc -n MiGenteEnLinea.Web`
+- [ ] Agregar a solución: `dotnet sln add src/Presentation/MiGenteEnLinea.Web`
+- [ ] Agregar referencias: Application + Infrastructure
+- [ ] Instalar DevExpress.AspNetCore.Bootstrap v23.2
+- [ ] Configurar Program.cs (MediatR, Auth, DevExpress)
+- [ ] Copiar assets (CSS, JS, Images) desde Legacy
+- [ ] Crear _Layout.cshtml base
 - ⚠️ Ecosystem más limitado
 
 **Opción C: Next.js + TypeScript (OVERKILL?)**
+
 - ✅ SSR/SSG para SEO
 - ✅ React-based
 - ✅ Best practices out-of-the-box
@@ -61,6 +1046,7 @@
 **RECOMENDACIÓN:** **React + TypeScript + Vite**
 
 **Razones:**
+
 1. Balance perfecto entre performance y DX (Developer Experience)
 2. DevExpress React Components (dx-react-grid, dx-react-scheduler)
 3. Vite build tool (ultra-rápido)
@@ -246,31 +1232,37 @@ migente-frontend/
 ### Justificación de Dependencias
 
 **React Query:**
+
 - Manejo de estado del servidor (cache, refetch, mutations)
 - Sincronización automática con backend
 - Optimistic updates
 
 **Zustand:**
+
 - State management global (auth, theme, etc.)
 - Más simple que Redux
 - TypeScript-first
 
 **React Hook Form + Zod:**
+
 - Validación de formularios type-safe
 - Performance (uncontrolled inputs)
 - Integración con TypeScript
 
 **DevExpress React:**
+
 - Grids complejos (nómina, colaboradores)
 - Schedulers (calendario de contrataciones)
 - Charts (dashboard)
 
 **date-fns:**
+
 - Manipulación de fechas
 - Formateo localizado (español)
 - Tree-shakeable
 
 **Tailwind CSS:**
+
 - Utility-first CSS
 - Responsive design fácil
 - Customización vía config
@@ -312,6 +1304,7 @@ npx tailwindcss init -p
 **FASE 2: Configuración (4 horas)**
 
 1. **Tailwind CSS Setup**
+
    ```css
    /* src/assets/styles/global.css */
    @tailwind base;
@@ -330,6 +1323,7 @@ npx tailwindcss init -p
    ```
 
 2. **Axios Instance**
+
    ```typescript
    // src/shared/services/api.ts
    import axios from 'axios';
@@ -362,6 +1356,7 @@ npx tailwindcss init -p
    ```
 
 3. **React Query Setup**
+
    ```typescript
    // src/app/App.tsx
    import { QueryClient, QueryClientProvider } from 'react-query';
@@ -386,6 +1381,7 @@ npx tailwindcss init -p
    ```
 
 4. **Environment Variables**
+
    ```env
    # .env.development
    VITE_API_URL=http://localhost:5015/api
@@ -399,6 +1395,7 @@ npx tailwindcss init -p
 **FASE 3: UI Components Library (6-8 horas)**
 
 1. **Button Component**
+
    ```typescript
    // src/shared/components/ui/Button.tsx
    import clsx from 'clsx';
@@ -456,6 +1453,7 @@ npx tailwindcss init -p
 #### Archivos a Crear (Total: ~40 archivos, ~2,500 líneas)
 
 **Configuración:**
+
 - `vite.config.ts`
 - `tsconfig.json`
 - `tailwind.config.js`
@@ -465,33 +1463,42 @@ npx tailwindcss init -p
 - `.env.production`
 
 **App Setup:**
+
 - `src/main.tsx`
 - `src/app/App.tsx`
 - `src/app/Router.tsx`
 - `src/app/theme.ts`
 
 **Shared Components (UI):**
+
 - `Button.tsx`, `Input.tsx`, `Card.tsx`, `Modal.tsx`, `Table.tsx`, `Spinner.tsx` (6 archivos)
 
 **Shared Components (Forms):**
+
 - `FormInput.tsx`, `FormSelect.tsx`, `FormDatePicker.tsx`, `FormCheckbox.tsx` (4 archivos)
 
 **Shared Components (Layout):**
+
 - `Header.tsx`, `Sidebar.tsx`, `Footer.tsx`, `MainLayout.tsx`, `PublicLayout.tsx` (5 archivos)
 
 **Services:**
+
 - `api.ts`, `storage.ts` (2 archivos)
 
 **Hooks:**
+
 - `useApi.ts`, `useDebounce.ts`, `usePagination.ts`, `useLocalStorage.ts` (4 archivos)
 
 **Utils:**
+
 - `formatters.ts`, `validators.ts`, `dateHelpers.ts`, `currencyHelpers.ts` (4 archivos)
 
 **Types:**
+
 - `global.types.ts`, `api.types.ts` (2 archivos)
 
 **Styles:**
+
 - `global.css`, `variables.css`, `utilities.css` (3 archivos)
 
 #### Métricas de Éxito
@@ -524,6 +1531,7 @@ npx tailwindcss init -p
 **FASE 1: Auth Store & Service (4 horas)**
 
 1. **Auth Store (Zustand)**
+
    ```typescript
    // src/features/auth/store/authStore.ts
    import create from 'zustand';
@@ -578,6 +1586,7 @@ npx tailwindcss init -p
    ```
 
 2. **Auth Service**
+
    ```typescript
    // src/features/auth/services/authService.ts
    import api from '@/shared/services/api';
@@ -603,6 +1612,7 @@ npx tailwindcss init -p
 **FASE 2: Login Page (4 horas)**
 
 1. **LoginForm Component**
+
    ```typescript
    // src/features/auth/components/LoginForm.tsx
    import { useForm } from 'react-hook-form';
@@ -688,6 +1698,7 @@ npx tailwindcss init -p
 **FASE 5: Protected Routes (2 horas)**
 
 1. **ProtectedRoute Component**
+
    ```typescript
    // src/app/ProtectedRoute.tsx
    import { Navigate } from 'react-router-dom';
@@ -711,15 +1722,19 @@ npx tailwindcss init -p
 #### Archivos a Crear (Total: ~20 archivos, ~1,500 líneas)
 
 **Store:**
+
 - `authStore.ts` (~100 líneas)
 
 **Services:**
+
 - `authService.ts` (~80 líneas)
 
 **Hooks:**
+
 - `useAuth.ts`, `useLogin.ts`, `useRegister.ts` (3 archivos, ~150 líneas)
 
 **Components:**
+
 - `LoginForm.tsx` (~150 líneas)
 - `LoginPage.tsx` (~80 líneas)
 - `RegisterForm.tsx` (~250 líneas) - Multi-step
@@ -727,16 +1742,20 @@ npx tailwindcss init -p
 - `ActivationPage.tsx` (~80 líneas)
 
 **Utils:**
+
 - `authValidators.ts` (~60 líneas)
 
 **Types:**
+
 - `auth.types.ts` (~50 líneas)
 
 **Routing:**
+
 - `ProtectedRoute.tsx` (~50 líneas)
 - `RoleBasedRoute.tsx` (~60 líneas)
 
 **Tests:**
+
 - `LoginForm.test.tsx`, `RegisterForm.test.tsx`, `authStore.test.ts` (3 archivos, ~300 líneas)
 
 #### Métricas de Éxito
@@ -781,6 +1800,7 @@ npx tailwindcss init -p
    - Notificaciones (calificaciones pendientes, suscripción por vencer)
 
 2. **useEmpleadorDashboard Hook**
+
    ```typescript
    export function useEmpleadorDashboard(empleadorId: string) {
      return useQuery(['empleador-dashboard', empleadorId], () =>
@@ -835,18 +1855,23 @@ npx tailwindcss init -p
 #### Archivos a Crear (Total: ~45 archivos, ~3,750 líneas)
 
 **Pages:**
+
 - Dashboard, Colaboradores, FichaEmpleado, FichaColaboradorTemporal, DetalleContratacion, Nomina, CalificacionPerfiles, MiPerfil, Checkout (9 archivos)
 
 **Components:**
+
 - ~30 componentes (grids, forms, modals)
 
 **Hooks:**
+
 - ~15 hooks (useEmpleados, useContrataciones, useNomina, etc.)
 
 **Services:**
+
 - empleadosService.ts, contratacionesService.ts, nominaService.ts (3 archivos)
 
 **Types:**
+
 - empleador.types.ts, empleado.types.ts, contratacion.types.ts (3 archivos)
 
 #### Métricas de Éxito
@@ -901,18 +1926,23 @@ npx tailwindcss init -p
 #### Archivos a Crear (Total: ~14 archivos, ~1,100 líneas)
 
 **Pages:**
+
 - Dashboard, MisCalificaciones, MiPerfil, Checkout (4 archivos)
 
 **Components:**
+
 - ~8 componentes
 
 **Hooks:**
+
 - ~5 hooks
 
 **Services:**
+
 - contr atistasService.ts
 
 **Types:**
+
 - contratista.types.ts
 
 #### Métricas de Éxito
@@ -970,9 +2000,11 @@ npx tailwindcss init -p
 #### Archivos a Crear (Total: ~10 archivos, ~600 líneas)
 
 **Pages:**
+
 - FAQ, PublicDashboard, BotChat, NotFound (4 archivos)
 
 **Components:**
+
 - ~6 componentes
 
 #### Métricas de Éxito
@@ -998,6 +2030,7 @@ npx tailwindcss init -p
 | 6.5 | Shared & Polish | 🟡 MEDIA | 1-2 días | ~10 | ~600 | ❌ |
 
 **Total:**
+
 - **Tiempo:** 12-17 días (~96-136 horas)
 - **Archivos:** ~129 archivos
 - **Líneas:** ~9,450 líneas
