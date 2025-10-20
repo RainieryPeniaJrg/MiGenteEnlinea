@@ -23,6 +23,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTempo
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.ModificarCalificacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -474,6 +475,41 @@ public class EmpleadosController : ControllerBase
         if (!success)
         {
             return NotFound($"No se encontró la contratación con ID: {contratacionId}");
+        }
+
+        return Ok(success);
+    }
+
+    /// <summary>
+    /// Modifica una calificación existente.
+    /// Migrado de: EmpleadosService.modificarCalificacionDeContratacion
+    /// </summary>
+    /// <param name="calificacionId">ID de la calificación a modificar</param>
+    /// <param name="command">Datos actualizados de la calificación</param>
+    /// <returns>True si se modificó exitosamente, False si no se encontró</returns>
+    /// <response code="200">Calificación modificada exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    /// <response code="404">Calificación no encontrada</response>
+    [HttpPut("calificaciones/{calificacionId}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> ModificarCalificacion(
+        int calificacionId,
+        [FromBody] ModificarCalificacionCommand command)
+    {
+        if (calificacionId != command.CalificacionId)
+        {
+            return BadRequest("El CalificacionId de la ruta no coincide con el del comando");
+        }
+
+        var success = await _mediator.Send(command);
+
+        if (!success)
+        {
+            return NotFound($"No se encontró la calificación con ID: {calificacionId}");
         }
 
         return Ok(success);

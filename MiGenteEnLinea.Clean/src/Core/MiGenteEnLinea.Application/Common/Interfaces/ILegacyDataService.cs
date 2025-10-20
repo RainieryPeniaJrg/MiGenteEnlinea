@@ -3,6 +3,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTempo
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.ModificarCalificacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
@@ -119,5 +120,13 @@ public interface ILegacyDataService
     Task<bool> CalificarContratacionAsync(
         int contratacionId,
         int calificacionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Modifica una calificación existente (updates 9 fields in Calificaciones table)
+    /// Migrado de: EmpleadosService.modificarCalificacionDeContratacion(Calificaciones cal)
+    /// </summary>
+    Task<bool> ModificarCalificacionAsync(
+        ModificarCalificacionCommand command,
         CancellationToken cancellationToken = default);
 }

@@ -5,6 +5,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTempo
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.ModificarCalificacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
@@ -434,6 +435,35 @@ public class LegacyDataService : ILegacyDataService
         // Set calificado flag and assign calificacionID
         detalle.Calificado = true;
         detalle.CalificacionId = calificacionId;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> ModificarCalificacionAsync(
+        ModificarCalificacionCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Find Calificaciones by calificacionID and update all 9 fields
+        var calificacion = await _context
+            .Set<Calificacione>()
+            .Where(x => x.CalificacionId == command.CalificacionId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (calificacion == null)
+            return false;
+
+        // Update all 9 fields from command
+        calificacion.Identificacion = command.Identificacion ?? calificacion.Identificacion;
+        calificacion.Conocimientos = command.Conocimientos ?? calificacion.Conocimientos;
+        calificacion.Cumplimiento = command.Cumplimiento ?? calificacion.Cumplimiento;
+        calificacion.Fecha = command.Fecha ?? calificacion.Fecha;
+        calificacion.Nombre = command.Nombre ?? calificacion.Nombre;
+        calificacion.Puntualidad = command.Puntualidad ?? calificacion.Puntualidad;
+        calificacion.Recomendacion = command.Recomendacion ?? calificacion.Recomendacion;
+        calificacion.Tipo = command.Tipo ?? calificacion.Tipo;
+        calificacion.UserId = command.UserId ?? calificacion.UserId;
 
         await _context.SaveChangesAsync(cancellationToken);
 
