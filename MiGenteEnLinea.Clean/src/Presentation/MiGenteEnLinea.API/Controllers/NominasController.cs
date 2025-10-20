@@ -2,10 +2,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.EnviarRecibosEmailLote;
+using MiGenteEnLinea.Application.Features.Nominas.Commands.ExportarNominaCsv;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.GenerarRecibosPdfLote;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.ProcesarNominaLote;
 using MiGenteEnLinea.Application.Features.Nominas.DTOs;
 using MiGenteEnLinea.Application.Features.Nominas.Queries.GetNominaResumen;
+using System.Security.Claims;
 
 namespace MiGenteEnLinea.API.Controllers;
 
@@ -391,7 +393,7 @@ public class NominasController : ControllerBase
         {
             service = "Nominas API",
             status = "healthy",
-            version = "1.0.0",
+            version = "2.0.0",
             timestamp = DateTime.UtcNow,
             features = new[]
             {
@@ -399,8 +401,75 @@ public class NominasController : ControllerBase
                 "PDF Generation",
                 "Payroll Summary",
                 "Statistics & Reports",
-                "Email Distribution"
+                "Email Distribution",
+                "CSV Export"
             }
         });
+    }
+
+    /// <summary>
+    /// Exporta nómina de un período a CSV.
+    /// </summary>
+    /// <param name="periodo">Período en formato YYYY-MM (ej: 2025-01)</param>
+    /// <param name="incluirAnulados">Incluir recibos anulados</param>
+    /// <returns>Archivo CSV con nómina del período</returns>
+    /// <response code="200">CSV generado exitosamente</response>
+    /// <response code="400">Período inválido</response>
+    /// <response code="401">No autenticado</response>
+    /// <remarks>
+    /// Ejemplo de uso:
+    /// 
+    ///     GET /api/nominas/exportar-csv?periodo=2025-01&amp;incluirAnulados=false
+    /// 
+    /// El archivo CSV incluye:
+    /// - Header row con columnas: PagoID, EmpleadoID, FechaPago, Periodo, SalarioBruto, etc.
+    /// - Una fila por recibo con datos principales
+    /// - Filas adicionales por cada deducción (concepto y monto)
+    /// 
+    /// Formato del período:
+    /// - YYYY-MM: Mes específico (ej: "2025-01")
+    /// 
+    /// El archivo se descarga con nombre:
+    /// - Nomina_YYYY_MM_timestamp.csv
+    /// 
+    /// NOTA: El CSV usa codificación UTF-8 y puede abrirse en Excel.
+    /// </remarks>
+    [HttpGet("exportar-csv")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ExportarCsv(
+        [FromQuery] string periodo,
+        [FromQuery] bool incluirAnulados = false)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        _logger.LogInformation(
+            "Exporting payroll CSV - User: {UserId}, Period: {Periodo}",
+            userId,
+            periodo);
+
+        var command = new ExportarNominaCsvCommand
+        {
+            UserId = userId ?? string.Empty,
+            Periodo = periodo,
+            IncluirAnulados = incluirAnulados
+        };
+
+        try
+        {
+            var result = await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "CSV export completed - Receipts: {Count}, Size: {Bytes}",
+                result.TotalRecibos,
+                result.FileContent.Length);
+
+            return File(result.FileContent, result.ContentType, result.FileName);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Validation error exporting CSV");
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }
