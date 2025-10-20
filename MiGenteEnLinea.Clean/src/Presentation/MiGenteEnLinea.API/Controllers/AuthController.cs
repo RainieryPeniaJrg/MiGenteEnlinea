@@ -1,7 +1,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Common.Exceptions;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.RefreshToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
@@ -529,6 +531,77 @@ public class AuthController : ControllerBase
         {
             _logger.LogWarning("Revoke token fallido: {Message}", ex.Message);
             return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Eliminar credencial específica de un usuario
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="credentialId">ID de la credencial a eliminar</param>
+    /// <returns>204 No Content si se eliminó exitosamente</returns>
+    /// <response code="204">Credencial eliminada exitosamente</response>
+    /// <response code="400">Validación falló (ej: última credencial activa, userId inválido)</response>
+    /// <response code="404">Credencial no encontrada o no pertenece al usuario</response>
+    /// <response code="401">No autorizado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.borrarUsuario(string userID, int credencialID)
+    /// 
+    /// USO:
+    /// - Usuario elimina email alternativo
+    /// - Admin elimina credencial comprometida
+    /// - Limpieza de credenciales duplicadas
+    /// 
+    /// IMPORTANTE:
+    /// - No se puede eliminar la ÚLTIMA credencial activa del usuario
+    /// - Usuario necesita al menos 1 credencial activa para mantener acceso
+    /// - Se puede eliminar credencial inactiva sin restricciones
+    /// - Solo el propio usuario o admin pueden eliminar credenciales
+    /// 
+    /// MEJORA sobre Legacy:
+    /// - Legacy no validaba última credencial (podía dejar usuario sin acceso)
+    /// - Clean Architecture previene este error con validación explícita
+    /// 
+    /// Sample request:
+    /// 
+    ///     DELETE /api/auth/users/550e8400-e29b-41d4-a716-446655440000/credentials/5
+    /// 
+    /// </remarks>
+    [HttpDelete("users/{userId}/credentials/{credentialId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteUserCredential(
+        string userId,
+        int credentialId)
+    {
+        _logger.LogInformation(
+            "DELETE /api/auth/users/{UserId}/credentials/{CredentialId}",
+            userId,
+            credentialId);
+
+        try
+        {
+            var command = new DeleteUserCredentialCommand(userId, credentialId);
+            await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Credencial {CredentialId} eliminada exitosamente para usuario {UserId}",
+                credentialId,
+                userId);
+
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning("Credencial no encontrada: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogWarning("Validación falló: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
         }
     }
 }
