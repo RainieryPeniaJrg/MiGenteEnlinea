@@ -100,4 +100,14 @@ public class LegacyDataService : ILegacyDataService
         // Step 2: Insert new remuneraciones
         await CreateRemuneracionesAsync(userId, empleadoId, remuneraciones, cancellationToken);
     }
+
+    public async Task<List<DeduccionTssDto>> GetDeduccionesTssAsync(CancellationToken cancellationToken = default)
+    {
+        // Legacy: return db.Deducciones_TSS.ToList();
+        return await _context.Database
+            .SqlQueryRaw<DeduccionTssDto>(
+                "SELECT id AS Id, descripcion AS Descripcion, porcentaje AS Porcentaje " +
+                "FROM Deducciones_TSS")
+            .ToListAsync(cancellationToken);
+    }
 }

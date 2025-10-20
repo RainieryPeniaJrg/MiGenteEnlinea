@@ -22,6 +22,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadosByEmplea
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboById;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRecibosByEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneraciones;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetDeduccionesTss;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -562,6 +563,33 @@ public class EmpleadosController : ControllerBase
         _logger.LogInformation("Información del Padrón obtenida: {Cedula} - {Nombre}", result.Cedula, result.NombreCompleto);
 
         return Ok(result);
+    }
+
+    // ========================================
+    // CATÁLOGOS
+    // ========================================
+
+    /// <summary>
+    /// Obtener catálogo de deducciones TSS (Tesorería de la Seguridad Social).
+    /// Retorna todas las deducciones disponibles con sus porcentajes.
+    /// Migrado desde: EmpleadosService.deducciones()
+    /// </summary>
+    /// <returns>Lista de deducciones TSS</returns>
+    /// <response code="200">Catálogo obtenido exitosamente</response>
+    /// <response code="401">No autenticado</response>
+    [HttpGet("deducciones-tss")]
+    [ProducesResponseType(typeof(List<DeduccionTssDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<DeduccionTssDto>>> GetDeduccionesTss()
+    {
+        _logger.LogInformation("Obteniendo catálogo de deducciones TSS");
+
+        var query = new GetDeduccionesTssQuery();
+        var deducciones = await _mediator.Send(query);
+
+        _logger.LogInformation("Deducciones TSS obtenidas: {Count}", deducciones.Count);
+
+        return Ok(deducciones);
     }
 
     // ========================================

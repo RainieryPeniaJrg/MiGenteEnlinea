@@ -30,4 +30,10 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.actualizarRemuneraciones
     /// </summary>
     Task UpdateRemuneracionesAsync(string userId, int empleadoId, List<RemuneracionItemDto> remuneraciones, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene el catálogo de deducciones TSS
+    /// Migrado de: EmpleadosService.deducciones
+    /// </summary>
+    Task<List<DeduccionTssDto>> GetDeduccionesTssAsync(CancellationToken cancellationToken = default);
 }
