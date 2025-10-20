@@ -57,6 +57,10 @@ public class UnitOfWork : IUnitOfWork
     private IServicioRepository? _servicios;
     private IConfigCorreoRepository? _configuracionCorreo;
 
+    // LOTE 5.6: Nóminas (Recibos)
+    private Domain.Interfaces.Repositories.Nominas.IReciboHeaderRepository? _recibosHeader;
+    private Domain.Interfaces.Repositories.Nominas.IReciboDetalleRepository? _recibosDetalle;
+
     // TODO LOTES 9+: Future repositories (optional)
     // private IReciboHeaderRepository? _recibosHeader;
     // private IReciboDetalleRepository? _recibosDetalle;
@@ -157,6 +161,13 @@ public class UnitOfWork : IUnitOfWork
 
     public IConfigCorreoRepository ConfiguracionCorreo =>
         _configuracionCorreo ??= new ConfigCorreoRepository(_context);
+
+    // LOTE 5.6: Nóminas (Recibos)
+    public Domain.Interfaces.Repositories.Nominas.IReciboHeaderRepository RecibosHeader =>
+        _recibosHeader ??= new Nominas.ReciboHeaderRepository(_context);
+
+    public Domain.Interfaces.Repositories.Nominas.IReciboDetalleRepository RecibosDetalle =>
+        _recibosDetalle ??= new Nominas.ReciboDetalleRepository(_context);
 
     // ===========================================
     // TODO LOTES 9+: Future repositories (optional)

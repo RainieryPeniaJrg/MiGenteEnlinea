@@ -102,6 +102,10 @@ public interface IUnitOfWork : IDisposable
     Catalogos.IServicioRepository Servicios { get; }
     Configuracion.IConfigCorreoRepository ConfiguracionCorreo { get; }
 
+    // LOTE 5.6: Nóminas (Recibos)
+    Nominas.IReciboHeaderRepository RecibosHeader { get; }
+    Nominas.IReciboDetalleRepository RecibosDetalle { get; }
+
     // ========================================
     // TODO LOTE 9+: Future repositories (optional)
     // ========================================

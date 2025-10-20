@@ -105,43 +105,38 @@ public class ProcesarNominaLoteCommandHandler : IRequestHandler<ProcesarNominaLo
 
                 decimal neto = ingresos - deducciones;
 
-                // Crear ReciboHeader
-                var reciboHeader = ReciboHeader.Crear(
+                // Crear ReciboHeader usando factory method con firmas correctas
+                var reciboHeader = ReciboHeader.Create(
                     userId: empleador.UserId,
                     empleadoId: empleadoItem.EmpleadoId,
-                    fechaPago: request.FechaPago,
-                    periodo: request.Periodo,
-                    totalIngresos: ingresos,
-                    totalDeducciones: deducciones,
-                    montoNeto: neto,
-                    notas: request.Notas
+                    conceptoPago: $"Nómina {request.Periodo}",
+                    tipo: 1, // Tipo 1 = Nómina Regular
+                    periodoInicio: DateOnly.FromDateTime(request.FechaPago.AddDays(-14)), // Aproximado
+                    periodoFin: DateOnly.FromDateTime(request.FechaPago)
                 );
 
-                // Agregar Header
-                await _unitOfWork.RecibosHeader.AddAsync(reciboHeader);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                // Agregar ingresos y deducciones al recibo usando métodos del aggregate
+                // Salario base
+                reciboHeader.AgregarIngreso("Salario Base", empleadoItem.Salario);
 
-                // Crear ReciboDetalle para salario base
-                var detalleSalario = ReciboDetalle.Crear(
-                    pagoId: reciboHeader.PagoId,
-                    concepto: "Salario Base",
-                    monto: empleadoItem.Salario,
-                    detalle: $"Salario período {request.Periodo}"
-                );
-                await _unitOfWork.RecibosDetalle.AddAsync(detalleSalario);
-
-                // Crear ReciboDetalle para cada concepto adicional
+                // Conceptos adicionales
                 foreach (var concepto in empleadoItem.Conceptos)
                 {
-                    var detalleConcepto = ReciboDetalle.Crear(
-                        pagoId: reciboHeader.PagoId,
-                        concepto: concepto.Concepto,
-                        monto: concepto.EsDeduccion ? -concepto.Monto : concepto.Monto,
-                        detalle: concepto.Detalle
-                    );
-                    await _unitOfWork.RecibosDetalle.AddAsync(detalleConcepto);
+                    if (concepto.EsDeduccion)
+                    {
+                        reciboHeader.AgregarDeduccion(concepto.Concepto, concepto.Monto);
+                    }
+                    else
+                    {
+                        reciboHeader.AgregarIngreso(concepto.Concepto, concepto.Monto);
+                    }
                 }
 
+                // Recalcular totales
+                reciboHeader.RecalcularTotales();
+
+                // Guardar en base de datos
+                await _unitOfWork.RecibosHeader.AddAsync(reciboHeader);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 // Actualizar contadores
