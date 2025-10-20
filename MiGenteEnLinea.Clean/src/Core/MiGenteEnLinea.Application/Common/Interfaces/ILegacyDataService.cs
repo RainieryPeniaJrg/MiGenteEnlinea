@@ -2,6 +2,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneracione
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
@@ -109,5 +110,14 @@ public interface ILegacyDataService
     /// </summary>
     Task<bool> UpdateDetalleContratacionAsync(
         UpdateDetalleContratacionCommand command,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marca una contratación como calificada (calificado=true, asigna calificacionID)
+    /// Migrado de: EmpleadosService.calificarContratacion(int contratacionID, int calificacionID)
+    /// </summary>
+    Task<bool> CalificarContratacionAsync(
+        int contratacionId,
+        int calificacionId,
         CancellationToken cancellationToken = default);
 }

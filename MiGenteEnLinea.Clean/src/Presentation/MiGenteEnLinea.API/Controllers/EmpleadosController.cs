@@ -22,6 +22,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarEmpleadoTem
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -437,6 +438,42 @@ public class EmpleadosController : ControllerBase
         if (!success)
         {
             return NotFound($"No se encontró el detalle de contratación con ContratacionId: {contratacionId}");
+        }
+
+        return Ok(success);
+    }
+
+    /// <summary>
+    /// Marca una contratación como calificada y asigna el ID de la calificación.
+    /// Migrado de: EmpleadosService.calificarContratacion
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="calificacionId">ID de la calificación asignada</param>
+    /// <returns>True si se calificó exitosamente, False si no se encontró</returns>
+    /// <response code="200">Contratación calificada exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    /// <response code="404">Contratación no encontrada</response>
+    [HttpPut("contrataciones/{contratacionId}/calificar")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> CalificarContratacion(
+        int contratacionId,
+        [FromQuery] int calificacionId)
+    {
+        var command = new CalificarContratacionCommand
+        {
+            ContratacionId = contratacionId,
+            CalificacionId = calificacionId
+        };
+
+        var success = await _mediator.Send(command);
+
+        if (!success)
+        {
+            return NotFound($"No se encontró la contratación con ID: {contratacionId}");
         }
 
         return Ok(success);

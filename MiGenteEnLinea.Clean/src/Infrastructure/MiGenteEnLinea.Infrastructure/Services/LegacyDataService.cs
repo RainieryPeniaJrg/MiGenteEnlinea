@@ -4,6 +4,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneracione
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateDetalleContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CalificarContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
@@ -410,6 +411,29 @@ public class LegacyDataService : ILegacyDataService
         detalle.MontoAcordado = command.MontoAcordado ?? detalle.MontoAcordado;
         detalle.EsquemaPagos = command.EsquemaPagos;
         detalle.Estatus = command.Estatus ?? detalle.Estatus;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> CalificarContratacionAsync(
+        int contratacionId,
+        int calificacionId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Find DetalleContrataciones by contratacionID and set calificado=true + calificacionID
+        var detalle = await _context
+            .Set<DetalleContratacione>()
+            .Where(x => x.ContratacionId == contratacionId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (detalle == null)
+            return false;
+
+        // Set calificado flag and assign calificacionID
+        detalle.Calificado = true;
+        detalle.CalificacionId = calificacionId;
 
         await _context.SaveChangesAsync(cancellationToken);
 
