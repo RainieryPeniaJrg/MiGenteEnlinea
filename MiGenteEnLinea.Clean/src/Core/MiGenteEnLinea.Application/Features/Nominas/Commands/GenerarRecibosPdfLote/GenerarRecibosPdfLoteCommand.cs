@@ -14,19 +14,9 @@ public record GenerarRecibosPdfLoteCommand : IRequest<GenerarRecibosPdfLoteResul
     public List<int> ReciboIds { get; init; } = new();
 
     /// <summary>
-    /// Ruta donde guardar los PDFs (opcional, por defecto: temp)
+    /// Incluir detalle completo de ingresos y deducciones
     /// </summary>
-    public string? RutaDestino { get; init; }
-
-    /// <summary>
-    /// Comprimir los PDFs en un archivo ZIP
-    /// </summary>
-    public bool ComprimirEnZip { get; init; } = true;
-
-    /// <summary>
-    /// Nombre del archivo ZIP (si ComprimirEnZip = true)
-    /// </summary>
-    public string? NombreArchivoZip { get; init; }
+    public bool IncluirDetalleCompleto { get; init; } = true;
 }
 
 /// <summary>
@@ -34,10 +24,23 @@ public record GenerarRecibosPdfLoteCommand : IRequest<GenerarRecibosPdfLoteResul
 /// </summary>
 public record GenerarRecibosPdfLoteResult
 {
-    public int PdfsGenerados { get; init; }
-    public int PdfsError { get; init; }
-    public string? RutaArchivoZip { get; init; }
-    public List<string> RutasArchivos { get; init; } = new();
-    public List<string> Errores { get; init; } = new();
-    public bool Exitoso => PdfsError == 0;
+    public int PdfsExitosos { get; set; }
+    public int PdfsFallidos { get; set; }
+    public List<ReciboPdfDto> PdfsGenerados { get; set; } = new();
+    public List<string> Errores { get; set; } = new();
+    public bool Exitoso => Errores.Count == 0;
+}
+
+/// <summary>
+/// DTO con información de un PDF generado
+/// </summary>
+public record ReciboPdfDto
+{
+    public int ReciboId { get; init; }
+    public int EmpleadoId { get; init; }
+    public string EmpleadoNombre { get; init; } = string.Empty;
+    public byte[] PdfBytes { get; init; } = Array.Empty<byte>();
+    public string Periodo { get; init; } = string.Empty;
+    public DateTime FechaGeneracion { get; init; }
+    public long TamanioBytes => PdfBytes.Length;
 }
