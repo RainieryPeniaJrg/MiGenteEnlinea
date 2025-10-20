@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Features.Nominas.Commands.EnviarRecibosEmailLote;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.GenerarRecibosPdfLote;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.ProcesarNominaLote;
 using MiGenteEnLinea.Application.Features.Nominas.DTOs;
@@ -300,6 +301,83 @@ public class NominasController : ControllerBase
     }
 
     /// <summary>
+    /// Envía recibos de nómina por email en lote.
+    /// </summary>
+    /// <param name="command">Lista de recibos a enviar con configuración</param>
+    /// <returns>Resultado del envío con contadores y errores</returns>
+    /// <response code="200">Emails procesados (puede tener errores parciales)</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    /// <remarks>
+    /// Ejemplo de request:
+    /// 
+    ///     POST /api/nominas/enviar-emails
+    ///     {
+    ///       "reciboIds": [1001, 1002, 1003],
+    ///       "asunto": "Recibo de Pago - Enero 2025",
+    ///       "mensajeAdicional": "Feliz año nuevo. Gracias por su dedicación.",
+    ///       "incluirDetalleCompleto": true,
+    ///       "copiarEmpleador": false
+    ///     }
+    /// 
+    /// Respuesta incluye:
+    /// - emailsEnviados/emailsFallidos: Contadores
+    /// - recibosEnviados: Array con status por recibo
+    ///   * reciboId, empleadoId, empleadoNombre, empleadoEmail
+    ///   * enviado (true/false)
+    ///   * fechaEnvio, errorMensaje
+    ///   * tamanoPdf (bytes)
+    /// - errores: Lista de errores detallados
+    /// - totalBytesEnviados: Tamaño total de PDFs
+    /// 
+    /// FUNCIONALIDAD:
+    /// - Genera PDF de cada recibo automáticamente
+    /// - Envía email con PDF embebido como download link
+    /// - HTML email con formato profesional
+    /// - Fallback a texto plano
+    /// - Continúa procesando aunque algunos fallen
+    /// - Validaciones: email configurado en empleado, recibo existe
+    /// 
+    /// LÍMITES:
+    /// - Máximo 100 recibos por lote (validador)
+    /// - Para cantidades mayores, usar múltiples llamadas
+    /// 
+    /// NOTA TÉCNICA:
+    /// - PDF se embebe en HTML como base64 data URI
+    /// - En futuro: migrar a attachments nativos (SMTP)
+    /// </remarks>
+    [HttpPost("enviar-emails")]
+    [ProducesResponseType(typeof(EnviarRecibosEmailLoteResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<EnviarRecibosEmailLoteResult>> EnviarEmails(
+        [FromBody] EnviarRecibosEmailLoteCommand command)
+    {
+        _logger.LogInformation(
+            "Sending batch emails - Receipts: {Count}",
+            command.ReciboIds.Count);
+
+        try
+        {
+            var result = await _mediator.Send(command);
+
+            if (result.Errores.Count > 0)
+            {
+                _logger.LogWarning(
+                    "Email batch completed with errors - Success: {Success}, Failed: {Failed}",
+                    result.EmailsEnviados,
+                    result.EmailsFallidos);
+            }
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Validation error sending emails");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Obtiene estadísticas de salud del servicio de nómina.
     /// </summary>
     /// <returns>Información de estado y versión</returns>
@@ -320,7 +398,8 @@ public class NominasController : ControllerBase
                 "Batch Payroll Processing",
                 "PDF Generation",
                 "Payroll Summary",
-                "Statistics & Reports"
+                "Statistics & Reports",
+                "Email Distribution"
             }
         });
     }
