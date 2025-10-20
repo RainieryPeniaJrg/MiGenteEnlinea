@@ -10,6 +10,7 @@ using MiGenteEnLinea.Application.Features.Authentication.Commands.RefreshToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.RevokeToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfileExtended;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCredenciales;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCuentaById;
@@ -350,7 +351,101 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Actualizar perfil de usuario
+    /// Actualizar perfil completo de usuario (Perfile + PerfilesInfo)
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="command">Datos a actualizar (Perfile + PerfilesInfo opcionales)</param>
+    /// <returns>Resultado de la actualización</returns>
+    /// <response code="200">Perfil actualizado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Usuario no encontrado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.actualizarPerfil(perfilesInfo info, Cuentas cuenta) (línea 136)
+    /// 
+    /// LEGACY BEHAVIOR:
+    /// - Actualiza 2 entidades con 2 DbContexts separados
+    /// - db.Entry(info).State = Modified (perfilesInfo)
+    /// - db1.Entry(cuenta).State = Modified (Cuentas)
+    /// 
+    /// CLEAN ARCHITECTURE:
+    /// - Actualiza Perfile (antes Cuentas) + PerfilesInfo en 1 transacción
+    /// - Usa domain methods para garantizar invariantes
+    /// - PerfilesInfo es opcional (solo se actualiza si se proveen datos)
+    /// 
+    /// USO:
+    /// - Actualizar información básica del perfil (nombre, email, teléfonos)
+    /// - Actualizar información adicional (identificación, dirección, presentación)
+    /// - Actualizar foto de perfil
+    /// - Actualizar información del gerente (empresas)
+    /// 
+    /// Sample request (solo info básica):
+    /// 
+    ///     PUT /api/auth/perfil-completo/550e8400-e29b-41d4-a716-446655440000
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "nombre": "Juan Carlos",
+    ///        "apellido": "Pérez González",
+    ///        "email": "juan.perez@example.com",
+    ///        "telefono1": "809-555-1234",
+    ///        "telefono2": "809-555-5678",
+    ///        "usuario": "juancp"
+    ///     }
+    /// 
+    /// Sample request (con info adicional):
+    /// 
+    ///     PUT /api/auth/perfil-completo/550e8400-e29b-41d4-a716-446655440000
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "nombre": "Juan Carlos",
+    ///        "apellido": "Pérez González",
+    ///        "email": "juan.perez@example.com",
+    ///        "telefono1": "809-555-1234",
+    ///        "identificacion": "00112345678",
+    ///        "tipoIdentificacion": 1,
+    ///        "direccion": "Calle Principal #123",
+    ///        "presentacion": "Profesional con experiencia...",
+    ///        "nombreComercial": "Mi Empresa SRL",
+    ///        "cedulaGerente": "00198765432",
+    ///        "nombreGerente": "María",
+    ///        "apellidoGerente": "García"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPut("perfil-completo/{userId}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateProfileExtended(string userId, [FromBody] UpdateProfileExtendedCommand command)
+    {
+        if (userId != command.UserId)
+        {
+            return BadRequest(new { message = "El UserId del path no coincide con el del body" });
+        }
+
+        _logger.LogInformation("PUT /api/auth/perfil-completo/{UserId} - Email: {Email}", userId, command.Email);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning("Actualización de perfil extendido fallida - Usuario no encontrado: {UserId}", userId);
+                return NotFound(new { message = "Usuario no encontrado" });
+            }
+
+            _logger.LogInformation("Perfil extendido actualizado exitosamente - UserId: {UserId}", userId);
+            return Ok(new { message = "Perfil actualizado exitosamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error de validación al actualizar perfil extendido: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Actualizar perfil básico de usuario (solo Perfile)
     /// </summary>
     /// <param name="userId">ID del usuario (GUID)</param>
     /// <param name="command">Datos a actualizar</param>
@@ -359,7 +454,8 @@ public class AuthController : ControllerBase
     /// <response code="400">Datos inválidos</response>
     /// <response code="404">Usuario no encontrado</response>
     /// <remarks>
-    /// Réplica de LoginService.actualizarPerfil() del Legacy
+    /// Versión simplificada que solo actualiza información básica (Perfile)
+    /// Para actualizar también PerfilesInfo, usar PUT /api/auth/perfil-completo/{userId}
     /// 
     /// Sample request:
     /// 
