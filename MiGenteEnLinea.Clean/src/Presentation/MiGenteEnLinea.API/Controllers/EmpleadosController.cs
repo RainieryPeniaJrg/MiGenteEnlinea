@@ -26,6 +26,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboById;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRecibosByEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetDeduccionesTss;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -286,6 +287,35 @@ public class EmpleadosController : ControllerBase
         _logger.LogInformation("Recibo de contratación eliminado: PagoId={PagoId}", pagoId);
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Obtener un recibo de contratación con su detalle y empleado temporal.
+    /// Migrado desde: EmpleadosService.GetContratacion_ReciboByPagoID(int pagoID)
+    /// </summary>
+    /// <param name="pagoId">ID del recibo a consultar</param>
+    /// <returns>Recibo de contratación con detalles</returns>
+    /// <response code="200">Recibo obtenido exitosamente</response>
+    /// <response code="404">Recibo no encontrado</response>
+    /// <response code="401">No autenticado</response>
+    [HttpGet("recibos-contratacion/{pagoId}")]
+    [ProducesResponseType(typeof(ReciboContratacionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ReciboContratacionDto>> GetReciboContratacion(int pagoId)
+    {
+        _logger.LogInformation("Consultando recibo de contratación: PagoId={PagoId}", pagoId);
+
+        var query = new GetReciboContratacionQuery(pagoId);
+        var recibo = await _mediator.Send(query);
+
+        if (recibo == null)
+        {
+            _logger.LogWarning("Recibo de contratación no encontrado: PagoId={PagoId}", pagoId);
+            return NotFound(new { message = "Recibo de contratación no encontrado" });
+        }
+
+        return Ok(recibo);
     }
 
     /// <summary>

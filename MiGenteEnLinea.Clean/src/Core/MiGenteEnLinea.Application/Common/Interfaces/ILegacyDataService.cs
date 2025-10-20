@@ -60,4 +60,10 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.eliminarReciboContratacion
     /// </summary>
     Task<bool> EliminarReciboContratacionAsync(int pagoId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene un recibo de contratación con su detalle y empleado temporal
+    /// Migrado de: EmpleadosService.GetContratacion_ReciboByPagoID(int pagoID)
+    /// </summary>
+    Task<ReciboContratacionDto?> GetReciboContratacionAsync(int pagoId, CancellationToken cancellationToken = default);
 }

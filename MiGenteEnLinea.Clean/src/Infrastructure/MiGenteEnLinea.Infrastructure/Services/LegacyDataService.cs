@@ -3,6 +3,7 @@ using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
+using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
 using System.Text;
 
 namespace MiGenteEnLinea.Infrastructure.Services;
@@ -191,6 +192,64 @@ public class LegacyDataService : ILegacyDataService
             cancellationToken);
 
         return true;
+    }
+
+    public async Task<ReciboContratacionDto?> GetReciboContratacionAsync(
+        int pagoId,
+        CancellationToken cancellationToken = default)
+    {
+        // Query identical to Legacy:
+        // db.Empleador_Recibos_Header_Contrataciones.Where(x => x.pagoID == pagoID)
+        //   .Include(h => h.Empleador_Recibos_Detalle_Contrataciones)
+        //   .Include(f => f.EmpleadosTemporales).FirstOrDefault();
+
+        var headerEntity = await _context
+            .Set<EmpleadorRecibosHeaderContratacione>()
+            .Where(x => x.PagoId == pagoId)
+            .Include(h => h.EmpleadorRecibosDetalleContrataciones)
+            .Include(f => f.Contratacion) // EmpleadoTemporal
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (headerEntity == null)
+        {
+            return null;
+        }
+
+        // Map to DTO
+        var dto = new ReciboContratacionDto
+        {
+            PagoId = headerEntity.PagoId,
+            UserId = headerEntity.UserId,
+            ContratacionId = headerEntity.ContratacionId,
+            FechaRegistro = headerEntity.FechaRegistro,
+            FechaPago = headerEntity.FechaPago,
+            ConceptoPago = headerEntity.ConceptoPago,
+            Tipo = headerEntity.Tipo,
+            Detalles = headerEntity.EmpleadorRecibosDetalleContrataciones
+                .Select(d => new ReciboContratacionDetalleDto
+                {
+                    DetalleId = d.DetalleId,
+                    PagoId = d.PagoId,
+                    Concepto = d.Concepto,
+                    Monto = d.Monto
+                })
+                .ToList()
+        };
+
+        // Map EmpleadoTemporal if exists
+        if (headerEntity.Contratacion != null)
+        {
+            var emp = headerEntity.Contratacion;
+            dto.EmpleadoTemporal = new EmpleadoTemporalSimpleDto
+            {
+                ContratacionId = emp.ContratacionId,
+                Nombre = emp.Nombre,
+                Apellido = emp.Apellido,
+                Cedula = emp.Identificacion // In Legacy, "identificacion" is the cedula field
+            };
+        }
+
+        return dto;
     }
 }
 
