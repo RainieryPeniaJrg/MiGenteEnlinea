@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
@@ -362,6 +363,29 @@ public class LegacyDataService : ILegacyDataService
         await _context.SaveChangesAsync(cancellationToken);
 
         return contratacionId;
+    }
+
+    public async Task<int> CreateDetalleContratacionAsync(
+        CreateDetalleContratacionCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Simple INSERT into DetalleContrataciones
+        var detalle = new DetalleContratacione
+        {
+            ContratacionId = command.ContratacionId,
+            DescripcionCorta = command.DescripcionCorta,
+            DescripcionAmpliada = command.DescripcionAmpliada,
+            FechaInicio = command.FechaInicio.HasValue ? DateOnly.FromDateTime(command.FechaInicio.Value) : null,
+            FechaFinal = command.FechaFin.HasValue ? DateOnly.FromDateTime(command.FechaFin.Value) : null,
+            MontoAcordado = command.MontoAcordado,
+            EsquemaPagos = command.EsquemaPagos,
+            Estatus = command.Estatus ?? 1
+        };
+
+        _context.Set<DetalleContratacione>().Add(detalle);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return detalle.DetalleId;
     }
 }
 

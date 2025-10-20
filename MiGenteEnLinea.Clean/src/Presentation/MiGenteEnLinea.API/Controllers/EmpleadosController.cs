@@ -20,6 +20,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CancelarTrabajo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateDetalleContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -386,6 +387,25 @@ public class EmpleadosController : ControllerBase
     {
         var contratacionId = await _mediator.Send(command);
         return Ok(contratacionId);
+    }
+
+    /// <summary>
+    /// Crear un nuevo detalle de contratación
+    /// Migrado de: EmpleadosService.nuevaContratacionTemporal
+    /// </summary>
+    /// <param name="command">Datos del detalle de contratación</param>
+    /// <returns>DetalleId del detalle creado</returns>
+    /// <response code="200">Detalle de contratación creado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPost("contrataciones/detalles")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<int>> CreateDetalleContratacion([FromBody] CreateDetalleContratacionCommand command)
+    {
+        var detalleId = await _mediator.Send(command);
+        return Ok(detalleId);
     }
 
     /// <summary>
