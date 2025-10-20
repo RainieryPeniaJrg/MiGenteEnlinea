@@ -110,4 +110,29 @@ public class LegacyDataService : ILegacyDataService
                 "FROM Deducciones_TSS")
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> DarDeBajaEmpleadoAsync(
+        int empleadoId,
+        string userId,
+        DateTime fechaBaja,
+        decimal prestaciones,
+        string motivo,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: 
+        // empleado.Activo = false;
+        // empleado.fechaSalida = fechaBaja.Date;
+        // empleado.motivoBaja = motivo;
+        // empleado.prestaciones = prestaciones;
+        // db.SaveChanges();
+
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE Empleados SET Activo = 0, fechaSalida = {0}, motivoBaja = {1}, prestaciones = {2} " +
+            "WHERE empleadoID = {3} AND userID = {4}",
+            [fechaBaja.Date, motivo, prestaciones, empleadoId, userId],
+            cancellationToken);
+
+        return true;
+    }
 }
+

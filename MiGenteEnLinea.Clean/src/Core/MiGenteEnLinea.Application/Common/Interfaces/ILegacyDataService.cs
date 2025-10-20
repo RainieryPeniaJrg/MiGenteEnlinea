@@ -36,4 +36,10 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.deducciones
     /// </summary>
     Task<List<DeduccionTssDto>> GetDeduccionesTssAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Da de baja a un empleado (actualiza Activo, fechaSalida, motivoBaja, prestaciones)
+    /// Migrado de: EmpleadosService.darDeBaja
+    /// </summary>
+    Task<bool> DarDeBajaEmpleadoAsync(int empleadoId, string userId, DateTime fechaBaja, decimal prestaciones, string motivo, CancellationToken cancellationToken = default);
 }

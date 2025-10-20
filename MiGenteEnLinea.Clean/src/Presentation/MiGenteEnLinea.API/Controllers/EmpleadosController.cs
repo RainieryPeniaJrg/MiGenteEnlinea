@@ -15,6 +15,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.RemoveRemuneracion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.DeleteRemuneracion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateRemuneraciones;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.DarDeBajaEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -165,6 +166,42 @@ public class EmpleadosController : ControllerBase
         _logger.LogInformation("Empleado eliminado exitosamente: {EmpleadoId}", id);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Dar de baja a un empleado (actualiza estado, fecha de salida, motivo y prestaciones).
+    /// Migrado desde: EmpleadosService.darDeBaja(int empleadoID, string userID, DateTime fechaBaja, decimal prestaciones, string motivo)
+    /// </summary>
+    /// <param name="empleadoId">ID del empleado a dar de baja</param>
+    /// <param name="request">Datos de la baja (fecha, motivo, prestaciones)</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Empleado dado de baja exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPut("{empleadoId}/dar-de-baja")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> DarDeBajaEmpleado(int empleadoId, [FromBody] DarDeBajaRequest request)
+    {
+        _logger.LogInformation(
+            "Dando de baja empleado: {EmpleadoId}, Fecha: {FechaBaja}, Motivo: {Motivo}",
+            empleadoId,
+            request.FechaBaja,
+            request.Motivo);
+
+        var command = new DarDeBajaEmpleadoCommand(
+            empleadoId,
+            GetUserId(),
+            request.FechaBaja,
+            request.Prestaciones,
+            request.Motivo);
+
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Empleado dado de baja exitosamente: {EmpleadoId}", empleadoId);
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -624,4 +661,26 @@ public record AnularReciboRequest
     /// Máximo 500 caracteres.
     /// </summary>
     public string? MotivoAnulacion { get; init; }
+}
+
+/// <summary>
+/// Request para dar de baja a un empleado.
+/// </summary>
+public record DarDeBajaRequest
+{
+    /// <summary>
+    /// Fecha de la baja del empleado.
+    /// </summary>
+    public DateTime FechaBaja { get; init; }
+
+    /// <summary>
+    /// Monto de prestaciones laborales a pagar.
+    /// </summary>
+    public decimal Prestaciones { get; init; }
+
+    /// <summary>
+    /// Motivo de la baja.
+    /// Máximo 500 caracteres.
+    /// </summary>
+    public string Motivo { get; init; } = string.Empty;
 }
