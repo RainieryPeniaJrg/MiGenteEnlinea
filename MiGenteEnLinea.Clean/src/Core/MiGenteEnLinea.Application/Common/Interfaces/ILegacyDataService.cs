@@ -1,3 +1,4 @@
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
@@ -17,4 +18,16 @@ public interface ILegacyDataService
     /// Elimina una remuneración de la tabla Remuneraciones
     /// </summary>
     Task DeleteRemuneracionAsync(string userId, int remuneracionId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Crea múltiples remuneraciones en batch
+    /// Migrado de: EmpleadosService.guardarOtrasRemuneraciones
+    /// </summary>
+    Task CreateRemuneracionesAsync(string userId, int empleadoId, List<RemuneracionItemDto> remuneraciones, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Actualiza remuneraciones (elimina existentes y crea nuevas)
+    /// Migrado de: EmpleadosService.actualizarRemuneraciones
+    /// </summary>
+    Task UpdateRemuneracionesAsync(string userId, int empleadoId, List<RemuneracionItemDto> remuneraciones, CancellationToken cancellationToken = default);
 }

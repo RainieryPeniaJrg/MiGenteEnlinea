@@ -13,6 +13,8 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.AddRemuneracion;
 using MiGenteEnLinea.Application.Common.Models;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.RemoveRemuneracion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.DeleteRemuneracion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -322,6 +324,58 @@ public class EmpleadosController : ControllerBase
         _logger.LogInformation("Remuneración eliminada exitosamente: {RemuneracionId}", remuneracionId);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Crear múltiples remuneraciones en batch para un empleado.
+    /// Migrado desde: EmpleadosService.guardarOtrasRemuneraciones(List<Remuneraciones> rem)
+    /// </summary>
+    /// <param name="empleadoId">ID del empleado</param>
+    /// <param name="command">Lista de remuneraciones a crear</param>
+    /// <returns>Confirmación de creación</returns>
+    /// <response code="200">Remuneraciones creadas exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPost("{empleadoId}/remuneraciones/batch")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> CreateRemuneracionesBatch(int empleadoId, [FromBody] List<RemuneracionItemDto> remuneraciones)
+    {
+        _logger.LogInformation("Creando {Count} remuneraciones para empleado: {EmpleadoId}", remuneraciones.Count, empleadoId);
+
+        var command = new CreateRemuneracionesCommand(GetUserId(), empleadoId, remuneraciones);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Remuneraciones creadas exitosamente para empleado: {EmpleadoId}", empleadoId);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Actualizar todas las remuneraciones de un empleado (elimina existentes y crea nuevas).
+    /// Migrado desde: EmpleadosService.actualizarRemuneraciones(List<Remuneraciones> rem, int empleadoID)
+    /// </summary>
+    /// <param name="empleadoId">ID del empleado</param>
+    /// <param name="command">Lista de nuevas remuneraciones</param>
+    /// <returns>Confirmación de actualización</returns>
+    /// <response code="200">Remuneraciones actualizadas exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPut("{empleadoId}/remuneraciones/batch")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> UpdateRemuneracionesBatch(int empleadoId, [FromBody] List<RemuneracionItemDto> remuneraciones)
+    {
+        _logger.LogInformation("Actualizando remuneraciones para empleado: {EmpleadoId} (creará {Count} nuevas)", empleadoId, remuneraciones.Count);
+
+        var command = new UpdateRemuneracionesCommand(GetUserId(), empleadoId, remuneraciones);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Remuneraciones actualizadas exitosamente para empleado: {EmpleadoId}", empleadoId);
+
+        return Ok(result);
     }
 
     // ========================================

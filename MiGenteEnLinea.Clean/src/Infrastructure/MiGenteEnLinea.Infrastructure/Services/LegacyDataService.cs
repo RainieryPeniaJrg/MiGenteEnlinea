@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
+using System.Text;
 
 namespace MiGenteEnLinea.Infrastructure.Services;
 
@@ -43,5 +45,59 @@ public class LegacyDataService : ILegacyDataService
             "DELETE FROM Remuneraciones WHERE userID = {0} AND id = {1}",
             [userId, remuneracionId],
             cancellationToken);
+    }
+
+    public async Task CreateRemuneracionesAsync(
+        string userId,
+        int empleadoId,
+        List<RemuneracionItemDto> remuneraciones,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: db.Remuneraciones.AddRange(rem); db.SaveChanges();
+        // Construir INSERT batch usando StringBuilder
+        var sqlBuilder = new StringBuilder();
+        var parameters = new List<object>();
+        int paramIndex = 0;
+
+        foreach (var rem in remuneraciones)
+        {
+            if (sqlBuilder.Length > 0)
+                sqlBuilder.Append(";");
+
+            sqlBuilder.Append($"INSERT INTO Remuneraciones (userID, empleadoID, descripcion, monto) " +
+                            $"VALUES ({{{paramIndex}}}, {{{paramIndex + 1}}}, {{{paramIndex + 2}}}, {{{paramIndex + 3}}})");
+
+            parameters.Add(userId);
+            parameters.Add(empleadoId);
+            parameters.Add(rem.Descripcion);
+            parameters.Add(rem.Monto);
+
+            paramIndex += 4;
+        }
+
+        if (sqlBuilder.Length > 0)
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                sqlBuilder.ToString(),
+                parameters.ToArray(),
+                cancellationToken);
+        }
+    }
+
+    public async Task UpdateRemuneracionesAsync(
+        string userId,
+        int empleadoId,
+        List<RemuneracionItemDto> remuneraciones,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: DELETE existing, then INSERT new
+        // Step 1: Delete existing remuneraciones for this empleadoId
+        await _context.Database.ExecuteSqlRawAsync(
+            "DELETE FROM Remuneraciones WHERE userID = {0} AND empleadoID = {1}",
+            [userId, empleadoId],
+            cancellationToken);
+
+        // Step 2: Insert new remuneraciones
+        await CreateRemuneracionesAsync(userId, empleadoId, remuneraciones, cancellationToken);
     }
 }
