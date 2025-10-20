@@ -172,5 +172,25 @@ public class LegacyDataService : ILegacyDataService
 
         return true;
     }
+
+    public async Task<bool> EliminarReciboContratacionAsync(
+        int pagoId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy uses 2 separate DbContexts - same pattern for contrataciones
+        // Step 1: Delete details
+        await _context.Database.ExecuteSqlRawAsync(
+            "DELETE FROM Empleador_Recibos_Detalle_Contrataciones WHERE pagoID = {0}",
+            [pagoId],
+            cancellationToken);
+
+        // Step 2: Delete header
+        await _context.Database.ExecuteSqlRawAsync(
+            "DELETE FROM Empleador_Recibos_Header_Contrataciones WHERE pagoID = {0}",
+            [pagoId],
+            cancellationToken);
+
+        return true;
+    }
 }
 

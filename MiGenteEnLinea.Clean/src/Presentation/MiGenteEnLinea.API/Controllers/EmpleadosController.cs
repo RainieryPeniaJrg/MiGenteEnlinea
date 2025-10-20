@@ -264,6 +264,31 @@ public class EmpleadosController : ControllerBase
     }
 
     /// <summary>
+    /// Eliminar un recibo de contratación (Header + Detalle).
+    /// Migrado desde: EmpleadosService.eliminarReciboContratacion(int pagoID)
+    /// </summary>
+    /// <param name="pagoId">ID del recibo a eliminar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Recibo eliminado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpDelete("recibos-contratacion/{pagoId}/eliminar")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> EliminarReciboContratacion(int pagoId)
+    {
+        _logger.LogWarning("Eliminando recibo de contratación: PagoId={PagoId}", pagoId);
+
+        var command = new EliminarReciboContratacionCommand(pagoId);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Recibo de contratación eliminado: PagoId={PagoId}", pagoId);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Obtener todos los empleados del empleador autenticado.
     /// Soporta paginación, filtrado y búsqueda.
     /// </summary>
