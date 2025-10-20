@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Features.Dashboard.Queries.GetDashboardEmpleador;
+using MiGenteEnLinea.Application.Features.Dashboard.Queries.GetDashboardContratista;
 using System.Security.Claims;
 
 namespace MiGenteEnLinea.API.Controllers;
@@ -148,6 +149,81 @@ public class DashboardController : ControllerBase
     }
 
     /// <summary>
+    /// Obtiene todas las métricas del dashboard para un Contratista.
+    /// </summary>
+    /// <param name="fechaReferencia">Fecha de referencia para calcular métricas (opcional, default: hoy)</param>
+    /// <returns>Dashboard completo con métricas de contrataciones, calificaciones, ingresos y gráficos</returns>
+    /// <response code="200">Dashboard obtenido exitosamente</response>
+    /// <response code="401">No autenticado</response>
+    /// <response code="500">Error interno del servidor</response>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     GET /api/dashboard/contratista
+    ///     GET /api/dashboard/contratista?fechaReferencia=2025-10-15
+    ///     
+    /// Sample response:
+    /// 
+    ///     {
+    ///       "nombreCompleto": "Juan Pérez",
+    ///       "titulo": "Plomero Certificado",
+    ///       "totalServicios": 5,
+    ///       "promedioCalificacion": 4.8,
+    ///       "totalCalificaciones": 45,
+    ///       "contratacionesCompletadas": 52,
+    ///       "contratacionesEnProgreso": 3,
+    ///       "ingresosMesActual": 85000.00,
+    ///       "ingresosAnoActual": 950000.00,
+    ///       "suscripcionPlan": "Plan Premium",
+    ///       "suscripcionActiva": true,
+    ///       "evolucionIngresos": [...],
+    ///       "distribucionCalificaciones": [...],
+    ///       "serviciosMasFrecuentes": [...]
+    ///     }
+    /// </remarks>
+    [HttpGet("contratista")]
+    [ProducesResponseType(typeof(DashboardContratistaDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<DashboardContratistaDto>> GetContratistaDashboard(
+        [FromQuery] DateTime? fechaReferencia = null)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            _logger.LogWarning("GetContratistaDashboard called without valid UserId");
+            return Unauthorized(new { message = "Usuario no autenticado" });
+        }
+
+        _logger.LogInformation("Fetching dashboard for Contratista UserId: {UserId}", userId);
+
+        try
+        {
+            var query = new GetDashboardContratistaQuery
+            {
+                UserId = userId,
+                FechaReferencia = fechaReferencia
+            };
+
+            var dashboard = await _mediator.Send(query);
+
+            _logger.LogInformation(
+                "Dashboard fetched - Contrataciones: {Completadas}, Calificación: {Calificacion:F2}, Ingresos Mes: {IngresosMes:C}",
+                dashboard.ContratacionesCompletadas,
+                dashboard.PromedioCalificacion,
+                dashboard.IngresosMesActual);
+
+            return Ok(dashboard);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching dashboard for Contratista UserId: {UserId}", userId);
+            return StatusCode(500, new { message = "Error al obtener el dashboard del contratista" });
+        }
+    }
+
+    /// <summary>
     /// Health check endpoint para el DashboardController.
     /// </summary>
     /// <returns>Estado del servicio</returns>
@@ -159,21 +235,24 @@ public class DashboardController : ControllerBase
         return Ok(new
         {
             service = "Dashboard API",
-            version = "1.0.0",
+            version = "2.0.0",
             timestamp = DateTime.UtcNow,
             features = new[]
             {
                 "Empleador Dashboard (Metrics + Charts)",
+                "Contratista Dashboard (Ratings + Income + Jobs)",
                 "Real-time Statistics",
-                "6-month Payroll Evolution",
-                "Top 5 Deductions Analysis",
-                "Employee Distribution by Position",
-                "Payment History (Last 10)",
-                "Subscription Status Tracking"
+                "6-month Evolution Charts",
+                "Top Services Analysis",
+                "Rating Distribution",
+                "Response Time Metrics",
+                "Payment History",
+                "Subscription Tracking"
             },
             endpoints = new[]
             {
                 "GET /api/dashboard/empleador",
+                "GET /api/dashboard/contratista",
                 "GET /api/dashboard/health"
             },
             status = "Healthy"
