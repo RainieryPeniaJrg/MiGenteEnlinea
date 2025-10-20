@@ -2,11 +2,14 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Features.Calificaciones.Commands.CalificarPerfil;
 using MiGenteEnLinea.Application.Features.Calificaciones.Commands.CreateCalificacion;
 using MiGenteEnLinea.Application.Features.Calificaciones.DTOs;
 using MiGenteEnLinea.Application.Features.Calificaciones.Queries.GetCalificacionById;
+using MiGenteEnLinea.Application.Features.Calificaciones.Queries.GetCalificaciones;
 using MiGenteEnLinea.Application.Features.Calificaciones.Queries.GetCalificacionesByContratista;
 using MiGenteEnLinea.Application.Features.Calificaciones.Queries.GetPromedioCalificacion;
+using MiGenteEnLinea.Application.Features.Calificaciones.Queries.GetTodasCalificaciones;
 
 namespace MiGenteEnLinea.API.Controllers;
 
@@ -163,5 +166,102 @@ public class CalificacionesController : ControllerBase
         }
 
         return Ok(promedio);
+    }
+
+    // ============================================
+    // ENDPOINTS ADICIONALES - MIGRADOS DESDE CalificacionesService.cs
+    // ============================================
+
+    /// <summary>
+    /// LOTE 6.0.2: Calificar perfil de contratista (Legacy calificarPerfil)
+    /// </summary>
+    /// <remarks>
+    /// Migrado desde: CalificacionesService.calificarPerfil(Calificaciones cal)
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/calificaciones/calificar-perfil
+    ///     {
+    ///       "empleadorUserId": "12345678-1234-1234-1234-123456789012",
+    ///       "contratistaIdentificacion": "40212345678",
+    ///       "contratistaNombre": "Juan Pérez",
+    ///       "puntualidad": 5,
+    ///       "cumplimiento": 4,
+    ///       "conocimientos": 5,
+    ///       "recomendacion": 5
+    ///     }
+    /// </remarks>
+    [HttpPost("calificar-perfil")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<int>> CalificarPerfil([FromBody] CalificarPerfilCommand command)
+    {
+        _logger.LogInformation(
+            "POST /api/calificaciones/calificar-perfil - EmpleadorUserId: {EmpleadorUserId}, ContratistaIdentificacion: {ContratistaIdentificacion}",
+            command.EmpleadorUserId,
+            command.ContratistaIdentificacion);
+
+        var calificacionId = await _mediator.Send(command);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = calificacionId },
+            new { calificacionId });
+    }
+
+    /// <summary>
+    /// LOTE 6.0.2: Obtener todas las calificaciones (Legacy getTodas)
+    /// </summary>
+    /// <remarks>
+    /// Migrado desde: CalificacionesService.getTodas()
+    /// 
+    /// NOTA: Este endpoint usa CalificacionVistaDto (placeholder).
+    /// La vista VCalificaciones aún no está implementada en Clean Architecture.
+    /// </remarks>
+    [HttpGet("todas")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<CalificacionVistaDto>>> GetTodasCalificaciones()
+    {
+        _logger.LogInformation("GET /api/calificaciones/todas");
+
+        var query = new GetTodasCalificacionesQuery();
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// LOTE 6.0.2: Obtener calificaciones por identificación (Legacy getById)
+    /// </summary>
+    /// <remarks>
+    /// Migrado desde: CalificacionesService.getById(string id, string userID = null)
+    /// 
+    /// Sample request:
+    /// 
+    ///     GET /api/calificaciones/legacy/40212345678
+    ///     GET /api/calificaciones/legacy/40212345678?userId=12345678-1234-1234-1234-123456789012
+    /// 
+    /// NOTA: Este endpoint usa CalificacionVistaDto (placeholder).
+    /// La vista VCalificaciones aún no está implementada en Clean Architecture.
+    /// </remarks>
+    [HttpGet("legacy/{identificacion}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<CalificacionVistaDto>>> GetCalificacionesLegacy(
+        string identificacion,
+        [FromQuery] string? userId = null)
+    {
+        _logger.LogInformation(
+            "GET /api/calificaciones/legacy/{Identificacion}?userId={UserId}",
+            identificacion,
+            userId);
+
+        var query = new GetCalificacionesQuery(identificacion, userId);
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 }
