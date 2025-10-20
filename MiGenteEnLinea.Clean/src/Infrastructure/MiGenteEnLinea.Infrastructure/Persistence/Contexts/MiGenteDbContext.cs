@@ -120,6 +120,9 @@ public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApp
     // DDD Refactored entity (replaces legacy Empleado)
     public virtual DbSet<Domain.Entities.Empleados.Empleado> Empleados { get; set; }
 
+    // Legacy entity (Generated - no DDD refactoring needed for simple tables)
+    public virtual DbSet<Remuneracione> Remuneraciones { get; set; }
+
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<EmpleadorRecibosDetalle> EmpleadorRecibosDetallesLegacy { get; set; }
 

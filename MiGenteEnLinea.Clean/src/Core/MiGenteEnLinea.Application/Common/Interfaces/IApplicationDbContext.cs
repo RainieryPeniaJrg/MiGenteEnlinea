@@ -1,5 +1,6 @@
 using MiGenteEnLinea.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
 
@@ -8,8 +9,8 @@ namespace MiGenteEnLinea.Application.Common.Interfaces;
 /// </summary>
 /// <remarks>
 /// Permite a Application Layer acceder a entidades sin depender de Infrastructure.
-/// NOTA: RefreshToken NO está expuesto aquí porque es una entidad de infraestructura
-/// (no es parte del dominio de negocio). Se maneja directamente en Infrastructure layer.
+/// NOTA: Algunas entidades Legacy (como Remuneracione) se exponen vía dynamic para evitar
+/// dependencia circular. Se acceden directamente desde Infrastructure layer.
 /// </remarks>
 public interface IApplicationDbContext
 {
@@ -36,4 +37,8 @@ public interface IApplicationDbContext
     
     // EF Core methods
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    DatabaseFacade Database { get; }
+    
+    // Helper methods for Legacy entities (expuestos vía método genérico)
+    DbSet<TEntity> Set<TEntity>() where TEntity : class;
 }

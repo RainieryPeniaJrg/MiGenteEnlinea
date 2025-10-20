@@ -12,12 +12,14 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.DesactivarEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AddRemuneracion;
 using MiGenteEnLinea.Application.Common.Models;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.RemoveRemuneracion;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.DeleteRemuneracion;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadosByEmpleador;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboById;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRecibosByEmpleado;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -272,6 +274,52 @@ public class EmpleadosController : ControllerBase
         await _mediator.Send(command);
 
         _logger.LogInformation("Remuneración eliminada exitosamente: EmpleadoId={EmpleadoId}, Slot={Slot}", id, slot);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Obtener todas las remuneraciones adicionales de un empleado.
+    /// Migrado desde: EmpleadosService.obtenerRemuneraciones(userID, empleadoID)
+    /// </summary>
+    /// <param name="empleadoId">ID del empleado</param>
+    /// <returns>Lista de remuneraciones adicionales</returns>
+    /// <response code="200">Remuneraciones obtenidas exitosamente (puede ser lista vacía)</response>
+    /// <response code="401">No autenticado</response>
+    [HttpGet("{empleadoId}/remuneraciones")]
+    [ProducesResponseType(typeof(List<RemuneracionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<RemuneracionDto>>> GetRemuneraciones(int empleadoId)
+    {
+        _logger.LogInformation("Obteniendo remuneraciones del empleado: {EmpleadoId}", empleadoId);
+
+        var query = new GetRemuneracionesQuery(GetUserId(), empleadoId);
+        var remuneraciones = await _mediator.Send(query);
+
+        _logger.LogInformation("Remuneraciones obtenidas: {Count} registros", remuneraciones.Count);
+
+        return Ok(remuneraciones);
+    }
+
+    /// <summary>
+    /// Eliminar una remuneración adicional de la tabla Remuneraciones.
+    /// Migrado desde: EmpleadosService.quitarRemuneracion(userID, id)
+    /// </summary>
+    /// <param name="remuneracionId">ID de la remuneración a eliminar</param>
+    /// <returns>Confirmación de eliminación</returns>
+    /// <response code="204">Remuneración eliminada exitosamente</response>
+    /// <response code="401">No autenticado</response>
+    [HttpDelete("remuneraciones/{remuneracionId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteRemuneracion(int remuneracionId)
+    {
+        _logger.LogInformation("Eliminando remuneración: {RemuneracionId}", remuneracionId);
+
+        var command = new DeleteRemuneracionCommand(GetUserId(), remuneracionId);
+        await _mediator.Send(command);
+
+        _logger.LogInformation("Remuneración eliminada exitosamente: {RemuneracionId}", remuneracionId);
 
         return NoContent();
     }

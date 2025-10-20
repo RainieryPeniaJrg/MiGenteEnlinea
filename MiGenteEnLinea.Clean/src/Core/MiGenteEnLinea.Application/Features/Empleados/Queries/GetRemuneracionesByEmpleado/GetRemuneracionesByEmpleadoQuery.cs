@@ -11,7 +11,7 @@ namespace MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneracione
 /// Retorna los 3 slots de remuneraciones.
 /// Los slots vacíos tendrán Descripcion y Monto = null.
 /// </remarks>
-public record GetRemuneracionesByEmpleadoQuery : IRequest<List<RemuneracionDto>>
+public record GetRemuneracionesByEmpleadoQuery : IRequest<List<RemuneracionSlotDto>>
 {
     /// <summary>
     /// Identificador del empleador (para validar propiedad del empleado).

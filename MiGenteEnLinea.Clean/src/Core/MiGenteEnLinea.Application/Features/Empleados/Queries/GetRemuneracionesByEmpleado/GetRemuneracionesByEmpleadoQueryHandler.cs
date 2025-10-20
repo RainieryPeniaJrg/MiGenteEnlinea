@@ -11,7 +11,7 @@ namespace MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneracione
 /// Legacy: EmpleadosService.obtenerRemuneraciones(userID, empleadoID)
 /// Retorna los 3 slots de remuneraciones extras del empleado.
 /// </summary>
-public class GetRemuneracionesByEmpleadoQueryHandler : IRequestHandler<GetRemuneracionesByEmpleadoQuery, List<RemuneracionDto>>
+public class GetRemuneracionesByEmpleadoQueryHandler : IRequestHandler<GetRemuneracionesByEmpleadoQuery, List<RemuneracionSlotDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -20,7 +20,7 @@ public class GetRemuneracionesByEmpleadoQueryHandler : IRequestHandler<GetRemune
         _context = context;
     }
 
-    public async Task<List<RemuneracionDto>> Handle(GetRemuneracionesByEmpleadoQuery request, CancellationToken cancellationToken)
+    public async Task<List<RemuneracionSlotDto>> Handle(GetRemuneracionesByEmpleadoQuery request, CancellationToken cancellationToken)
     {
         // PASO 1: Buscar empleado y validar propiedad
         var empleado = await _context.Empleados
@@ -36,21 +36,21 @@ public class GetRemuneracionesByEmpleadoQueryHandler : IRequestHandler<GetRemune
 
         // PASO 2: Construir lista con los 3 slots de remuneraciones
         // Siempre retorna 3 elementos, incluso si están vacíos
-        var remuneraciones = new List<RemuneracionDto>
+        var remuneraciones = new List<RemuneracionSlotDto>
         {
-            new RemuneracionDto
+            new RemuneracionSlotDto
             {
                 Numero = 1,
                 Descripcion = empleado.RemuneracionExtra1,
                 Monto = empleado.MontoExtra1
             },
-            new RemuneracionDto
+            new RemuneracionSlotDto
             {
                 Numero = 2,
                 Descripcion = empleado.RemuneracionExtra2,
                 Monto = empleado.MontoExtra2
             },
-            new RemuneracionDto
+            new RemuneracionSlotDto
             {
                 Numero = 3,
                 Descripcion = empleado.RemuneracionExtra3,
