@@ -34,6 +34,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetDeduccionesTss;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetPagosContrataciones;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetFichaTemporales;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -513,6 +514,40 @@ public class EmpleadosController : ControllerBase
         }
 
         return Ok(success);
+    }
+
+    /// <summary>
+    /// Obtiene ficha de empleado temporal con detalles de contratación.
+    /// Migrado de: EmpleadosService.obtenerFichaTemporales
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="userId">ID del usuario</param>
+    /// <returns>Ficha de empleado temporal con detalles</returns>
+    /// <response code="200">Ficha obtenida exitosamente</response>
+    /// <response code="404">No se encontró la ficha temporal</response>
+    /// <response code="401">No autenticado</response>
+    [HttpGet("temporales/ficha")]
+    [ProducesResponseType(typeof(EmpleadoTemporalDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<EmpleadoTemporalDto>> GetFichaTemporales(
+        [FromQuery] int contratacionId,
+        [FromQuery] string userId)
+    {
+        var query = new GetFichaTemporalesQuery
+        {
+            ContratacionId = contratacionId,
+            UserId = userId
+        };
+
+        var result = await _mediator.Send(query);
+
+        if (result == null)
+        {
+            return NotFound($"No se encontró ficha temporal con ContratacionId={contratacionId} y UserId={userId}");
+        }
+
+        return Ok(result);
     }
 
     /// <summary>

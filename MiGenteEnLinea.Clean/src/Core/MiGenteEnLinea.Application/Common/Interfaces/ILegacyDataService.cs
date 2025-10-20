@@ -129,4 +129,13 @@ public interface ILegacyDataService
     Task<bool> ModificarCalificacionAsync(
         ModificarCalificacionCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene EmpleadosTemporales con DetalleContrataciones incluido
+    /// Migrado de: EmpleadosService.obtenerFichaTemporales(int contratacionID, string userID)
+    /// </summary>
+    Task<EmpleadoTemporalDto?> GetFichaTemporalesAsync(
+        int contratacionId,
+        string userId,
+        CancellationToken cancellationToken = default);
 }

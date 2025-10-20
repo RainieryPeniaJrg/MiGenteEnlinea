@@ -469,5 +469,51 @@ public class LegacyDataService : ILegacyDataService
 
         return true;
     }
+
+    public async Task<EmpleadoTemporalDto?> GetFichaTemporalesAsync(
+        int contratacionId,
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Get EmpleadosTemporales with DetalleContrataciones included
+        var empleadoTemporal = await _context
+            .Set<EmpleadosTemporale>()
+            .Where(x => x.UserId == userId && x.ContratacionId == contratacionId)
+            .Select(e => new EmpleadoTemporalDto
+            {
+                ContratacionId = e.ContratacionId,
+                UserId = e.UserId,
+                FechaRegistro = e.FechaRegistro,
+                Tipo = e.Tipo,
+                NombreComercial = e.NombreComercial,
+                Rnc = e.Rnc,
+                Nombre = e.Nombre,
+                Apellido = e.Apellido,
+                Identificacion = e.Identificacion,
+                Telefono1 = e.Telefono1,
+                Direccion = e.Direccion,
+                // Include DetalleContrataciones
+                Detalle = _context.Set<DetalleContratacione>()
+                    .Where(d => d.ContratacionId == e.ContratacionId)
+                    .Select(d => new DetalleContratacionDto
+                    {
+                        DetalleId = d.DetalleId,
+                        ContratacionId = d.ContratacionId,
+                        DescripcionCorta = d.DescripcionCorta,
+                        DescripcionAmpliada = d.DescripcionAmpliada,
+                        FechaInicio = d.FechaInicio,
+                        FechaFinal = d.FechaFinal,
+                        MontoAcordado = d.MontoAcordado,
+                        EsquemaPagos = d.EsquemaPagos,
+                        Estatus = d.Estatus,
+                        Calificado = d.Calificado,
+                        CalificacionId = d.CalificacionId
+                    })
+                    .FirstOrDefault()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return empleadoTemporal;
+    }
 }
 
