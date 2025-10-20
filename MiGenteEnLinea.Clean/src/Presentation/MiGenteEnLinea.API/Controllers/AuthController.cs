@@ -12,6 +12,7 @@ using MiGenteEnLinea.Application.Features.Authentication.Commands.RevokeToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCredenciales;
+using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCuentaById;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfil;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfilByEmail;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreo;
@@ -604,6 +605,43 @@ public class AuthController : ControllerBase
             _logger.LogWarning("Validación falló: {Message}", ex.Message);
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    /// <summary>
+    /// Obtener perfil (Cuenta) por su ID
+    /// </summary>
+    /// <param name="cuentaId">ID de la cuenta (PerfilId)</param>
+    /// <returns>Datos del perfil</returns>
+    /// <response code="200">Perfil encontrado</response>
+    /// <response code="404">Perfil no encontrado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.getPerfilByID(int cuentaID) (línea 179)
+    /// 
+    /// USO:
+    /// - Obtener datos de un perfil específico por su ID numérico
+    /// - Equivalente a GetPerfil pero usando cuentaID en vez de userId (GUID)
+    /// 
+    /// Sample request:
+    /// 
+    ///     GET /api/auth/cuenta/5
+    /// 
+    /// </remarks>
+    [HttpGet("cuenta/{cuentaId}")]
+    [ProducesResponseType(typeof(PerfilDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PerfilDto>> GetCuentaById(int cuentaId)
+    {
+        _logger.LogInformation("GET /api/auth/cuenta/{CuentaId}", cuentaId);
+
+        var result = await _mediator.Send(new GetCuentaByIdQuery(cuentaId));
+
+        if (result == null)
+        {
+            _logger.LogWarning("Perfil no encontrado para cuentaId: {CuentaId}", cuentaId);
+            return NotFound(new { message = "Perfil no encontrado" });
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
