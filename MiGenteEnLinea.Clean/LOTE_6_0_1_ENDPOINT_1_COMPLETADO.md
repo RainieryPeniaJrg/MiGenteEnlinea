@@ -283,12 +283,12 @@ dotnet run --project src/Presentation/MiGenteEnLinea.API
 [12:18:32 INF] Hosting environment: Development
 ```
 
-**API URL:** <http://localhost:5015>  
-**Swagger UI:** <http://localhost:5015/swagger>
+**API URL:** http://localhost:5015  
+**Swagger UI:** http://localhost:5015/swagger
 
 **Conclusión:** ✅ API EJECUTÁNDOSE CORRECTAMENTE
 
-**Nota:** Warning de SQL Server para logs (continuando con Console + File sinks) - no afecta funcionalidad.
+**SQL Server Status:** ✅ **CONECTADO** - "Serilog: SQL Server sink configurado"
 
 ---
 

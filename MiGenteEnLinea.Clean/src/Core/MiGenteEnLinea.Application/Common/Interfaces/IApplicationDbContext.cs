@@ -20,6 +20,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Suscripciones.PlanContratista> PlanesContratistas { get; }
     DbSet<Domain.Entities.Pagos.Venta> Ventas { get; }
     DbSet<Domain.Entities.Seguridad.Perfile> Perfiles { get; }
+    DbSet<Domain.Entities.Seguridad.PerfilesInfo> PerfilesInfos { get; }
     DbSet<Domain.Entities.Contratistas.Contratista> Contratistas { get; }
     DbSet<Domain.Entities.Contratistas.ContratistaServicio> ContratistasServicios { get; }
     DbSet<Domain.Entities.Empleadores.Empleador> Empleadores { get; }

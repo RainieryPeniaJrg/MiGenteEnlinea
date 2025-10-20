@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Common.Exceptions;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.AddProfileInfo;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
@@ -604,4 +605,99 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Agregar información adicional del perfil (perfilesInfo)
+    /// </summary>
+    /// <param name="command">Datos adicionales del perfil</param>
+    /// <returns>ID del registro creado</returns>
+    /// <response code="201">Información de perfil agregada exitosamente</response>
+    /// <response code="400">Datos de entrada inválidos</response>
+    /// <response code="500">Error interno del servidor</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.agregarPerfilInfo(perfilesInfo info)
+    /// 
+    /// USO:
+    /// - Agregar información de identificación (cédula, RNC, pasaporte)
+    /// - Registrar empresa con nombre comercial
+    /// - Agregar dirección, presentación y foto de perfil
+    /// - Registrar información del gerente (solo empresas)
+    /// 
+    /// TIPOS DE PERFIL:
+    /// 1. **Persona Física**: Solo requiere Identificacion (cédula/pasaporte)
+    /// 2. **Empresa**: Requiere Identificacion (RNC) + NombreComercial
+    /// 
+    /// IMPORTANTE:
+    /// - Legacy NO valida si ya existe un perfil para el usuario (permite duplicados)
+    /// - Clean Architecture MANTIENE este comportamiento (paridad 100%)
+    /// - TipoIdentificacion: 1=Cédula, 2=Pasaporte, 3=RNC
+    /// - FotoPerfil se guarda como byte[] (base64 en JSON)
+    /// - InformacionGerente es opcional (solo empresas)
+    /// 
+    /// Sample request (Persona Física):
+    /// 
+    ///     POST /api/auth/profile-info
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "identificacion": "00112345678",
+    ///        "tipoIdentificacion": 1,
+    ///        "direccion": "Calle Principal #123, Santo Domingo",
+    ///        "presentacion": "Profesional con 10 años de experiencia..."
+    ///     }
+    /// 
+    /// Sample request (Empresa):
+    /// 
+    ///     POST /api/auth/profile-info
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "identificacion": "12345678901",
+    ///        "tipoIdentificacion": 3,
+    ///        "nombreComercial": "Mi Empresa SRL",
+    ///        "direccion": "Av. Winston Churchill #456",
+    ///        "cedulaGerente": "00198765432",
+    ///        "nombreGerente": "Juan",
+    ///        "apellidoGerente": "Pérez",
+    ///        "direccionGerente": "Calle Secundaria #789"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("profile-info")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<int>> AddProfileInfo([FromBody] AddProfileInfoCommand command)
+    {
+        _logger.LogInformation(
+            "POST /api/auth/profile-info - UserId: {UserId}, Identificacion: {Identificacion}",
+            command.UserId,
+            command.Identificacion);
+
+        try
+        {
+            var perfilInfoId = await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Información de perfil agregada exitosamente - PerfilInfoId: {PerfilInfoId}, UserId: {UserId}",
+                perfilInfoId,
+                command.UserId);
+
+            return CreatedAtAction(
+                nameof(AddProfileInfo),
+                new { id = perfilInfoId },
+                new { id = perfilInfoId, message = "Información de perfil agregada exitosamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error de validación al agregar perfil info: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al agregar información de perfil para usuario {UserId}", command.UserId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
 }
+
