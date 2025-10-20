@@ -7,44 +7,43 @@ public class NominaResumenDto
 {
     public int EmpleadorId { get; set; }
     public string Periodo { get; set; } = string.Empty;
-    public DateTime FechaInicio { get; set; }
-    public DateTime FechaFin { get; set; }
+    public DateTime? FechaInicio { get; set; }
+    public DateTime? FechaFin { get; set; }
     
     // Totales generales
     public int TotalEmpleados { get; set; }
-    public int TotalRecibos { get; set; }
-    public decimal TotalIngresos { get; set; }
+    public decimal TotalSalarioBruto { get; set; }
     public decimal TotalDeducciones { get; set; }
-    public decimal TotalNeto { get; set; }
+    public decimal TotalSalarioNeto { get; set; }
     
-    // Deducciones TSS
-    public decimal TotalAFP { get; set; }
-    public decimal TotalSFS { get; set; }
-    public decimal TotalInfotep { get; set; }
+    // Desglose de deducciones por tipo (ej: AFP, SFS, ISR, etc.)
+    public Dictionary<string, decimal> DeduccionesPorTipo { get; set; } = new();
     
-    // Promedios
-    public decimal PromedioSalario { get; set; }
-    public decimal PromedioDeducciones { get; set; }
+    // Estadísticas
+    public int RecibosGenerados { get; set; }
+    public int RecibosAnulados { get; set; }
+    public decimal PromedioSalarioBruto { get; set; }
+    public decimal PromedioSalarioNeto { get; set; }
     
     // Detalle por empleado (opcional)
-    public List<EmpleadoNominaResumenDto> DetalleEmpleados { get; set; } = new();
+    public List<NominaEmpleadoDto> DetalleEmpleados { get; set; } = new();
 }
 
 /// <summary>
 /// DTO con resumen de nómina para un empleado específico
 /// </summary>
-public class EmpleadoNominaResumenDto
+public class NominaEmpleadoDto
 {
     public int EmpleadoId { get; set; }
-    public string NombreCompleto { get; set; } = string.Empty;
-    public string Identificacion { get; set; } = string.Empty;
+    public string NombreEmpleado { get; set; } = string.Empty;
     
-    public int CantidadRecibos { get; set; }
-    public decimal TotalIngresos { get; set; }
+    public int TotalRecibos { get; set; }
+    public decimal TotalSalarioBruto { get; set; }
     public decimal TotalDeducciones { get; set; }
-    public decimal TotalNeto { get; set; }
+    public decimal TotalSalarioNeto { get; set; }
     
-    public DateTime? UltimoPago { get; set; }
+    public decimal PromedioSalarioBruto { get; set; }
+    public decimal PromedioSalarioNeto { get; set; }
 }
 
 /// <summary>
@@ -57,7 +56,7 @@ public class EstadisticasNominaDto
     // Métricas generales
     public int TotalEmpleadosActivos { get; set; }
     public int TotalEmpleadosInactivos { get; set; }
-    public decimal MasaScalarial { get; set; }
+    public decimal MasaSalarial { get; set; }
     public decimal CostoTotalEmpresa { get; set; } // Incluye contribuciones patronales
     
     // Distribución salarial
