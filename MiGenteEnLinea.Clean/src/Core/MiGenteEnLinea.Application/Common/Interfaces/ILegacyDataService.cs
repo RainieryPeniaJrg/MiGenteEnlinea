@@ -48,4 +48,10 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.cancelarTrabajo
     /// </summary>
     Task<bool> CancelarTrabajoAsync(int contratacionId, int detalleId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Elimina un recibo de empleado (Header + Detalle) usando 2 DbContexts como en Legacy
+    /// Migrado de: EmpleadosService.eliminarReciboEmpleado
+    /// </summary>
+    Task<bool> EliminarReciboEmpleadoAsync(int pagoId, CancellationToken cancellationToken = default);
 }

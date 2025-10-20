@@ -17,6 +17,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneracione
 using MiGenteEnLinea.Application.Features.Empleados.Commands.UpdateRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.DarDeBajaEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CancelarTrabajo;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -233,6 +234,31 @@ public class EmpleadosController : ControllerBase
             "Trabajo temporal cancelado: ContratacionId={ContratacionId}, DetalleId={DetalleId}",
             contratacionId,
             detalleId);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Eliminar un recibo de empleado (Header + Detalle).
+    /// Migrado desde: EmpleadosService.eliminarReciboEmpleado(int pagoID)
+    /// </summary>
+    /// <param name="pagoId">ID del recibo a eliminar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Recibo eliminado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpDelete("recibos-empleado/{pagoId}/eliminar")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<bool>> EliminarReciboEmpleado(int pagoId)
+    {
+        _logger.LogWarning("Eliminando recibo de empleado: PagoId={PagoId}", pagoId);
+
+        var command = new EliminarReciboEmpleadoCommand(pagoId);
+        var result = await _mediator.Send(command);
+
+        _logger.LogInformation("Recibo de empleado eliminado: PagoId={PagoId}", pagoId);
 
         return Ok(result);
     }
