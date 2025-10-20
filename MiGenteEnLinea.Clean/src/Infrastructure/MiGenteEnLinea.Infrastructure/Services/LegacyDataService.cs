@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Entities.Generated;
@@ -316,6 +317,51 @@ public class LegacyDataService : ILegacyDataService
             .ToListAsync(cancellationToken);
 
         return result;
+    }
+
+    public async Task<int> CreateEmpleadoTemporalAsync(
+        CreateEmpleadoTemporalCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Uses 2 separate DbContexts (2 transactions)
+        // Step 1: Create EmpleadoTemporal
+        var empleadoTemporal = new EmpleadosTemporale
+        {
+            UserId = command.UserId,
+            FechaRegistro = DateTime.Now,
+            Tipo = command.Tipo,
+            NombreComercial = command.NombreComercial,
+            Rnc = command.Rnc,
+            Nombre = command.Nombre,
+            Apellido = command.Apellido,
+            Identificacion = command.Identificacion,
+            Telefono1 = command.Telefono,
+            Direccion = command.Direccion
+        };
+
+        _context.Set<EmpleadosTemporale>().Add(empleadoTemporal);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        int contratacionId = empleadoTemporal.ContratacionId;
+
+        // Step 2: Create DetalleContrataciones (with the generated contratacionId)
+        // Map Command properties to entity properties
+        var detalle = new DetalleContratacione
+        {
+            ContratacionId = contratacionId,
+            DescripcionCorta = command.Servicio, // "Servicio" maps to "DescripcionCorta"
+            FechaInicio = command.FechaInicio.HasValue ? DateOnly.FromDateTime(command.FechaInicio.Value) : null,
+            FechaFinal = command.FechaFin.HasValue ? DateOnly.FromDateTime(command.FechaFin.Value) : null,
+            MontoAcordado = command.Pago,
+            DescripcionAmpliada = command.LugarTrabajo, // Assuming LugarTrabajo maps to DescripcionAmpliada
+            EsquemaPagos = command.HorarioTrabajo, // Assuming HorarioTrabajo maps to EsquemaPagos
+            Estatus = command.Estatus ?? 1 // Default to 1 (active)
+        };
+
+        _context.Set<DetalleContratacione>().Add(detalle);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return contratacionId;
     }
 }
 

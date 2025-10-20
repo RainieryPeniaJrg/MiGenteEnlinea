@@ -19,6 +19,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Commands.DarDeBajaEmpleado;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CancelarTrabajo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.EliminarEmpleadoTemporal;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.ProcesarPago;
 using MiGenteEnLinea.Application.Features.Empleados.Commands.AnularRecibo;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetEmpleadoById;
@@ -366,6 +367,25 @@ public class EmpleadosController : ControllerBase
         var query = new GetPagosContratacionesQuery(contratacionId, detalleId);
         var result = await _mediator.Send(query);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Crear un nuevo empleado temporal con su detalle de contratación
+    /// Migrado de: EmpleadosService.nuevoTemporal
+    /// </summary>
+    /// <param name="command">Datos del empleado temporal y detalle de contratación</param>
+    /// <returns>ContratacionId del empleado temporal creado</returns>
+    /// <response code="200">Empleado temporal creado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpPost("temporales")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<int>> CreateEmpleadoTemporal([FromBody] CreateEmpleadoTemporalCommand command)
+    {
+        var contratacionId = await _mediator.Send(command);
+        return Ok(contratacionId);
     }
 
     /// <summary>

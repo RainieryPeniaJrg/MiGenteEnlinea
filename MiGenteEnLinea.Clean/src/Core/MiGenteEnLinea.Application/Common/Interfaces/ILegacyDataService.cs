@@ -1,4 +1,5 @@
 using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateRemuneraciones;
+using MiGenteEnLinea.Application.Features.Empleados.Commands.CreateEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
 namespace MiGenteEnLinea.Application.Common.Interfaces;
@@ -82,4 +83,13 @@ public interface ILegacyDataService
     /// Migrado de: EmpleadosService.GetEmpleador_RecibosContratacionesByID(int contratacionID, int detalleID)
     /// </summary>
     Task<List<PagoContratacionDto>> GetPagosContratacionesAsync(int contratacionId, int detalleId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Crea un nuevo EmpleadoTemporal y su DetalleContrataciones asociado
+    /// Migrado de: EmpleadosService.nuevoTemporal(EmpleadosTemporales temp, DetalleContrataciones det)
+    /// Usa dos transacciones como en Legacy (2 DbContexts)
+    /// </summary>
+    Task<int> CreateEmpleadoTemporalAsync(
+        CreateEmpleadoTemporalCommand command,
+        CancellationToken cancellationToken = default);
 }
