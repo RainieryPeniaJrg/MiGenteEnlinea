@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Features.Dashboard.Queries.GetDashboardEmpleador;
 using MiGenteEnLinea.Application.Features.Dashboard.Queries.GetDashboardContratista;
+using MiGenteEnLinea.Application.Features.Dashboard.Services;
 using System.Security.Claims;
 
 namespace MiGenteEnLinea.API.Controllers;
 
 /// <summary>
 /// Controller para endpoints de Dashboard (métricas y estadísticas).
+/// Implementa caching en memoria con TTL de 10 minutos para mejorar performance.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -18,13 +20,16 @@ public class DashboardController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<DashboardController> _logger;
+    private readonly IDashboardCacheService _cacheService;
 
     public DashboardController(
         IMediator mediator,
-        ILogger<DashboardController> logger)
+        ILogger<DashboardController> logger,
+        IDashboardCacheService cacheService)
     {
         _mediator = mediator;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     /// <summary>
