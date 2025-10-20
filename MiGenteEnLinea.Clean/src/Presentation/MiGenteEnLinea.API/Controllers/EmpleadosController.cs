@@ -28,6 +28,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRecibosByEmpleado
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetRemuneraciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetDeduccionesTss;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboContratacion;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetPagosContrataciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -341,6 +342,29 @@ public class EmpleadosController : ControllerBase
 
         _logger.LogInformation("Empleado temporal eliminado: ContratacionId={ContratacionId}", contratacionId);
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Obtener pagos de contrataciones por contratacionID y detalleID
+    /// Migrado de: EmpleadosService.GetEmpleador_RecibosContratacionesByID
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="detalleId">ID del detalle</param>
+    /// <returns>Lista de pagos de contrataciones</returns>
+    /// <response code="200">Lista de pagos obtenida exitosamente</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <response code="401">No autenticado</response>
+    [HttpGet("pagos-contrataciones")]
+    [ProducesResponseType(typeof(List<PagoContratacionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<PagoContratacionDto>>> GetPagosContrataciones(
+        [FromQuery] int contratacionId,
+        [FromQuery] int detalleId)
+    {
+        var query = new GetPagosContratacionesQuery(contratacionId, detalleId);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
 

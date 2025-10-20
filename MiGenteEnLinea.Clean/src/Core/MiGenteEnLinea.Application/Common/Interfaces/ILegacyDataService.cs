@@ -76,4 +76,10 @@ public interface ILegacyDataService
     /// 3. EmpleadosTemporales (el empleado temporal)
     /// </summary>
     Task<bool> EliminarEmpleadoTemporalAsync(int contratacionId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene pagos de contrataciones desde la vista VPagosContrataciones
+    /// Migrado de: EmpleadosService.GetEmpleador_RecibosContratacionesByID(int contratacionID, int detalleID)
+    /// </summary>
+    Task<List<PagoContratacionDto>> GetPagosContratacionesAsync(int contratacionId, int detalleId, CancellationToken cancellationToken = default);
 }

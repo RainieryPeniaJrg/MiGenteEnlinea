@@ -292,5 +292,30 @@ public class LegacyDataService : ILegacyDataService
 
         return true;
     }
+
+    public async Task<List<PagoContratacionDto>> GetPagosContratacionesAsync(
+        int contratacionId,
+        int detalleId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: SELECT from VPagosContrataciones view with filters
+        var result = await _context
+            .Set<VpagosContratacione>()
+            .Where(x => x.ContratacionId == contratacionId && x.DetalleId == detalleId)
+            .Select(x => new PagoContratacionDto
+            {
+                PagoId = x.PagoId,
+                UserId = x.UserId,
+                FechaRegistro = x.FechaRegistro,
+                FechaPago = x.FechaPago,
+                Expr1 = x.Expr1,
+                Monto = x.Monto,
+                ContratacionId = x.ContratacionId,
+                DetalleId = x.DetalleId
+            })
+            .ToListAsync(cancellationToken);
+
+        return result;
+    }
 }
 
