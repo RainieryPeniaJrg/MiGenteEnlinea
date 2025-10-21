@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Pago</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 200px;
+        }
+        .details {
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .details li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .details li:last-child {
+            border-bottom: none;
+        }
+        @media only screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+                border-radius: 0;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .logo img {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="http://platform.migenteenlinea.do/Images/logoMiGene.png" alt="MiGente En Línea" />
+        </div>
+        <h1>¡Hola {{UserName}}!</h1>
+        <p>Gracias por adquirir uno de nuestros planes. Tu pago ha sido procesado exitosamente.</p>
+        <div class="details">
+            <h3 style="margin-top: 0; color: #333;">Detalles de la transacción:</h3>
+            <ul>
+                <li><strong>Plan adquirido:</strong> {{PlanName}}</li>
+                <li><strong>Monto pagado:</strong> {{Amount}}</li>
+                <li><strong>Fecha de compra:</strong> {{PurchaseDate}}</li>
+                <li><strong>ID de transacción:</strong> {{TransactionId}}</li>
+            </ul>
+        </div>
+        <p>Tu suscripción está activa y puedes comenzar a disfrutar de todos los beneficios de inmediato.</p>
+        <p style="text-align: center;">
+            <a href="http://platform.migenteenlinea.do" class="button">Acceder a Mi Cuenta</a>
+        </p>
+        <p>Para cualquier consulta o soporte, no dudes en contactarnos.</p>
+        <p>¡Gracias nuevamente por tu compra!</p>
+        <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #999999; text-align: center;">
+            Este es un correo automático, por favor no respondas a este mensaje.<br/>
+            Guarda este correo como comprobante de tu transacción.
+        </p>
+    </div>
+</body>
+</html>

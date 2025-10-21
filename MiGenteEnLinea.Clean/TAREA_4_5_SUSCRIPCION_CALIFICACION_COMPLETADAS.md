@@ -176,6 +176,7 @@ La entidad `Calificacion` representa las calificaciones que los empleadores dan 
   6. `IX_Calificaciones_Tipo` - Por tipo de calificación
 
 - **Check Constraints SQL:**
+
   ```sql
   CK_Calificaciones_Puntualidad_Rango: puntualidad >= 1 AND puntualidad <= 5
   CK_Calificaciones_Cumplimiento_Rango: cumplimiento >= 1 AND cumplimiento <= 5

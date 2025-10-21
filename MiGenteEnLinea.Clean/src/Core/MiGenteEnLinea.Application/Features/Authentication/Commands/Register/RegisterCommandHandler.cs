@@ -1,33 +1,33 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiGenteEnLinea.Application.Common.Interfaces;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Domain.Entities.Authentication;
 using MiGenteEnLinea.Domain.Entities.Contratistas;
 using MiGenteEnLinea.Domain.Entities.Seguridad;
-using MiGenteEnLinea.Domain.Entities.Suscripciones;
+using MiGenteEnLinea.Domain.Interfaces.Repositories;
 
 namespace MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
 
 /// <summary>
 /// Handler para RegisterCommand
 /// Réplica EXACTA de SuscripcionesService.GuardarPerfil() del Legacy
+/// LOTE 6: Refactorizado completamente para usar IUnitOfWork
 /// </summary>
 public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResult>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork; // LOTE 6: Todas las entidades via repository pattern
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailService _emailService;
     private readonly ILogger<RegisterCommandHandler> _logger;
 
     public RegisterCommandHandler(
-        IApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
         IEmailService emailService,
         ILogger<RegisterCommandHandler> logger)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
         _emailService = emailService;
         _logger = logger;
@@ -39,9 +39,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         // PASO 1: VALIDAR QUE EL EMAIL NO EXISTA
         // ================================================================================
         // Legacy usa Cuentas.Email, Clean usa Credenciales.Email (mismo objetivo)
-        var emailLower = request.Email.ToLowerInvariant();
-        var emailExists = await _context.Credenciales
-            .AnyAsync(c => c.Email.Value.ToLowerInvariant() == emailLower, cancellationToken);
+        var emailExists = await _unitOfWork.Credenciales.ExistsByEmailAsync(request.Email, cancellationToken);
 
         if (emailExists)
         {
@@ -85,7 +83,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             );
         }
         
-        await _context.Perfiles.AddAsync(perfil, cancellationToken);
+        await _unitOfWork.Perfiles.AddAsync(perfil, cancellationToken);
 
         // ================================================================================
         // PASO 3: CREAR CREDENCIAL CON PASSWORD HASHEADO
@@ -96,11 +94,11 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         var email = Domain.ValueObjects.Email.Create(request.Email);
         var credencial = Credencial.Create(
             userId: userId,
-            email: email,
+            email: email!,
             passwordHash: _passwordHasher.HashPassword(request.Password)
         );
 
-        await _context.Credenciales.AddAsync(credencial, cancellationToken);
+        await _unitOfWork.Credenciales.AddAsync(credencial, cancellationToken);
 
         // ================================================================================
         // PASO 4: CREAR CONTRATISTA SI ES TIPO 2
@@ -116,7 +114,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
                 telefono1: request.Telefono1
             );
 
-            await _context.Contratistas.AddAsync(contratista, cancellationToken);
+            await _unitOfWork.Contratistas.AddAsync(contratista, cancellationToken);
         }
 
         // ================================================================================
@@ -133,13 +131,13 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
             duracionMeses: 1
         );
 
-        await _context.Suscripciones.AddAsync(suscripcion, cancellationToken);
+        await _unitOfWork.Suscripciones.AddAsync(suscripcion, cancellationToken);
         */
 
         // ================================================================================
-        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS
+        // PASO 6: GUARDAR CAMBIOS EN LA BASE DE DATOS (UN SOLO SaveChanges)
         // ================================================================================
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
             "Usuario registrado exitosamente. UserId: {UserId}, Email: {Email}, Tipo: {Tipo}",
@@ -152,10 +150,14 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         //         Genera URL: host + "/Activar.aspx?userID=" + userID + "&email=" + email
         try
         {
+            // Nueva firma: SendActivationEmailAsync(toEmail, toName, activationUrl)
+            var nombreCompleto = $"{request.Nombre} {request.Apellido}";
+            var activationUrl = $"{request.Host}/Activar.aspx?userID={userId}&email={request.Email}";
+            
             await _emailService.SendActivationEmailAsync(
-                email: request.Email,
-                userId: userId,
-                host: request.Host
+                toEmail: request.Email,
+                toName: nombreCompleto,
+                activationUrl: activationUrl
             );
 
             _logger.LogInformation("Email de activación enviado a: {Email}", request.Email);

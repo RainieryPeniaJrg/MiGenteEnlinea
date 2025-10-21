@@ -1,15 +1,23 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Common.Exceptions;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.AddProfileInfo;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.RefreshToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.RevokeToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfileExtended;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCredenciales;
+using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCuentaById;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfil;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfilByEmail;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreo;
+using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreoCuentaActual;
 
 namespace MiGenteEnLinea.API.Controllers;
 
@@ -35,52 +43,75 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Autenticar usuario con email y contraseña
+    /// Autenticar usuario con email y contraseña (JWT)
     /// </summary>
     /// <param name="command">Credenciales de login</param>
-    /// <returns>Resultado de autenticación con datos de sesión</returns>
-    /// <response code="200">Login exitoso - Retorna datos del usuario y su plan</response>
+    /// <returns>Tokens JWT y datos del usuario</returns>
+    /// <response code="200">Login exitoso - Retorna access token, refresh token y datos del usuario</response>
     /// <response code="401">Credenciales inválidas o cuenta inactiva</response>
     /// <response code="400">Datos de entrada inválidos</response>
     /// <remarks>
-    /// Códigos de StatusCode en respuesta:
-    /// - 2: Login exitoso
-    /// - 0: Credenciales inválidas
-    /// - -1: Cuenta inactiva
-    /// 
     /// Sample request:
     /// 
     ///     POST /api/auth/login
     ///     {
     ///        "email": "usuario@example.com",
-    ///        "password": "MiPassword123"
+    ///        "password": "MiPassword123",
+    ///        "ipAddress": "192.168.1.100"
     ///     }
     /// 
+    /// Sample response:
+    /// 
+    ///     {
+    ///        "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    ///        "refreshToken": "a1b2c3d4e5f6...",
+    ///        "accessTokenExpires": "2025-01-15T12:30:00Z",
+    ///        "refreshTokenExpires": "2025-01-22T11:15:00Z",
+    ///        "user": {
+    ///            "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///            "email": "usuario@example.com",
+    ///            "nombreCompleto": "Juan Pérez",
+    ///            "tipo": "1",
+    ///            "planId": 2,
+    ///            "vencimientoPlan": "2025-12-31T00:00:00Z",
+    ///            "roles": ["Empleador"]
+    ///        }
+    ///     }
+    /// 
+    /// IMPORTANTE:
+    /// - El ipAddress se obtiene automáticamente del HttpContext si no se provee
+    /// - El access token expira en 15 minutos
+    /// - El refresh token expira en 7 días
+    /// - Guardar el refresh token de forma segura para renovar el access token
     /// </remarks>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(LoginResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthenticationResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<LoginResult>> Login([FromBody] LoginCommand command)
+    public async Task<ActionResult<AuthenticationResultDto>> Login([FromBody] LoginCommand command)
     {
         _logger.LogInformation("POST /api/auth/login - Email: {Email}", command.Email);
 
-        var result = await _mediator.Send(command);
-
-        if (result.StatusCode == 0)
+        try
         {
-            _logger.LogWarning("Login fallido - Credenciales inválidas para: {Email}", command.Email);
-            return Unauthorized(new { message = "Credenciales inválidas" });
-        }
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
 
-        if (result.StatusCode == -1)
+            // Crear comando con IP
+            var loginCommand = command with { IpAddress = ipAddress };
+
+            var result = await _mediator.Send(loginCommand);
+
+            _logger.LogInformation("Login exitoso - UserId: {UserId}", result.User.UserId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
         {
-            _logger.LogWarning("Login fallido - Cuenta inactiva para: {Email}", command.Email);
-            return Unauthorized(new { message = "Cuenta inactiva. Por favor active su cuenta." });
+            _logger.LogWarning("Login fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
         }
-
-        _logger.LogInformation("Login exitoso - UserId: {UserId}", result.UserId);
-        return Ok(result);
     }
 
     /// <summary>
@@ -321,7 +352,101 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Actualizar perfil de usuario
+    /// Actualizar perfil completo de usuario (Perfile + PerfilesInfo)
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="command">Datos a actualizar (Perfile + PerfilesInfo opcionales)</param>
+    /// <returns>Resultado de la actualización</returns>
+    /// <response code="200">Perfil actualizado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Usuario no encontrado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.actualizarPerfil(perfilesInfo info, Cuentas cuenta) (línea 136)
+    /// 
+    /// LEGACY BEHAVIOR:
+    /// - Actualiza 2 entidades con 2 DbContexts separados
+    /// - db.Entry(info).State = Modified (perfilesInfo)
+    /// - db1.Entry(cuenta).State = Modified (Cuentas)
+    /// 
+    /// CLEAN ARCHITECTURE:
+    /// - Actualiza Perfile (antes Cuentas) + PerfilesInfo en 1 transacción
+    /// - Usa domain methods para garantizar invariantes
+    /// - PerfilesInfo es opcional (solo se actualiza si se proveen datos)
+    /// 
+    /// USO:
+    /// - Actualizar información básica del perfil (nombre, email, teléfonos)
+    /// - Actualizar información adicional (identificación, dirección, presentación)
+    /// - Actualizar foto de perfil
+    /// - Actualizar información del gerente (empresas)
+    /// 
+    /// Sample request (solo info básica):
+    /// 
+    ///     PUT /api/auth/perfil-completo/550e8400-e29b-41d4-a716-446655440000
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "nombre": "Juan Carlos",
+    ///        "apellido": "Pérez González",
+    ///        "email": "juan.perez@example.com",
+    ///        "telefono1": "809-555-1234",
+    ///        "telefono2": "809-555-5678",
+    ///        "usuario": "juancp"
+    ///     }
+    /// 
+    /// Sample request (con info adicional):
+    /// 
+    ///     PUT /api/auth/perfil-completo/550e8400-e29b-41d4-a716-446655440000
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "nombre": "Juan Carlos",
+    ///        "apellido": "Pérez González",
+    ///        "email": "juan.perez@example.com",
+    ///        "telefono1": "809-555-1234",
+    ///        "identificacion": "00112345678",
+    ///        "tipoIdentificacion": 1,
+    ///        "direccion": "Calle Principal #123",
+    ///        "presentacion": "Profesional con experiencia...",
+    ///        "nombreComercial": "Mi Empresa SRL",
+    ///        "cedulaGerente": "00198765432",
+    ///        "nombreGerente": "María",
+    ///        "apellidoGerente": "García"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPut("perfil-completo/{userId}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateProfileExtended(string userId, [FromBody] UpdateProfileExtendedCommand command)
+    {
+        if (userId != command.UserId)
+        {
+            return BadRequest(new { message = "El UserId del path no coincide con el del body" });
+        }
+
+        _logger.LogInformation("PUT /api/auth/perfil-completo/{UserId} - Email: {Email}", userId, command.Email);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning("Actualización de perfil extendido fallida - Usuario no encontrado: {UserId}", userId);
+                return NotFound(new { message = "Usuario no encontrado" });
+            }
+
+            _logger.LogInformation("Perfil extendido actualizado exitosamente - UserId: {UserId}", userId);
+            return Ok(new { message = "Perfil actualizado exitosamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error de validación al actualizar perfil extendido: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Actualizar perfil básico de usuario (solo Perfile)
     /// </summary>
     /// <param name="userId">ID del usuario (GUID)</param>
     /// <param name="command">Datos a actualizar</param>
@@ -330,7 +455,8 @@ public class AuthController : ControllerBase
     /// <response code="400">Datos inválidos</response>
     /// <response code="404">Usuario no encontrado</response>
     /// <remarks>
-    /// Réplica de LoginService.actualizarPerfil() del Legacy
+    /// Versión simplificada que solo actualiza información básica (Perfile)
+    /// Para actualizar también PerfilesInfo, usar PUT /api/auth/perfil-completo/{userId}
     /// 
     /// Sample request:
     /// 
@@ -378,4 +504,468 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Renovar access token usando refresh token (Token Refresh)
+    /// </summary>
+    /// <param name="command">Refresh token actual</param>
+    /// <returns>Nuevos tokens (access token + refresh token)</returns>
+    /// <response code="200">Tokens renovados exitosamente</response>
+    /// <response code="401">Refresh token inválido, expirado o revocado</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <remarks>
+    /// IMPORTANTE: Token Rotation (seguridad)
+    /// - El refresh token viejo se revoca automáticamente
+    /// - Se retorna un nuevo refresh token
+    /// - Cada refresh token solo puede usarse UNA VEZ
+    /// 
+    /// USO:
+    /// - Cuando el access token expira (15 minutos)
+    /// - NO se requieren credenciales nuevamente
+    /// - Experiencia de usuario fluida
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/refresh
+    ///     {
+    ///        "refreshToken": "a1b2c3d4e5f6g7h8...",
+    ///        "ipAddress": "192.168.1.100"
+    ///     }
+    /// 
+    /// Sample response (mismo formato que Login):
+    /// 
+    ///     {
+    ///        "accessToken": "eyJhbGciOiJIUzI1NiIs... (NUEVO)",
+    ///        "refreshToken": "x9y8z7w6v5u4... (NUEVO)",
+    ///        "accessTokenExpires": "2025-01-15T13:00:00Z",
+    ///        "refreshTokenExpires": "2025-01-22T12:45:00Z",
+    ///        "user": { ... }
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(AuthenticationResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthenticationResultDto>> RefreshToken([FromBody] RefreshTokenCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/refresh - IP: {IpAddress}", command.IpAddress);
+
+        try
+        {
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
+
+            // Crear comando con IP
+            var refreshCommand = command with { IpAddress = ipAddress };
+
+            var result = await _mediator.Send(refreshCommand);
+
+            _logger.LogInformation("Refresh token exitoso - UserId: {UserId}", result.User.UserId);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Refresh token fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Revocar refresh token (Logout)
+    /// </summary>
+    /// <param name="command">Refresh token a revocar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="204">Token revocado exitosamente</response>
+    /// <response code="401">Refresh token inválido</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <remarks>
+    /// USO:
+    /// - Logout de usuario (invalida el refresh token)
+    /// - Cambio de contraseña (revocar todos los tokens)
+    /// - Revocación por admin (seguridad)
+    /// 
+    /// IMPORTANTE:
+    /// - El refresh token revocado NO puede volver a usarse
+    /// - El access token actual sigue válido hasta que expire (max 15 min)
+    /// - Para logout inmediato, el cliente debe descartar el access token
+    /// - La operación es idempotente (revocar token ya revocado no falla)
+    /// 
+    /// Sample request:
+    /// 
+    ///     POST /api/auth/revoke
+    ///     {
+    ///        "refreshToken": "a1b2c3d4e5f6g7h8...",
+    ///        "ipAddress": "192.168.1.100",
+    ///        "reason": "User logout"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("revoke")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> RevokeToken([FromBody] RevokeTokenCommand command)
+    {
+        _logger.LogInformation("POST /api/auth/revoke - IP: {IpAddress}", command.IpAddress);
+
+        try
+        {
+            // Obtener IP del cliente si no se provee
+            var ipAddress = string.IsNullOrEmpty(command.IpAddress)
+                ? HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
+                : command.IpAddress;
+
+            // Crear comando con IP
+            var revokeCommand = command with { IpAddress = ipAddress };
+
+            await _mediator.Send(revokeCommand);
+
+            _logger.LogInformation("Refresh token revocado exitosamente");
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Revoke token fallido: {Message}", ex.Message);
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Eliminar credencial específica de un usuario
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="credentialId">ID de la credencial a eliminar</param>
+    /// <returns>204 No Content si se eliminó exitosamente</returns>
+    /// <response code="204">Credencial eliminada exitosamente</response>
+    /// <response code="400">Validación falló (ej: última credencial activa, userId inválido)</response>
+    /// <response code="404">Credencial no encontrada o no pertenece al usuario</response>
+    /// <response code="401">No autorizado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.borrarUsuario(string userID, int credencialID)
+    /// 
+    /// USO:
+    /// - Usuario elimina email alternativo
+    /// - Admin elimina credencial comprometida
+    /// - Limpieza de credenciales duplicadas
+    /// 
+    /// IMPORTANTE:
+    /// - No se puede eliminar la ÚLTIMA credencial activa del usuario
+    /// - Usuario necesita al menos 1 credencial activa para mantener acceso
+    /// - Se puede eliminar credencial inactiva sin restricciones
+    /// - Solo el propio usuario o admin pueden eliminar credenciales
+    /// 
+    /// MEJORA sobre Legacy:
+    /// - Legacy no validaba última credencial (podía dejar usuario sin acceso)
+    /// - Clean Architecture previene este error con validación explícita
+    /// 
+    /// Sample request:
+    /// 
+    ///     DELETE /api/auth/users/550e8400-e29b-41d4-a716-446655440000/credentials/5
+    /// 
+    /// </remarks>
+    [HttpDelete("users/{userId}/credentials/{credentialId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteUserCredential(
+        string userId,
+        int credentialId)
+    {
+        _logger.LogInformation(
+            "DELETE /api/auth/users/{UserId}/credentials/{CredentialId}",
+            userId,
+            credentialId);
+
+        try
+        {
+            var command = new DeleteUserCredentialCommand(userId, credentialId);
+            await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Credencial {CredentialId} eliminada exitosamente para usuario {UserId}",
+                credentialId,
+                userId);
+
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning("Credencial no encontrada: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogWarning("Validación falló: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Obtener perfil (Cuenta) por su ID
+    /// </summary>
+    /// <param name="cuentaId">ID de la cuenta (PerfilId)</param>
+    /// <returns>Datos del perfil</returns>
+    /// <response code="200">Perfil encontrado</response>
+    /// <response code="404">Perfil no encontrado</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.getPerfilByID(int cuentaID) (línea 179)
+    /// 
+    /// USO:
+    /// - Obtener datos de un perfil específico por su ID numérico
+    /// - Equivalente a GetPerfil pero usando cuentaID en vez de userId (GUID)
+    /// 
+    /// Sample request:
+    /// 
+    ///     GET /api/auth/cuenta/5
+    /// 
+    /// </remarks>
+    [HttpGet("cuenta/{cuentaId}")]
+    [ProducesResponseType(typeof(PerfilDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PerfilDto>> GetCuentaById(int cuentaId)
+    {
+        _logger.LogInformation("GET /api/auth/cuenta/{CuentaId}", cuentaId);
+
+        var result = await _mediator.Send(new GetCuentaByIdQuery(cuentaId));
+
+        if (result == null)
+        {
+            _logger.LogWarning("Perfil no encontrado para cuentaId: {CuentaId}", cuentaId);
+            return NotFound(new { message = "Perfil no encontrado" });
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Agregar información adicional del perfil (perfilesInfo)
+    /// </summary>
+    /// <param name="command">Datos adicionales del perfil</param>
+    /// <returns>ID del registro creado</returns>
+    /// <response code="201">Información de perfil agregada exitosamente</response>
+    /// <response code="400">Datos de entrada inválidos</response>
+    /// <response code="500">Error interno del servidor</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.agregarPerfilInfo(perfilesInfo info)
+    /// 
+    /// USO:
+    /// - Agregar información de identificación (cédula, RNC, pasaporte)
+    /// - Registrar empresa con nombre comercial
+    /// - Agregar dirección, presentación y foto de perfil
+    /// - Registrar información del gerente (solo empresas)
+    /// 
+    /// TIPOS DE PERFIL:
+    /// 1. **Persona Física**: Solo requiere Identificacion (cédula/pasaporte)
+    /// 2. **Empresa**: Requiere Identificacion (RNC) + NombreComercial
+    /// 
+    /// IMPORTANTE:
+    /// - Legacy NO valida si ya existe un perfil para el usuario (permite duplicados)
+    /// - Clean Architecture MANTIENE este comportamiento (paridad 100%)
+    /// - TipoIdentificacion: 1=Cédula, 2=Pasaporte, 3=RNC
+    /// - FotoPerfil se guarda como byte[] (base64 en JSON)
+    /// - InformacionGerente es opcional (solo empresas)
+    /// 
+    /// Sample request (Persona Física):
+    /// 
+    ///     POST /api/auth/profile-info
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "identificacion": "00112345678",
+    ///        "tipoIdentificacion": 1,
+    ///        "direccion": "Calle Principal #123, Santo Domingo",
+    ///        "presentacion": "Profesional con 10 años de experiencia..."
+    ///     }
+    /// 
+    /// Sample request (Empresa):
+    /// 
+    ///     POST /api/auth/profile-info
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "identificacion": "12345678901",
+    ///        "tipoIdentificacion": 3,
+    ///        "nombreComercial": "Mi Empresa SRL",
+    ///        "direccion": "Av. Winston Churchill #456",
+    ///        "cedulaGerente": "00198765432",
+    ///        "nombreGerente": "Juan",
+    ///        "apellidoGerente": "Pérez",
+    ///        "direccionGerente": "Calle Secundaria #789"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("profile-info")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<int>> AddProfileInfo([FromBody] AddProfileInfoCommand command)
+    {
+        _logger.LogInformation(
+            "POST /api/auth/profile-info - UserId: {UserId}, Identificacion: {Identificacion}",
+            command.UserId,
+            command.Identificacion);
+
+        try
+        {
+            var perfilInfoId = await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Información de perfil agregada exitosamente - PerfilInfoId: {PerfilInfoId}, UserId: {UserId}",
+                perfilInfoId,
+                command.UserId);
+
+            return CreatedAtAction(
+                nameof(AddProfileInfo),
+                new { id = perfilInfoId },
+                new { id = perfilInfoId, message = "Información de perfil agregada exitosamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Error de validación al agregar perfil info: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al agregar información de perfil para usuario {UserId}", command.UserId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
+
+    /// <summary>
+    /// Method #24: Eliminar una credencial específica de un usuario
+    /// </summary>
+    /// <param name="userId">ID del usuario propietario</param>
+    /// <param name="credentialId">ID de la credencial a eliminar</param>
+    /// <returns>204 No Content si se eliminó exitosamente</returns>
+    /// <response code="204">Credencial eliminada exitosamente</response>
+    /// <response code="400">Validación falló (ej: última credencial activa)</response>
+    /// <response code="404">Credencial no encontrada</response>
+    /// <response code="401">No autorizado</response>
+    /// <remarks>
+    /// Migrado de: LoginService.borrarUsuario(string userID, int credencialID) - line 108
+    /// 
+    /// **Ejemplo de Request:**
+    /// 
+    ///     DELETE /api/auth/users/550e8400-e29b-41d4-a716-446655440000/credentials/123
+    /// 
+    /// **Business Rules:**
+    /// - Usuario debe tener al menos 1 credencial activa (no puede eliminar la última)
+    /// - Solo el propio usuario puede eliminar sus credenciales
+    /// - Se valida que la credencial exista y pertenezca al usuario
+    /// 
+    /// </remarks>
+    [HttpDelete("users/{userId}/credentials/{credentialId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteUserCredential(string userId, int credentialId)
+    {
+        _logger.LogInformation(
+            "DELETE /api/auth/users/{UserId}/credentials/{CredentialId}",
+            userId,
+            credentialId);
+
+        try
+        {
+            var command = new DeleteUserCredentialCommand(userId, credentialId);
+            await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Credencial {CredentialId} eliminada exitosamente para usuario {UserId}",
+                credentialId,
+                userId);
+
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning("Credencial no encontrada: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogWarning("Error de validación: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar credencial {CredentialId} del usuario {UserId}", credentialId, userId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
+
+    /// <summary>
+    /// Method #47: Validar si un correo electrónico pertenece a la cuenta actual del usuario
+    /// </summary>
+    /// <param name="email">Correo electrónico a validar</param>
+    /// <param name="userId">ID del usuario propietario de la cuenta</param>
+    /// <returns>true si el correo pertenece al usuario, false si no</returns>
+    /// <response code="200">Validación exitosa (true/false)</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <remarks>
+    /// Migrado desde: SuscripcionesService.validarCorreoCuentaActual(string correo, string userID) - línea 220
+    /// 
+    /// **Ejemplo de Request:**
+    /// 
+    ///     GET /api/auth/validar-correo-cuenta?email=usuario@ejemplo.com&amp;userId=550e8400-e29b-41d4-a716-446655440000
+    /// 
+    /// **Business Rules:**
+    /// - Valida que el correo exista Y pertenezca al userID específico
+    /// - Usado antes de cambios de email para verificar propiedad
+    /// - Previene conflictos cuando usuario intenta cambiar a email de otra cuenta
+    /// - Retorna true solo si email existe y pertenece al usuario
+    /// 
+    /// **Use Cases:**
+    /// - Validación en formulario de cambio de email
+    /// - Verificación de propiedad de cuenta
+    /// - Prevención de duplicados
+    /// </remarks>
+    [HttpGet("validar-correo-cuenta")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ValidarCorreoCuentaActual(
+        [FromQuery] string email,
+        [FromQuery] string userId)
+    {
+        _logger.LogInformation(
+            "GET /api/auth/validar-correo-cuenta?email={Email}&userId={UserId}",
+            email,
+            userId);
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest(new { message = "Email y userId son requeridos" });
+        }
+
+        try
+        {
+            var query = new ValidarCorreoCuentaActualQuery(email, userId);
+            var esValido = await _mediator.Send(query);
+
+            _logger.LogInformation(
+                "Validación correo-cuenta: Email={Email}, UserId={UserId}, Resultado={Resultado}",
+                email,
+                userId,
+                esValido ? "VÁLIDO" : "INVÁLIDO");
+
+            return Ok(new { esValido, message = esValido 
+                ? "El correo pertenece al usuario" 
+                : "El correo no pertenece al usuario o no existe" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al validar correo-cuenta: Email={Email}, UserId={UserId}", email, userId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
 }
+

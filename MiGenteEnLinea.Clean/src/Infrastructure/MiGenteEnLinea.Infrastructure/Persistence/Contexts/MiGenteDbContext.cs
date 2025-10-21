@@ -16,10 +16,18 @@ using MiGenteEnLinea.Domain.Entities.Configuracion;
 using MiGenteEnLinea.Domain.ReadModels;
 using Microsoft.EntityFrameworkCore;
 using MiGenteEnLinea.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using MiGenteEnLinea.Infrastructure.Identity;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 
-public partial class MiGenteDbContext : DbContext, IApplicationDbContext
+/// <summary>
+/// DbContext principal que combina:
+/// 1. ASP.NET Core Identity (autenticación/autorización)
+/// 2. Entidades de negocio DDD (Legacy migradas)
+/// 3. Read Models (Views de base de datos)
+/// </summary>
+public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
 {
     public MiGenteDbContext(DbContextOptions<MiGenteDbContext> options)
         : base(options)
@@ -38,6 +46,17 @@ public partial class MiGenteDbContext : DbContext, IApplicationDbContext
     // Suscripciones y PlanesEmpleadores ya coinciden con los nombres de interfaz
 
     // ========================================
+    // ASP.NET CORE IDENTITY ENTITIES
+    // ========================================
+    // ApplicationUser ya está definido por IdentityDbContext<ApplicationUser>
+    // AspNetUsers, AspNetRoles, AspNetUserRoles, etc. se crean automáticamente
+    
+    /// <summary>
+    /// Refresh tokens para autenticación JWT
+    /// </summary>
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    // ========================================
     // DATABASE ENTITIES
     // ========================================
 
@@ -52,6 +71,12 @@ public partial class MiGenteDbContext : DbContext, IApplicationDbContext
 
     // DDD Refactored entity (replaces legacy ConfigCorreo)
     public virtual DbSet<Domain.Entities.Configuracion.ConfigCorreo> ConfigCorreos { get; set; }
+
+    /// <summary>
+    /// Configuración del bot OpenAI (tabla: OpenAi_Config)
+    /// ⚠️ SECURITY WARNING: Contiene API keys sensibles
+    /// </summary>
+    public virtual DbSet<Domain.Entities.Configuracion.OpenAiConfig> OpenAiConfigs { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Contratista> ContratistasLegacy { get; set; }
@@ -100,6 +125,9 @@ public partial class MiGenteDbContext : DbContext, IApplicationDbContext
 
     // DDD Refactored entity (replaces legacy Empleado)
     public virtual DbSet<Domain.Entities.Empleados.Empleado> Empleados { get; set; }
+
+    // Legacy entity (Generated - no DDD refactoring needed for simple tables)
+    public virtual DbSet<Remuneracione> Remuneraciones { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<EmpleadorRecibosDetalle> EmpleadorRecibosDetallesLegacy { get; set; }
@@ -284,6 +312,55 @@ public partial class MiGenteDbContext : DbContext, IApplicationDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // CRITICAL: Call base method to configure Identity tables
+        base.OnModelCreating(modelBuilder);
+
+        // ========================================
+        // ASP.NET CORE IDENTITY CONFIGURATION
+        // ========================================
+        
+        // Customize Identity table names (optional - can keep defaults)
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.ToTable("AspNetUsers");
+            // ApplicationUser custom properties already defined in class
+        });
+
+        // Configure RefreshToken entity
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshTokens");
+            
+            entity.HasKey(e => e.Id);
+            
+            // Token must be unique
+            entity.HasIndex(e => e.Token)
+                .IsUnique()
+                .HasDatabaseName("IX_RefreshTokens_Token");
+            
+            // Relationship: ApplicationUser (1) -> RefreshTokens (many)
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade) // Delete tokens when user is deleted
+                .HasConstraintName("FK_RefreshTokens_AspNetUsers_UserId");
+            
+            // String length constraints
+            entity.Property(e => e.Token).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.UserId).HasMaxLength(450).IsRequired(); // AspNetUsers.Id is nvarchar(450)
+            entity.Property(e => e.ReplacedByToken).HasMaxLength(200);
+            entity.Property(e => e.ReasonRevoked).HasMaxLength(500);
+            entity.Property(e => e.CreatedByIp).HasMaxLength(50);
+            entity.Property(e => e.RevokedByIp).HasMaxLength(50);
+            
+            // Default values
+            entity.Property(e => e.Created).HasDefaultValueSql("GETUTCDATE()");
+        });
+
+        // ========================================
+        // DOMAIN ENTITIES CONFIGURATION
+        // ========================================
+        
         // Ignore domain events - they should NOT be persisted to database
         modelBuilder.Ignore<MiGenteEnLinea.Domain.Common.DomainEvent>();
         

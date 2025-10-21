@@ -31,4 +31,7 @@ public partial class VpagosContratacione
 
     [Column("contratacionID")]
     public int? ContratacionId { get; set; }
+
+    [Column("detalleID")]
+    public int? DetalleId { get; set; }
 }

@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using MiGenteEnLinea.Application.Features.Dashboard.Services;
 
 namespace MiGenteEnLinea.Application;
 
@@ -33,6 +34,12 @@ public static class DependencyInjection
         // AUTOMAPPER (Object Mapping)
         // ========================================
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+        // ========================================
+        // MEMORY CACHE & DASHBOARD CACHING
+        // ========================================
+        services.AddMemoryCache();
+        services.AddScoped<IDashboardCacheService, DashboardCacheService>();
 
         return services;
     }

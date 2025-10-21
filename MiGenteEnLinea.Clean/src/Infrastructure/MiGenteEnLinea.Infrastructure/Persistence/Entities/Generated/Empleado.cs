@@ -144,4 +144,7 @@ public partial class Empleado
 
     [InverseProperty("Empleado")]
     public virtual ICollection<EmpleadorRecibosHeader> EmpleadorRecibosHeaders { get; set; } = new List<EmpleadorRecibosHeader>();
+
+    [InverseProperty("Empleado")]
+    public virtual ICollection<Remuneracione> Remuneraciones { get; set; } = new List<Remuneracione>();
 }

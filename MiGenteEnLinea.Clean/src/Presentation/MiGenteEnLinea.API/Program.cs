@@ -1,27 +1,45 @@
 using MiGenteEnLinea.Infrastructure;
 using MiGenteEnLinea.Application;
 using Serilog;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ========================================
 // CONFIGURACIÓN DE LOGGING CON SERILOG
 // ========================================
-Log.Logger = new LoggerConfiguration()
+var loggerConfig = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "MiGenteEnLinea.API")
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName)
     .WriteTo.Console()
-    .WriteTo.File("logs/migente-.txt", rollingInterval: RollingInterval.Day)
-    .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
-        {
-            TableName = "Logs",
-            AutoCreateSqlTable = true
-        })
-    .CreateLogger();
+    .WriteTo.File("logs/migente-.txt", rollingInterval: RollingInterval.Day);
+
+// Intentar agregar SQL Server sink (opcional si DB no está disponible)
+try
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        loggerConfig.WriteTo.MSSqlServer(
+            connectionString: connectionString,
+            sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+            {
+                TableName = "Logs",
+                AutoCreateSqlTable = true
+            });
+        Console.WriteLine("✅ Serilog: SQL Server sink configurado");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"⚠️ Serilog: No se pudo conectar a SQL Server para logs. Continuando con Console y File sinks. Error: {ex.Message}");
+}
+
+Log.Logger = loggerConfig.CreateLogger();
 
 builder.Host.UseSerilog();
 
@@ -69,15 +87,15 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // TODO: Descomentar cuando se implemente JWT
-    /*
+    // JWT Authentication en Swagger
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando el esquema Bearer. Ejemplo: 'Bearer {token}'",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
 
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -94,8 +112,63 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-    */
 });
+
+// ========================================
+// JWT AUTHENTICATION
+// ========================================
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["SecretKey"];
+
+if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+{
+    throw new InvalidOperationException("JWT SecretKey debe tener al menos 32 caracteres. Configurar en appsettings.json o User Secrets.");
+}
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment(); // Solo HTTP en desarrollo
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ClockSkew = TimeSpan.Zero // Sin tolerancia de tiempo
+    };
+
+    // Logging de eventos de autenticación
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Log.Warning("JWT Authentication failed: {Error}", context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            Log.Information("JWT validated for user: {UserId}", userId);
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Log.Warning("JWT Challenge: {Error}", context.Error);
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // ========================================
 // CORS (permitir frontend localhost)
@@ -168,8 +241,8 @@ else
     app.UseCors("ProductionPolicy");
 }
 
-// Authentication & Authorization (TODO: Habilitar cuando JWT esté implementado)
-// app.UseAuthentication();
+// Authentication & Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Map Controllers
