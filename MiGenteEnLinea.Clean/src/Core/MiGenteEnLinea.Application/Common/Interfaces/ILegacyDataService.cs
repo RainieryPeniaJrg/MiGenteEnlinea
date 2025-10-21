@@ -149,4 +149,13 @@ public interface ILegacyDataService
     Task<List<EmpleadoTemporalDto>> GetTodosLosTemporalesAsync(
         string userId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene VistaContratacionTemporal por contratacionID y userID
+    /// Migrado de: EmpleadosService.obtenerVistaTemporal(int contratacionID, string userID) - line 554
+    /// </summary>
+    Task<VistaContratacionTemporalDto?> GetVistaContratacionTemporalAsync(
+        int contratacionId,
+        string userId,
+        CancellationToken cancellationToken = default);
 }

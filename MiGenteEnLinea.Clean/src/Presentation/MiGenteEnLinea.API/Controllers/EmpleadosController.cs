@@ -36,6 +36,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboContratacio
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetPagosContrataciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetFichaTemporales;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetTodosLosTemporales;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetVistaContratacionTemporal;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -576,6 +577,38 @@ public class EmpleadosController : ControllerBase
         var result = await _mediator.Send(query);
 
         return Ok(result); // Empty list is valid, not 404
+    }
+
+    /// <summary>
+    /// Obtener vista completa de contratación temporal.
+    /// Migrado de: EmpleadosService.obtenerVistaTemporal (line 554).
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="userId">ID del usuario</param>
+    /// <returns>Vista completa con información del contratista y proyecto</returns>
+    /// <response code="200">Vista obtenida exitosamente</response>
+    /// <response code="404">Vista no encontrada</response>
+    [HttpGet("temporales/vista")]
+    [ProducesResponseType(typeof(VistaContratacionTemporalDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<VistaContratacionTemporalDto>> GetVistaContratacionTemporal(
+        [FromQuery] int contratacionId,
+        [FromQuery] string userId)
+    {
+        var query = new GetVistaContratacionTemporalQuery
+        {
+            ContratacionId = contratacionId,
+            UserId = userId
+        };
+
+        var result = await _mediator.Send(query);
+
+        if (result == null)
+        {
+            return NotFound($"No se encontró vista temporal con ContratacionId={contratacionId} y UserId={userId}");
+        }
+
+        return Ok(result);
     }
 
     /// <summary>

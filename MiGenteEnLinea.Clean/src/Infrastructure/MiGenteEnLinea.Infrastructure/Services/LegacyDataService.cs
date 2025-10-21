@@ -585,5 +585,55 @@ public class LegacyDataService : ILegacyDataService
 
         return empleadosTemporales;
     }
+
+    /// <summary>
+    /// Obtiene VistaContratacionTemporal por contratacionID y userID
+    /// Migrado de: EmpleadosService.obtenerVistaTemporal(int contratacionID, string userID) - line 554
+    /// </summary>
+    public async Task<VistaContratacionTemporalDto?> GetVistaContratacionTemporalAsync(
+        int contratacionId,
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Query VistaContratacionTemporal view
+        var vista = await _context.VistasContratacionTemporal
+            .Where(x => x.UserId == userId && x.ContratacionId == contratacionId)
+            .Select(v => new VistaContratacionTemporalDto
+            {
+                ContratacionId = v.ContratacionId,
+                UserId = v.UserId,
+                FechaRegistro = v.FechaRegistro,
+                Tipo = v.Tipo,
+                NombreComercial = v.NombreComercial,
+                Rnc = v.Rnc,
+                Identificacion = v.Identificacion,
+                Nombre = v.Nombre,
+                Apellido = v.Apellido,
+                Alias = v.Alias,
+                Direccion = v.Direccion,
+                Provincia = v.Provincia,
+                Municipio = v.Municipio,
+                Telefono1 = v.Telefono1,
+                Telefono2 = v.Telefono2,
+                DetalleId = v.DetalleId,
+                Expr1 = v.Expr1,
+                DescripcionCorta = v.DescripcionCorta,
+                DescripcionAmpliada = v.DescripcionAmpliada,
+                FechaInicio = v.FechaInicio,
+                FechaFinal = v.FechaFinal,
+                MontoAcordado = v.MontoAcordado,
+                EsquemaPagos = v.EsquemaPagos,
+                Estatus = v.Estatus,
+                ComposicionNombre = v.ComposicionNombre,
+                ComposicionId = v.ComposicionId,
+                Conocimientos = v.Conocimientos,
+                Puntualidad = v.Puntualidad,
+                Recomendacion = v.Recomendacion,
+                Cumplimiento = v.Cumplimiento
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return vista;
+    }
 }
 
