@@ -32,6 +32,12 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Calificaciones.Calificacion> Calificaciones { get; }
     DbSet<Domain.Entities.Contrataciones.DetalleContratacion> DetalleContrataciones { get; }
     
+    /// <summary>
+    /// Configuración del bot OpenAI (tabla: OpenAi_Config)
+    /// ⚠️ SECURITY WARNING: Contiene API keys sensibles
+    /// </summary>
+    DbSet<Domain.Entities.Configuracion.OpenAiConfig> OpenAiConfigs { get; }
+    
     // Read Models (Views)
     DbSet<VistaPerfil> VPerfiles { get; }
     

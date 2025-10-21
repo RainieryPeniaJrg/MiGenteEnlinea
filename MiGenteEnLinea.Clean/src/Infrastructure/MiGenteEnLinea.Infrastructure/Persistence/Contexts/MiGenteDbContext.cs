@@ -72,6 +72,12 @@ public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApp
     // DDD Refactored entity (replaces legacy ConfigCorreo)
     public virtual DbSet<Domain.Entities.Configuracion.ConfigCorreo> ConfigCorreos { get; set; }
 
+    /// <summary>
+    /// Configuración del bot OpenAI (tabla: OpenAi_Config)
+    /// ⚠️ SECURITY WARNING: Contiene API keys sensibles
+    /// </summary>
+    public virtual DbSet<Domain.Entities.Configuracion.OpenAiConfig> OpenAiConfigs { get; set; }
+
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<Infrastructure.Persistence.Entities.Generated.Contratista> ContratistasLegacy { get; set; }
 

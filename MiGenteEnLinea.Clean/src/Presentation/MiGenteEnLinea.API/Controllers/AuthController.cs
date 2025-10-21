@@ -17,6 +17,7 @@ using MiGenteEnLinea.Application.Features.Authentication.Queries.GetCuentaById;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfil;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfilByEmail;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreo;
+using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreoCuentaActual;
 
 namespace MiGenteEnLinea.API.Controllers;
 
@@ -894,6 +895,73 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error al eliminar credencial {CredentialId} del usuario {UserId}", credentialId, userId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
+
+    /// <summary>
+    /// Method #47: Validar si un correo electrónico pertenece a la cuenta actual del usuario
+    /// </summary>
+    /// <param name="email">Correo electrónico a validar</param>
+    /// <param name="userId">ID del usuario propietario de la cuenta</param>
+    /// <returns>true si el correo pertenece al usuario, false si no</returns>
+    /// <response code="200">Validación exitosa (true/false)</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <remarks>
+    /// Migrado desde: SuscripcionesService.validarCorreoCuentaActual(string correo, string userID) - línea 220
+    /// 
+    /// **Ejemplo de Request:**
+    /// 
+    ///     GET /api/auth/validar-correo-cuenta?email=usuario@ejemplo.com&amp;userId=550e8400-e29b-41d4-a716-446655440000
+    /// 
+    /// **Business Rules:**
+    /// - Valida que el correo exista Y pertenezca al userID específico
+    /// - Usado antes de cambios de email para verificar propiedad
+    /// - Previene conflictos cuando usuario intenta cambiar a email de otra cuenta
+    /// - Retorna true solo si email existe y pertenece al usuario
+    /// 
+    /// **Use Cases:**
+    /// - Validación en formulario de cambio de email
+    /// - Verificación de propiedad de cuenta
+    /// - Prevención de duplicados
+    /// </remarks>
+    [HttpGet("validar-correo-cuenta")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ValidarCorreoCuentaActual(
+        [FromQuery] string email,
+        [FromQuery] string userId)
+    {
+        _logger.LogInformation(
+            "GET /api/auth/validar-correo-cuenta?email={Email}&userId={UserId}",
+            email,
+            userId);
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest(new { message = "Email y userId son requeridos" });
+        }
+
+        try
+        {
+            var query = new ValidarCorreoCuentaActualQuery(email, userId);
+            var esValido = await _mediator.Send(query);
+
+            _logger.LogInformation(
+                "Validación correo-cuenta: Email={Email}, UserId={UserId}, Resultado={Resultado}",
+                email,
+                userId,
+                esValido ? "VÁLIDO" : "INVÁLIDO");
+
+            return Ok(new { esValido, message = esValido 
+                ? "El correo pertenece al usuario" 
+                : "El correo no pertenece al usuario o no existe" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al validar correo-cuenta: Email={Email}, UserId={UserId}", email, userId);
             return StatusCode(
                 StatusCodes.Status500InternalServerError,
                 new { message = "Error interno al procesar la solicitud" });
