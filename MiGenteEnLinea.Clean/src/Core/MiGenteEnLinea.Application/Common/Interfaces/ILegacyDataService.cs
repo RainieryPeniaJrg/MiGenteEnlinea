@@ -158,4 +158,12 @@ public interface ILegacyDataService
         int contratacionId,
         string userId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene Recibo Header completo con Detalle y Empleado por PagoID
+    /// Migrado de: EmpleadosService.GetEmpleador_ReciboByPagoID(int pagoID) - line 212
+    /// </summary>
+    Task<ReciboHeaderCompletoDto?> GetReciboHeaderByPagoIdAsync(
+        int pagoId,
+        CancellationToken cancellationToken = default);
 }

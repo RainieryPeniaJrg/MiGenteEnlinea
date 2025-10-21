@@ -635,5 +635,63 @@ public class LegacyDataService : ILegacyDataService
 
         return vista;
     }
+
+    /// <summary>
+    /// Method #21: Obtiene Empleador_Recibos_Header completo con Detalle y Empleado
+    /// Migrado de: EmpleadosService.GetEmpleador_ReciboByPagoID(int pagoID) - line 212
+    /// Legacy: db.Empleador_Recibos_Header.Where(x => x.pagoID == pagoID)
+    ///         .Include(h => h.Empleador_Recibos_Detalle)
+    ///         .Include(f => f.Empleados).FirstOrDefault()
+    /// </summary>
+    public async Task<ReciboHeaderCompletoDto?> GetReciboHeaderByPagoIdAsync(
+        int pagoId,
+        CancellationToken cancellationToken = default)
+    {
+        var recibo = await _context
+            .Set<EmpleadorRecibosHeader>()
+            .Where(x => x.PagoId == pagoId)
+            .Select(h => new ReciboHeaderCompletoDto
+            {
+                // Map header fields
+                PagoId = h.PagoId,
+                UserId = h.UserId,
+                EmpleadoId = h.EmpleadoId,
+                FechaRegistro = h.FechaRegistro,
+                FechaPago = h.FechaPago,
+                ConceptoPago = h.ConceptoPago,
+                Tipo = h.Tipo,
+                
+                // Nested Select for Detalles (1:N)
+                Detalles = _context
+                    .Set<EmpleadorRecibosDetalle>()
+                    .Where(d => d.PagoId == h.PagoId)
+                    .Select(d => new EmpleadorReciboDetalleDto
+                    {
+                        DetalleId = d.DetalleId,
+                        PagoId = d.PagoId,
+                        Concepto = d.Concepto,
+                        Monto = d.Monto
+                    })
+                    .ToList(),
+                
+                // Nested Select for Empleado (1:1)
+                Empleado = h.EmpleadoId.HasValue
+                    ? _context
+                        .Set<Empleado>()
+                        .Where(e => e.EmpleadoId == h.EmpleadoId.Value)
+                        .Select(e => new EmpleadoBasicoDto
+                        {
+                            EmpleadoId = e.EmpleadoId,
+                            Nombre = e.Nombre,
+                            Apellido = e.Apellido,
+                            Identificacion = e.Identificacion
+                        })
+                        .FirstOrDefault()
+                    : null
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        return recibo;
+    }
 }
 

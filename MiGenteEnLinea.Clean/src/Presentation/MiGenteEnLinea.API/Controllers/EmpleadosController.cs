@@ -37,6 +37,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetPagosContratacion
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetFichaTemporales;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetTodosLosTemporales;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetVistaContratacionTemporal;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboHeaderByPagoId;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -608,6 +609,30 @@ public class EmpleadosController : ControllerBase
             return NotFound($"No se encontró vista temporal con ContratacionId={contratacionId} y UserId={userId}");
         }
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Method #21: Obtener recibo completo por pagoId con detalle y empleado
+    /// Migrado de: EmpleadosService.GetEmpleador_ReciboByPagoID(int pagoID) - line 212
+    /// </summary>
+    /// <param name="pagoId">ID del pago (PK de Empleador_Recibos_Header)</param>
+    /// <returns>Recibo completo con header, detalles y datos del empleado</returns>
+    /// <response code="200">Recibo obtenido exitosamente</response>
+    /// <response code="404">No se encontró el recibo</response>
+    [HttpGet("recibos/{pagoId}")]
+    [ProducesResponseType(typeof(ReciboHeaderCompletoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ReciboHeaderCompletoDto>> GetReciboHeaderByPagoId(int pagoId)
+    {
+        var query = new GetReciboHeaderByPagoIdQuery { PagoId = pagoId };
+        var result = await _mediator.Send(query);
+        
+        if (result == null)
+        {
+            return NotFound($"No se encontró el recibo con PagoId: {pagoId}");
+        }
+        
         return Ok(result);
     }
 
