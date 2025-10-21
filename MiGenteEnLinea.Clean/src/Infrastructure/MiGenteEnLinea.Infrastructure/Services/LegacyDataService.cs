@@ -515,5 +515,75 @@ public class LegacyDataService : ILegacyDataService
 
         return empleadoTemporal;
     }
+
+    /// <summary>
+    /// Obtiene todos los EmpleadosTemporales de un usuario con transformación de nombres
+    /// Migrado de: EmpleadosService.obtenerTodosLosTemporales(string userID) - line 526
+    /// 
+    /// BUSINESS LOGIC (copied from Legacy):
+    ///   - tipo == 1 (Individual): Nombre = Nombre + Apellido
+    ///   - tipo == 2 (Business): Nombre = NombreComercial, Identificacion = Rnc
+    /// </summary>
+    public async Task<List<EmpleadoTemporalDto>> GetTodosLosTemporalesAsync(
+        string userId,
+        CancellationToken cancellationToken = default)
+    {
+        // Legacy: Query EmpleadosTemporales by userID with Include
+        var empleadosTemporales = await _context
+            .Set<EmpleadosTemporale>()
+            .Where(x => x.UserId == userId)
+            .Select(e => new EmpleadoTemporalDto
+            {
+                ContratacionId = e.ContratacionId,
+                UserId = e.UserId,
+                FechaRegistro = e.FechaRegistro,
+                Tipo = e.Tipo,
+                NombreComercial = e.NombreComercial,
+                Rnc = e.Rnc,
+                Nombre = e.Nombre,
+                Apellido = e.Apellido,
+                Identificacion = e.Identificacion,
+                Telefono1 = e.Telefono1,
+                Direccion = e.Direccion,
+                // Include DetalleContrataciones
+                Detalle = _context.Set<DetalleContratacione>()
+                    .Where(d => d.ContratacionId == e.ContratacionId)
+                    .Select(d => new DetalleContratacionDto
+                    {
+                        DetalleId = d.DetalleId,
+                        ContratacionId = d.ContratacionId,
+                        DescripcionCorta = d.DescripcionCorta,
+                        DescripcionAmpliada = d.DescripcionAmpliada,
+                        FechaInicio = d.FechaInicio,
+                        FechaFinal = d.FechaFinal,
+                        MontoAcordado = d.MontoAcordado,
+                        EsquemaPagos = d.EsquemaPagos,
+                        Estatus = d.Estatus,
+                        Calificado = d.Calificado,
+                        CalificacionId = d.CalificacionId
+                    })
+                    .FirstOrDefault()
+            })
+            .ToListAsync(cancellationToken);
+
+        // Legacy post-processing: Transform names based on tipo
+        foreach (var empleado in empleadosTemporales)
+        {
+            if (empleado.Tipo == 1) // Individual
+            {
+                // Concatenate nombre + apellido
+                empleado.Nombre = empleado.Nombre + " " + empleado.Apellido;
+            }
+            else if (empleado.Tipo == 2) // Business
+            {
+                // Use nombreComercial as nombre
+                empleado.Nombre = empleado.NombreComercial;
+                // Use rnc as identificacion
+                empleado.Identificacion = empleado.Rnc;
+            }
+        }
+
+        return empleadosTemporales;
+    }
 }
 

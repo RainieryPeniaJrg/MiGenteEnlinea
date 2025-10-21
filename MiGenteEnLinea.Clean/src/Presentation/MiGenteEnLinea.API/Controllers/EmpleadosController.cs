@@ -35,6 +35,7 @@ using MiGenteEnLinea.Application.Features.Empleados.Queries.GetDeduccionesTss;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetReciboContratacion;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetPagosContrataciones;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.GetFichaTemporales;
+using MiGenteEnLinea.Application.Features.Empleados.Queries.GetTodosLosTemporales;
 using MiGenteEnLinea.Application.Features.Empleados.Queries.ConsultarPadron;
 using MiGenteEnLinea.Application.Features.Empleados.DTOs;
 
@@ -548,6 +549,33 @@ public class EmpleadosController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Obtener todos los empleados temporales de un usuario (con transformación de nombres).
+    /// Migrado de: EmpleadosService.obtenerTodosLosTemporales (line 526).
+    /// Aplica lógica de negocio:
+    ///   - tipo==1: Nombre = Nombre + Apellido
+    ///   - tipo==2: Nombre = NombreComercial, Identificacion = Rnc
+    /// </summary>
+    /// <param name="userId">ID del usuario</param>
+    /// <returns>Lista de empleados temporales con nombres transformados</returns>
+    /// <response code="200">Lista obtenida exitosamente (puede ser vacía)</response>
+    /// <response code="400">UserId no proporcionado</response>
+    [HttpGet("temporales/todos")]
+    [ProducesResponseType(typeof(List<EmpleadoTemporalDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<EmpleadoTemporalDto>>> GetTodosLosTemporales(
+        [FromQuery] string userId)
+    {
+        var query = new GetTodosLosTemporalesQuery
+        {
+            UserId = userId
+        };
+
+        var result = await _mediator.Send(query);
+
+        return Ok(result); // Empty list is valid, not 404
     }
 
     /// <summary>

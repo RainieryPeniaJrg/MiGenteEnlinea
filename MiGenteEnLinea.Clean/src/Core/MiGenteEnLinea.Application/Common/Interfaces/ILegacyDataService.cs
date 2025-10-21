@@ -138,4 +138,15 @@ public interface ILegacyDataService
         int contratacionId,
         string userId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtiene todos los EmpleadosTemporales de un usuario con transformación de nombres
+    /// Migrado de: EmpleadosService.obtenerTodosLosTemporales(string userID) - line 526
+    /// Business Logic:
+    ///   - tipo == 1 (Individual): Nombre = Nombre + Apellido
+    ///   - tipo == 2 (Business): Nombre = NombreComercial, Identificacion = Rnc
+    /// </summary>
+    Task<List<EmpleadoTemporalDto>> GetTodosLosTemporalesAsync(
+        string userId,
+        CancellationToken cancellationToken = default);
 }
