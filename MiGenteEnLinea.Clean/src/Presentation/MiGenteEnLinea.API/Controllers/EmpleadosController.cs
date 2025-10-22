@@ -620,7 +620,7 @@ public class EmpleadosController : ControllerBase
     /// <returns>Recibo completo con header, detalles y datos del empleado</returns>
     /// <response code="200">Recibo obtenido exitosamente</response>
     /// <response code="404">No se encontró el recibo</response>
-    [HttpGet("recibos/{pagoId}")]
+    [HttpGet("recibos/completo/{pagoId}")]
     [ProducesResponseType(typeof(ReciboHeaderCompletoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ReciboHeaderCompletoDto>> GetReciboHeaderByPagoId(int pagoId)
@@ -900,7 +900,7 @@ public class EmpleadosController : ControllerBase
     /// <response code="200">Recibo encontrado</response>
     /// <response code="404">Recibo no encontrado</response>
     /// <response code="401">No autenticado</response>
-    [HttpGet("recibos/{pagoId}")]
+    [HttpGet("recibos/detalle/{pagoId}")]
     [ProducesResponseType(typeof(ReciboDetalleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
