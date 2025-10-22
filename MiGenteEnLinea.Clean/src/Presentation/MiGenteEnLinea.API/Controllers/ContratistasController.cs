@@ -307,37 +307,6 @@ public class ContratistasController : ControllerBase
     ///         return result;
     ///     }
     /// }
-    /// </code>
-    /// 
-    /// **Business Rules:**
-    /// - Retorna todos los servicios asociados a un contratista
-    /// - Los servicios son strings descriptivos (ej: "Plomería", "Electricidad")
-    /// - Usados para filtrar búsquedas en marketplace
-    /// </remarks>
-    [HttpGet("{contratistaId}/servicios")]
-    [ProducesResponseType(typeof(List<Application.Features.Contratistas.Common.ServicioDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetServiciosContratista(int contratistaId)
-    {
-        _logger.LogInformation("Obteniendo servicios del contratista: {ContratistaId}", contratistaId);
-
-        try
-        {
-            var query = new GetServiciosContratistaQuery(contratistaId);
-            var servicios = await _mediator.Send(query);
-
-            _logger.LogInformation("Servicios obtenidos: {Count} registros para contratista {ContratistaId}", 
-                servicios.Count, contratistaId);
-
-            return Ok(servicios);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(ex, "Contratista no encontrado: {ContratistaId}", contratistaId);
-            return NotFound(new { error = ex.Message });
-        }
-    }
-
     /// <summary>
     /// Agrega un nuevo servicio al perfil de un contratista
     /// </summary>
