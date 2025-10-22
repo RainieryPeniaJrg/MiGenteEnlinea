@@ -58,12 +58,16 @@ public class UpdateProfileExtendedCommandHandler : IRequestHandler<UpdateProfile
         // Legacy: db.Entry(info).State = EntityState.Modified; db.SaveChanges()
         
         bool tieneInfoAdicional = 
-            !string.IsNullOrEmpty(request.Identificacion) ||
-            !string.IsNullOrEmpty(request.NombreComercial) ||
-            !string.IsNullOrEmpty(request.Direccion) ||
-            !string.IsNullOrEmpty(request.Presentacion) ||
+            request.Identificacion != null ||
+            request.TipoIdentificacion.HasValue ||
+            request.NombreComercial != null ||
+            request.Direccion != null ||
+            request.Presentacion != null ||
             request.FotoPerfil != null ||
-            !string.IsNullOrEmpty(request.CedulaGerente);
+            request.CedulaGerente != null ||
+            request.NombreGerente != null ||
+            request.ApellidoGerente != null ||
+            request.DireccionGerente != null;
 
         if (tieneInfoAdicional)
         {
@@ -73,30 +77,24 @@ public class UpdateProfileExtendedCommandHandler : IRequestHandler<UpdateProfile
 
             if (perfilInfo != null)
             {
-                // Actualizar identificación si se provee
-                if (!string.IsNullOrEmpty(request.Identificacion))
+                if (request.Identificacion != null)
                 {
                     perfilInfo.ActualizarIdentificacion(
                         request.Identificacion,
                         request.TipoIdentificacion);
                 }
 
-                // Actualizar nombre comercial si es empresa (NO hay método domain, usar directamente)
-                // NOTA: Property es private set, necesitamos ver si hay método domain
-                if (!string.IsNullOrEmpty(request.NombreComercial))
+                if (request.NombreComercial != null)
                 {
-                    // Por ahora omitir - verificar si existe método ActualizarNombreComercial
-                    _logger.LogWarning("NombreComercial no se puede actualizar (property read-only sin método domain)");
+                    perfilInfo.ActualizarNombreComercial(request.NombreComercial);
                 }
 
-                // Actualizar dirección si se provee
-                if (!string.IsNullOrEmpty(request.Direccion))
+                if (request.Direccion != null)
                 {
                     perfilInfo.ActualizarDireccion(request.Direccion);
                 }
 
-                // Actualizar presentación si se provee
-                if (!string.IsNullOrEmpty(request.Presentacion))
+                if (request.Presentacion != null)
                 {
                     perfilInfo.ActualizarPresentacion(request.Presentacion);
                 }
@@ -108,10 +106,10 @@ public class UpdateProfileExtendedCommandHandler : IRequestHandler<UpdateProfile
                 }
 
                 // Actualizar información del gerente si se provee algún dato
-                if (!string.IsNullOrEmpty(request.CedulaGerente) ||
-                    !string.IsNullOrEmpty(request.NombreGerente) ||
-                    !string.IsNullOrEmpty(request.ApellidoGerente) ||
-                    !string.IsNullOrEmpty(request.DireccionGerente))
+                if (request.CedulaGerente != null ||
+                    request.NombreGerente != null ||
+                    request.ApellidoGerente != null ||
+                    request.DireccionGerente != null)
                 {
                     perfilInfo.ActualizarInformacionGerente(
                         request.CedulaGerente,

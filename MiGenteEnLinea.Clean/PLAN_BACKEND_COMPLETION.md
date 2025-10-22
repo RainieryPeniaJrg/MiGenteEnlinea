@@ -1,82 +1,67 @@
-# 🎯 PLAN DE COMPLETITUD BACKEND - Resumen Ejecutivo
+# PLAN DE COMPLETITUD BACKEND - Resumen Ejecutivo
 
 **Objetivo:** Cerrar brechas entre Legacy Services y Clean Architecture API  
-**Estado Actual:** 43% completado (35 de 81 métodos)  
+**Estado Actual:** 73% completado (59 de 81 métodos)  
 **Meta:** 100% paridad con Legacy  
-**Timeline:** 3 semanas (~40 horas)
+**Timeline:** 2 semanas (~24 horas) para cerrar pendientes y validaciones finales
 
 ---
 
-## 📊 RESUMEN VISUAL
+## RESUMEN VISUAL
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ PROGRESS: Backend API Completion                            │
-│                                                              │
-│ [████████████████░░░░░░░░░░░░░░░░░░░░░░] 43%              │
-│                                                              │
-│ ✅ Completado: 35 endpoints                                 │
-│ ⏳ Pendiente:   46 endpoints                                │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+Progress: 73% (59 / 81 endpoints)
+Completed: 59 endpoints
+Pending:   22 endpoints
 
-Módulos:
-✅ Calificaciones     [████████████████████] 100%
-✅ Pagos (Cardnet)    [████████████████████] 100%
-✅ Email              [████████████████████] 100%
-⚠️ Authentication     [███████████░░░░░░░░░]  55%
-⚠️ Empleados/Nómina   [███████░░░░░░░░░░░░░]  38%
-⚠️ Contratistas       [██████████░░░░░░░░░░]  50%
-⚠️ Suscripciones      [█████░░░░░░░░░░░░░░░]  29%
-❌ Bot OpenAI         [░░░░░░░░░░░░░░░░░░░░]   0%
+Module coverage:
+- Calificaciones ............... 100%
+- Pagos (Cardnet) .............. 100%
+- Email ........................ 100%
+- Authentication ............... 82% (faltan 2 de 11)
+- Empleados / Nomina ........... 62% (faltan 14 de 37)
+- Contratistas ................. 78% (faltan 4 de 18)
+- Suscripciones ................ 74% (faltan 3 de 19)
+- Bot / OpenAI ................. 100%
 ```
+
 
 ---
 
-## 🚀 PLAN DE EJECUCIÓN (7 LOTES)
+## Inventario actualizado vs Legacy (oct 2025)
 
-### ⏱️ SEMANA 1: CRÍTICOS (12-15 horas)
-
-#### ✅ LOTE 6.0.1: Authentication Completion (3-4h) 🔴 CRÍTICO
-
-**Prioridad:** MÁXIMA - Bloquea frontend  
-**Endpoints Faltantes:** 4 endpoints
-
-| # | Endpoint | Método Legacy | Complejidad |
-|---|----------|---------------|-------------|
-| 1 | DELETE /api/auth/users/{userId}/credentials/{credentialId} | borrarUsuario() | 🟢 Baja |
-| 2 | POST /api/auth/profile-info | agregarPerfilInfo() | 🟢 Baja |
-| 3 | GET /api/auth/cuenta/{cuentaId} | getPerfilByID() | 🟢 Baja |
-| 4 | PUT /api/auth/profile (mejorar) | actualizarPerfil() | 🟡 Media |
-
-**Archivos a Crear:**
-
-```
-Application/Features/Authentication/
-├── Commands/
-│   ├── DeleteUserCredential/
-│   │   ├── DeleteUserCredentialCommand.cs
-│   │   ├── DeleteUserCredentialHandler.cs
-│   │   └── DeleteUserCredentialValidator.cs
-│   └── AddProfileInfo/
-│       ├── AddProfileInfoCommand.cs
-│       ├── AddProfileInfoHandler.cs
-│       └── AddProfileInfoValidator.cs
-└── Queries/
-    └── GetCuentaById/
-        ├── GetCuentaByIdQuery.cs
-        └── GetCuentaByIdHandler.cs
-```
-
-**Testing:**
-
-- [ ] Unit tests (Commands + Queries)
-- [ ] Integration tests (AuthController)
-- [ ] Swagger UI validation
+| Servicio Legacy | Cobertura Clean | Pendientes | Notas |
+|-----------------|-----------------|------------|-------|
+| LoginService    | 9/11            | GET cuenta, PUT profile | Revisar comandos existentes y alinear DTOs con WebForms |
+| EmpleadosService| 31/31           | -          | Comandos y queries disponibles; falta batería de pruebas completas |
+| ContratistasService | 9/9        | Validación final | Endpoints implementados, revisar regresión con WebForms |
+| SuscripcionesService | 17/18    | `obtenerDetalleVentasBySuscripcion` | `actualizarPassByID` no existe; documentado como descartado |
+| PaymentService  | 2/3            | `consultarIdempotency` | Necesario para reintentos Cardnet desde UI |
+| botService      | 1/2            | `GetChatResponse` | Config OpenAI migrada; falta endpoint de chat si se mantiene feature |
+| EmailService / Sender | Sustituido | - | Capa Infrastructure cubre envío con plantillas |
 
 ---
 
-#### ✅ LOTE 6.0.2: Empleados - Remuneraciones & TSS (4-5h) 🟠 ALTA
+## PLAN DE EJECUCIÓN (7 LOTES)
+
+### SEMANA 1: CRÍTICOS (12-15 horas)
+
+####  LOTE 6.0.1: Authentication Completion (3-4h)  CRÍTICO
+
+**Progreso actual:** 50% (2 de 4 endpoints completados)
+
+**Endpoints ya migrados**
+- DELETE /api/auth/users/{userId}/credentials/{credentialId} → ver `LOTE_6_0_1_ENDPOINT_1_COMPLETADO.md`
+- POST /api/auth/profile-info → ver `LOTE_6_0_1_ENDPOINT_2_COMPLETADO.md`
+
+**Pendientes inmediatos**
+1. GET /api/auth/cuenta/{cuentaId} (exponer `GetCuentaByIdQuery` en AuthController y documentar contrato)
+2. PUT /api/auth/profile (revisar `actualizarPerfil` + `actualizarPerfil1` del legacy y completar validaciones en Clean)
+
+**Notas técnicas**
+- Revisar que el DTO de salida incluya los campos usados por WebForms (perfil + cuenta).
+- Asegurar pruebas unitarias e integración para ambos endpoints antes de cerrar el lote.
+####  LOTE 6.0.2: Empleados - Remuneraciones & TSS (4-5h)  ALTA
 
 **Prioridad:** ALTA - Módulo más usado  
 **Endpoints Faltantes:** 6 endpoints
@@ -87,7 +72,7 @@ Application/Features/Authentication/
 | 2 | DELETE /api/remuneraciones/{id} | Eliminar una remuneración | No |
 | 3 | POST /api/empleados/{id}/remuneraciones/batch | Agregar múltiples | No |
 | 4 | PUT /api/empleados/{id}/remuneraciones/batch | Actualizar todas | No |
-| 5 | GET /api/empleados/consultar-padron/{cedula} | Validar cédula JCE | ✅ SÍ |
+| 5 | GET /api/empleados/consultar-padron/{cedula} | Validar cédula JCE |  SÍ |
 | 6 | GET /api/catalogos/deducciones-tss | Catálogo TSS | No |
 
 **Dependencias Externas:**
@@ -98,7 +83,7 @@ Application/Features/Authentication/
 
 ---
 
-#### ✅ LOTE 6.0.4: Contratistas - Servicios (5-6h) 🟠 ALTA
+####  LOTE 6.0.4: Contratistas - Servicios (5-6h)  ALTA
 
 **Prioridad:** ALTA - Marketplace de servicios  
 **Endpoints Faltantes:** 5 endpoints
@@ -120,23 +105,23 @@ Application/Features/Authentication/
 
 ### ⏱️ SEMANA 2: COMPLEJOS (14-18 horas)
 
-#### ✅ LOTE 6.0.3: Contrataciones Temporales (8-10h) 🔴 CRÍTICA
+####  LOTE 6.0.3: Contrataciones Temporales (8-10h)  CRÍTICA
 
 **Prioridad:** CRÍTICA - Lógica más compleja del sistema  
 **Endpoints Faltantes:** 8 endpoints
 
-⚠️ **ADVERTENCIA:** Múltiples tablas relacionadas, cascade deletes complejos
+ **ADVERTENCIA:** Múltiples tablas relacionadas, cascade deletes complejos
 
 | # | Endpoint | Complejidad | Notas |
 |---|----------|-------------|-------|
-| 1 | GET /api/contrataciones/{id}/detalle/{detalleId}/pagos | 🟡 Media | Vista con joins |
-| 2 | GET /api/contrataciones/recibos/{pagoId} | 🟡 Media | Header + Detalles |
-| 3 | POST /api/contrataciones/{id}/detalle/{detalleId}/cancelar | 🟢 Baja | Update status |
-| 4 | DELETE /api/contrataciones/recibos/{pagoId} | 🟡 Media | 2 tablas |
-| 5 | DELETE /api/contrataciones/{id} | 🔴 Alta | CASCADE 3+ tablas |
-| 6 | POST /api/contrataciones/{id}/calificar | 🟢 Baja | Update flag |
-| 7 | GET /api/contrataciones/{id}/vista | 🟡 Media | Vista completa |
-| 8 | POST /api/contrataciones/procesar-pago | 🔴 Alta | Multi-step logic |
+| 1 | GET /api/contrataciones/{id}/detalle/{detalleId}/pagos |  Media | Vista con joins |
+| 2 | GET /api/contrataciones/recibos/{pagoId} |  Media | Header + Detalles |
+| 3 | POST /api/contrataciones/{id}/detalle/{detalleId}/cancelar |  Baja | Update status |
+| 4 | DELETE /api/contrataciones/recibos/{pagoId} |  Media | 2 tablas |
+| 5 | DELETE /api/contrataciones/{id} |  Alta | CASCADE 3+ tablas |
+| 6 | POST /api/contrataciones/{id}/calificar |  Baja | Update flag |
+| 7 | GET /api/contrataciones/{id}/vista |  Media | Vista completa |
+| 8 | POST /api/contrataciones/procesar-pago |  Alta | Multi-step logic |
 
 **Testing Crítico:**
 
@@ -146,39 +131,28 @@ Application/Features/Authentication/
 
 ---
 
-#### ✅ LOTE 6.0.5: Suscripciones - Gestión Avanzada (4-5h) 🟡 MEDIA
+####  LOTE 6.0.5: Suscripciones - Gestión Avanzada (4-5h)  MEDIA
 
-**Prioridad:** MEDIA - Monetización  
-**Endpoints Faltantes:** 3 endpoints
+**Estado actual:** 2 de 3 operaciones cubiertas. El método legacy `actualizarPassByID` no existe y se excluye del alcance.
 
-| # | Endpoint | Método Legacy |
-|---|----------|---------------|
-| 1 | PUT /api/auth/credentials/{id}/password | actualizarPassByID() |
-| 2 | GET /api/auth/validar-correo?userID={id} | validarCorreoCuentaActual() |
-| 3 | GET /api/suscripciones/{userId}/ventas | obtenerDetalleVentasBySuscripcion() |
+**Migración realizada**
+- GET /api/auth/validar-correo-cuenta → ver `SESION_LOTE_6_0_5_Y_6_0_6_COMPLETADO.md`
 
----
+**Pendiente**
+- GET /api/suscripciones/{userId}/ventas (migrar `obtenerDetalleVentasBySuscripcion`, reutilizar mapeo de ventas y documentar contrato)
 
-#### ✅ LOTE 6.0.6: Bot & Configuración (2-3h) 🟡 MEDIA
+**Notas**
+- Actualizar documentación para reflejar el descarte de `actualizarPassByID`.
+- Alinear DTOs de ventas con los campos consumidos por la UI legacy.
+####  LOTE 6.0.6: Bot & Configuración (2-3h)  COMPLETADO
 
-**Prioridad:** BAJA - Feature opcional  
-**Endpoints Faltantes:** 1 endpoint
+**Estado actual:** Endpoint GET /api/configuracion/openai migrado (ver `SESION_LOTE_6_0_5_Y_6_0_6_COMPLETADO.md`).
 
-| # | Endpoint | Descripción |
-|---|----------|-------------|
-| 1 | GET /api/configuracion/openai | Obtener config bot (API key, model) |
-
-**Decisión Arquitectural:**
-
-- [ ] Opción A: Endpoint público con Authorization
-- [ ] Opción B: Mover a Infrastructure Layer (IOpenAiService)
-- [ ] **Recomendación:** Opción B (config interna)
-
----
-
-### ⏱️ SEMANA 3: VALIDACIÓN (6-8 horas)
-
-#### ✅ LOTE 6.0.7: Testing & Validación (6-8h) ✅ OBLIGATORIO
+**Acciones siguientes**
+- Documentar riesgos de exposición de credenciales y definir estrategia segura (Key Vault, variables de entorno).
+- Añadir pruebas de integración para asegurar respuesta anónima/autenticada.
+- Planificar migración de `GetChatResponse` si el chatbot se mantiene en el roadmap.
+####  LOTE 6.0.7: Testing & Validación (6-8h)  OBLIGATORIO
 
 **Prioridad:** MÁXIMA - Garantiza calidad  
 
@@ -268,293 +242,51 @@ Application/Features/Authentication/
 
 ---
 
-## 🎯 QUICK WIN: Empezar AHORA con LOTE 6.0.1
+## QUICK WIN: Cerrar pendientes del Lote 6.0.1
 
-### Paso 1: Setup (5 min)
 
-```bash
-cd MiGenteEnLinea.Clean
-git checkout -b feature/lote-6.0.1-authentication-completion
-git pull origin main
-```
+1. Publicar `GetCuentaByIdQuery` en AuthController y documentar contrato JSON.
+2. Revisar `UpdateProfileCommand` vs legacy (`actualizarPerfil` y `actualizarPerfil1`) y ajustar validaciones/DTOs.
+3. Ejecutar pruebas unitarias e integración del módulo de Authentication.
+4. Actualizar documentación (Swagger/Postman/QA checklist) antes del traspaso al equipo frontend.
 
-### Paso 2: Crear Estructura (10 min)
-
-```bash
-# Commands
-mkdir -p src/Core/MiGenteEnLinea.Application/Features/Authentication/Commands/DeleteUserCredential
-mkdir -p src/Core/MiGenteEnLinea.Application/Features/Authentication/Commands/AddProfileInfo
-
-# Queries
-mkdir -p src/Core/MiGenteEnLinea.Application/Features/Authentication/Queries/GetCuentaById
-
-# Touch files
-cd src/Core/MiGenteEnLinea.Application/Features/Authentication/Commands/DeleteUserCredential
-touch DeleteUserCredentialCommand.cs DeleteUserCredentialHandler.cs DeleteUserCredentialValidator.cs
-```
-
-### Paso 3: Implementar Endpoint #1 (30-45 min)
-
-**DeleteUserCredentialCommand.cs:**
-
-```csharp
-using MediatR;
-
-namespace MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
-
-/// <summary>
-/// Command para eliminar una credencial específica de un usuario
-/// </summary>
-/// <remarks>
-/// Migrado desde: LoginService.borrarUsuario(string userID, int credencialID)
-/// 
-/// Reglas de negocio:
-/// - Usuario debe tener al menos 1 credencial activa (no puede eliminar la última)
-/// - Solo el propio usuario o admin puede eliminar
-/// </remarks>
-public record DeleteUserCredentialCommand(
-    string UserId,
-    int CredentialId
-) : IRequest<Unit>;
-```
-
-**DeleteUserCredentialHandler.cs:**
-
-```csharp
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using MiGenteEnLinea.Application.Common.Exceptions;
-using MiGenteEnLinea.Application.Common.Interfaces;
-
-namespace MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
-
-public class DeleteUserCredentialHandler 
-    : IRequestHandler<DeleteUserCredentialCommand, Unit>
-{
-    private readonly IApplicationDbContext _context;
-    private readonly ILogger<DeleteUserCredentialHandler> _logger;
-
-    public DeleteUserCredentialHandler(
-        IApplicationDbContext context,
-        ILogger<DeleteUserCredentialHandler> logger)
-    {
-        _context = context;
-        _logger = logger;
-    }
-
-    public async Task<Unit> Handle(
-        DeleteUserCredentialCommand request, 
-        CancellationToken cancellationToken)
-    {
-        _logger.LogInformation(
-            "Eliminando credencial {CredentialId} del usuario {UserId}",
-            request.CredentialId,
-            request.UserId);
-
-        // Validar que la credencial existe
-        var credential = await _context.Credenciales
-            .Where(c => c.id == request.CredentialId && c.userID == request.UserId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (credential == null)
-        {
-            throw new NotFoundException(
-                $"Credencial {request.CredentialId} no encontrada para usuario {request.UserId}");
-        }
-
-        // Validar que no es la última credencial activa
-        var activeCredentialsCount = await _context.Credenciales
-            .Where(c => c.userID == request.UserId && c.activo == true)
-            .CountAsync(cancellationToken);
-
-        if (activeCredentialsCount <= 1 && credential.activo == true)
-        {
-            throw new ValidationException(
-                "No se puede eliminar la única credencial activa del usuario");
-        }
-
-        // Eliminar credencial (mismo patrón que Legacy)
-        _context.Credenciales.Remove(credential);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation(
-            "Credencial {CredentialId} eliminada exitosamente",
-            request.CredentialId);
-
-        return Unit.Value;
-    }
-}
-```
-
-**DeleteUserCredentialValidator.cs:**
-
-```csharp
-using FluentValidation;
-
-namespace MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
-
-public class DeleteUserCredentialValidator 
-    : AbstractValidator<DeleteUserCredentialCommand>
-{
-    public DeleteUserCredentialValidator()
-    {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("UserId es requerido")
-            .Must(BeValidGuid).WithMessage("UserId debe ser un GUID válido");
-
-        RuleFor(x => x.CredentialId)
-            .GreaterThan(0).WithMessage("CredentialId debe ser mayor a 0");
-    }
-
-    private bool BeValidGuid(string userId)
-    {
-        return Guid.TryParse(userId, out _);
-    }
-}
-```
-
-**AuthController.cs (agregar método):**
-
-```csharp
-/// <summary>
-/// Eliminar credencial específica de usuario
-/// </summary>
-/// <param name="userId">ID del usuario</param>
-/// <param name="credentialId">ID de la credencial a eliminar</param>
-/// <returns>204 No Content si se eliminó exitosamente</returns>
-/// <response code="204">Credencial eliminada exitosamente</response>
-/// <response code="400">Validación falló (ej: última credencial activa)</response>
-/// <response code="404">Credencial no encontrada</response>
-/// <response code="401">No autorizado</response>
-[HttpDelete("users/{userId}/credentials/{credentialId}")]
-[ProducesResponseType(StatusCodes.Status204NoContent)]
-[ProducesResponseType(StatusCodes.Status400BadRequest)]
-[ProducesResponseType(StatusCodes.Status404NotFound)]
-[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-public async Task<IActionResult> DeleteUserCredential(
-    string userId, 
-    int credentialId)
-{
-    _logger.LogInformation(
-        "DELETE /api/auth/users/{UserId}/credentials/{CredentialId}",
-        userId,
-        credentialId);
-
-    var command = new DeleteUserCredentialCommand(userId, credentialId);
-    await _mediator.Send(command);
-
-    return NoContent();
-}
-```
-
-### Paso 4: Testing (20 min)
-
-**Unit Test:**
-
-```csharp
-[Fact]
-public async Task Handle_ValidCredential_ShouldDeleteSuccessfully()
-{
-    // Arrange
-    var command = new DeleteUserCredentialCommand(
-        userId: "550e8400-e29b-41d4-a716-446655440000",
-        credentialId: 5);
-
-    // Act
-    var result = await _handler.Handle(command, CancellationToken.None);
-
-    // Assert
-    result.Should().Be(Unit.Value);
-    _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-}
-
-[Fact]
-public async Task Handle_LastActiveCredential_ShouldThrowValidationException()
-{
-    // Arrange
-    var command = new DeleteUserCredentialCommand(
-        userId: "550e8400-e29b-41d4-a716-446655440000",
-        credentialId: 1);
-
-    // Act & Assert
-    await Assert.ThrowsAsync<ValidationException>(
-        () => _handler.Handle(command, CancellationToken.None));
-}
-```
-
-### Paso 5: Build & Test (10 min)
-
-```bash
-# Build
-dotnet build --no-restore
-
-# Run unit tests
-dotnet test --filter "FullyQualifiedName~DeleteUserCredential"
-
-# Run API y probar con Swagger
-dotnet run --project src/Presentation/MiGenteEnLinea.API
-# Navegar a: http://localhost:5015/swagger
-```
-
-### Paso 6: Commit (5 min)
-
-```bash
-git add .
-git commit -m "feat(auth): Implement DELETE /api/auth/users/{userId}/credentials/{credentialId}
-
-- Add DeleteUserCredentialCommand with validation
-- Add unit tests (2 scenarios)
-- Update AuthController with new endpoint
-- Migrated from Legacy: LoginService.borrarUsuario()
-
-Refs: LOTE-6.0.1"
-
-git push origin feature/lote-6.0.1-authentication-completion
-```
-
----
-
-## 📊 TRACKING DE PROGRESO
-
-### Crear Issue en GitHub
+## TRACKING DE PROGRESO
 
 ```markdown
 ## LOTE 6.0.1: Authentication Completion
 
-**Objetivo:** Completar todos los métodos del LoginService que faltan
+**Objetivo:** completar los endpoints restantes de autenticación y dejar documentación actualizada.
 
 **Endpoints:**
-- [ ] DELETE /api/auth/users/{userId}/credentials/{credentialId}
-- [ ] POST /api/auth/profile-info
+- [x] DELETE /api/auth/users/{userId}/credentials/{credentialId}
+- [x] POST /api/auth/profile-info
 - [ ] GET /api/auth/cuenta/{cuentaId}
-- [ ] PUT /api/auth/profile (mejorar)
+- [ ] PUT /api/auth/profile
 
-**Estimación:** 3-4 horas
-**Prioridad:** 🔴 CRÍTICA
-
-**Criterios de Aceptación:**
-- [ ] 4 Commands/Queries implementados
-- [ ] 4 endpoints en AuthController
-- [ ] Unit tests (80%+ coverage)
-- [ ] Integration tests passed
-- [ ] Swagger documentation completa
-- [ ] Manual testing con screenshots
+**Criterios de aceptación:**
+- [ ] Respuesta GET alineada al DTO legacy (`obtenerPerfil` + `getPerfilByID`).
+- [ ] Validaciones y manejo de errores equivalentes al Web Forms.
+- [ ] Pruebas unitarias e integración en AuthController actualizadas.
+- [ ] Documentación en README/Swagger y checklist QA actualizados.
 ```
 
----
 
-## 🎉 RESULTADOS ESPERADOS
+1. Publicar `GetCuentaByIdQuery` en AuthController y documentar contrato JSON.
+2. Revisar `UpdateProfileCommand` vs legacy (`actualizarPerfil` y `actualizarPerfil1`) y ajustar validaciones/DTOs.
+3. Ejecutar pruebas unitarias e integración del módulo de Authentication.
+4. Actualizar documentación (Swagger/Postman/QA checklist) antes del traspaso al equipo frontend.
+## RESULTADOS ESPERADOS
 
 Al finalizar las 3 semanas:
 
 ### Métricas Objetivo
 
-- ✅ **100% paridad** con Legacy (81/81 métodos)
-- ✅ **80%+ code coverage** en tests
-- ✅ **0 errores** de compilación
-- ✅ **0 warnings** críticos
-- ✅ **<500ms p95** en response times
-- ✅ **100% endpoints** documentados en Swagger
+-  **100% paridad** con Legacy (81/81 métodos)
+-  **80%+ code coverage** en tests
+-  **0 errores** de compilación
+-  **0 warnings** críticos
+-  **<500ms p95** en response times
+-  **100% endpoints** documentados en Swagger
 
 ### Entregables
 
@@ -578,24 +310,19 @@ Al finalizar las 3 semanas:
 
 ---
 
-## 🚀 COMANDO PARA EMPEZAR AHORA
+## COMANDO PARA EMPEZAR AHORA
 
 ```bash
-# Clone y setup
 cd MiGenteEnLinea.Clean
-git checkout main
-git pull origin main
-git checkout -b feature/lote-6.0.1-authentication-completion
+git checkout -b feature/lote-6.0.1-final
 
-# Abrir VS Code
+dotnet build --no-restore
+
 code .
 
-# Mensaje para usuario
-echo "✅ Setup completo!"
-echo "📝 Siguiente: Leer Legacy LoginService.borrarUsuario() línea 80-90"
-echo "🎯 Implementar: DeleteUserCredentialCommand"
-echo "⏱️  Tiempo estimado: 45 minutos"
+echo "Objetivo: exponer GetCuentaById y completar UpdateProfile"
 ```
+
 
 ---
 
