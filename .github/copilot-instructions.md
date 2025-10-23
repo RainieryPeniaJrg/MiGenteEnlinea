@@ -1,7 +1,6 @@
 # MiGente En Línea - AI Coding Instructions
 
-> **📍 Workspace Location:** `C:\Users\ray\OneDrive\Documents\ProyectoMigente\`  
-> **🤖 AI Agent Mode:** GitHub Copilot (IDE Integration)  
+> **📍 Workspace Location:** `C:\Users\ray\OneDrive\Documents\ProyectoMigente\` > **🤖 AI Agent Mode:** GitHub Copilot (IDE Integration)
 > **📚 Advanced Prompts:** See `/prompts/` folder for Claude Sonnet 4.5 and other agents
 
 ---
@@ -12,16 +11,16 @@
 
 ### 🔷 PROJECT 1: Legacy Web Forms (Maintenance Mode)
 
-**Location:** `Codigo Fuente Mi Gente/`  
-**Purpose:** Production system being phased out  
-**DO NOT:** Add new features or major refactoring  
+**Location:** `Codigo Fuente Mi Gente/`
+**Purpose:** Production system being phased out
+**DO NOT:** Add new features or major refactoring
 **DO:** Only critical bug fixes and security patches
 
 ### 🚀 PROJECT 2: Clean Architecture (Active Development)
 
-**Location:** `MiGenteEnLinea.Clean/`  
-**Purpose:** New modern implementation being built  
-**DO:** All new development, DDD refactoring, testing  
+**Location:** `MiGenteEnLinea.Clean/`
+**Purpose:** New modern implementation being built
+**DO:** All new development, DDD refactoring, testing
 **DO:** Reference legacy code for business logic understanding
 
 ---
@@ -55,8 +54,8 @@ This workspace provides specialized prompts for different AI agents:
 └── ddd-migration-agent.md                  # DDD migration workflow (coming soon)
 ```
 
-**🚀 CURRENT FOCUS:** Phase 4 - Application Layer (CQRS with MediatR)  
-**📄 Active Prompt:** `/prompts/APPLICATION_LAYER_CQRS_DETAILED.md`  
+**🚀 CURRENT FOCUS:** Phase 4 - Application Layer (CQRS with MediatR)
+**📄 Active Prompt:** `/prompts/APPLICATION_LAYER_CQRS_DETAILED.md`
 **📊 Progress:** LOTE 1 at 85% (blocked by NuGet), LOTES 2-6 pending
 
 ---
@@ -406,8 +405,8 @@ public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand com
 
 #### 🔄 Phase 4: Application Layer (CQRS) - EN PROGRESO
 
-**Estado:** LOTE 1 al 85% (bloqueado por NuGet), LOTES 2-6 pendientes  
-**Objetivo:** Migrar lógica de negocio desde Legacy Services a CQRS con MediatR  
+**Estado:** LOTE 1 al 85% (bloqueado por NuGet), LOTES 2-6 pendientes
+**Objetivo:** Migrar lógica de negocio desde Legacy Services a CQRS con MediatR
 **📄 Prompt Detallado:** `/prompts/APPLICATION_LAYER_CQRS_DETAILED.md` (5,000+ líneas)
 
 ---
@@ -417,6 +416,7 @@ public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand com
 **LOTE 1: Authentication & User Management - 85% COMPLETADO**
 
 **Archivos Creados:** 23 archivos (~1,380 líneas de código)
+
 - ✅ 2/5 Commands completados (LoginCommand, ChangePasswordCommand)
 - ✅ 4/5 Queries completados (GetPerfil, GetPerfilByEmail, ValidarCorreo, GetCredenciales)
 - ✅ 5/5 DTOs completados
@@ -426,6 +426,7 @@ public async Task<IActionResult> Register([FromBody] RegistrarUsuarioCommand com
 **🚫 BLOQUEADO POR:** 27 errores de compilación (NuGet faltante)
 
 **Acción Inmediata Requerida (5 minutos):**
+
 ```powershell
 # 1. Agregar referencias faltantes
 dotnet add src/Core/MiGenteEnLinea.Application/MiGenteEnLinea.Application.csproj package Microsoft.EntityFrameworkCore --version 8.0.0
@@ -439,6 +440,7 @@ dotnet build --no-restore
 ```
 
 **Pendiente (2-3 horas):**
+
 - ❌ RegisterCommand (desde SuscripcionesService.GuardarPerfil)
 - ❌ ActivateAccountCommand (desde activarperfil.aspx.cs)
 - ❌ UpdateProfileCommand (desde LoginService.actualizarPerfil)
@@ -450,23 +452,24 @@ dotnet build --no-restore
 
 ### 📋 SERVICIOS LEGACY IDENTIFICADOS (9 servicios, 89 métodos)
 
-| # | Servicio | Métodos | Complejidad | Prioridad |
-|---|----------|---------|-------------|-----------|
-| 1 | LoginService.asmx.cs | 10 | 🟡 MEDIA | 🔴 CRÍTICA |
-| 2 | EmpleadosService.cs | 32 | 🔴 ALTA | 🟠 ALTA |
-| 3 | ContratistasService.cs | 10 | 🟢 BAJA | 🟠 ALTA |
-| 4 | SuscripcionesService.cs | 17 | 🟡 MEDIA | 🟡 MEDIA |
-| 5 | CalificacionesService.cs | 4 | 🟢 BAJA | 🟢 BAJA |
-| 6 | PaymentService.cs | 3 | 🟡 MEDIA | 🟡 MEDIA |
-| 7 | EmailService.cs | 5 | 🟢 BAJA | 🟢 BAJA |
-| 8 | BotServices.cs | 3 | 🟢 BAJA | 🟢 BAJA |
-| 9 | Utilitario.cs | 5 | 🟢 BAJA | 🟢 BAJA |
+| #   | Servicio                 | Métodos | Complejidad | Prioridad  |
+| --- | ------------------------ | ------- | ----------- | ---------- |
+| 1   | LoginService.asmx.cs     | 10      | 🟡 MEDIA    | 🔴 CRÍTICA |
+| 2   | EmpleadosService.cs      | 32      | 🔴 ALTA     | 🟠 ALTA    |
+| 3   | ContratistasService.cs   | 10      | 🟢 BAJA     | 🟠 ALTA    |
+| 4   | SuscripcionesService.cs  | 17      | 🟡 MEDIA    | 🟡 MEDIA   |
+| 5   | CalificacionesService.cs | 4       | 🟢 BAJA     | 🟢 BAJA    |
+| 6   | PaymentService.cs        | 3       | 🟡 MEDIA    | 🟡 MEDIA   |
+| 7   | EmailService.cs          | 5       | 🟢 BAJA     | 🟢 BAJA    |
+| 8   | BotServices.cs           | 3       | 🟢 BAJA     | 🟢 BAJA    |
+| 9   | Utilitario.cs            | 5       | 🟢 BAJA     | 🟢 BAJA    |
 
 ---
 
 ### 🎯 PLAN DE IMPLEMENTACIÓN (6 LOTES CQRS)
 
 **LOTE 1 (CRÍTICO):** Authentication & User Management
+
 - **Estado:** 85% completado, bloqueado por NuGet
 - **Commands:** Login✅, ChangePassword✅, Register❌, Activate❌, UpdateProfile❌
 - **Queries:** GetPerfil✅, GetPerfilByEmail✅, ValidarCorreo✅, GetCredenciales✅
@@ -474,12 +477,14 @@ dotnet build --no-restore
 - **Legacy:** LoginService.asmx.cs, SuscripcionesService.cs (parcial)
 
 **LOTE 2 (ALTA):** Empleadores - CRUD Básico
+
 - CreateEmpleadorCommand, UpdateEmpleadorCommand, DeleteEmpleadorCommand
 - GetEmpleadorByIdQuery, GetEmpleadoresQuery, SearchEmpleadoresQuery
 - **Tiempo estimado:** 6-8 horas
-- **Legacy:** Empleador/*.aspx.cs
+- **Legacy:** Empleador/\*.aspx.cs
 
 **LOTE 3 (ALTA):** Contratistas - CRUD + Búsqueda
+
 - CreateContratistaCommand, UpdateContratistaCommand, ActivarPerfilCommand
 - GetContratistaByIdQuery, SearchContratistasQuery, GetServiciosQuery
 - AddServicioCommand, RemoveServicioCommand
@@ -487,6 +492,7 @@ dotnet build --no-restore
 - **Legacy:** ContratistasService.cs
 
 **LOTE 4 (MEDIA):** Empleados y Nómina - CRUD + Procesamiento
+
 - CreateEmpleadoCommand, UpdateEmpleadoCommand, DarDeBajaCommand
 - ProcesarPagoCommand, ProcesarPagoContratacionCommand
 - GetEmpleadosQuery, GetRecibosQuery, GetDeduccionesQuery
@@ -494,6 +500,7 @@ dotnet build --no-restore
 - **Legacy:** EmpleadosService.cs (métodos más complejos)
 
 **LOTE 5 (MEDIA):** Suscripciones y Pagos
+
 - CreateSuscripcionCommand, UpdateSuscripcionCommand, ProcesarVentaCommand
 - ProcessPaymentCommand (Cardnet integration)
 - GetPlanesQuery, GetSuscripcionQuery, GetVentasQuery
@@ -501,6 +508,7 @@ dotnet build --no-restore
 - **Legacy:** SuscripcionesService.cs, PaymentService.cs
 
 **LOTE 6 (BAJA):** Calificaciones y Extras
+
 - CreateCalificacionCommand, UpdateCalificacionCommand
 - GetCalificacionesQuery, GetPromedioQuery
 - EnviarEmailCommand (EmailService)
@@ -517,37 +525,45 @@ dotnet build --no-restore
 **Proceso de Implementación:**
 
 1. ✅ **LEER servicio Legacy COMPLETO** (SIEMPRE PRIMERO)
+
    - Identificar todos los métodos públicos
    - Analizar lógica de negocio (validaciones, cálculos, reglas)
    - Documentar queries EF6 que se convertirán a EF Core
 
 2. ✅ **Mapear a Commands/Queries**
+
    - Write operations → Commands
    - Read operations → Queries
    - Identificar DTOs y Validators necesarios
 
 3. ✅ **Implementar Handler con lógica EXACTA del Legacy**
+
    - Copiar comportamiento 100% (no "mejorar")
    - Mantener mismos códigos de retorno (ej: 2=success, 0=invalid, -1=inactive)
    - Mantener mismo orden de operaciones
    - Preservar estrategias (ej: 2 DbContext si Legacy lo usa)
 
 4. ✅ **Crear Validator con FluentValidation**
+
    - Validar inputs antes de Handler
 
 5. ✅ **Crear DTOs para request/response**
+
    - Usar AutoMapper cuando sea apropiado
 
 6. ✅ **Crear Controller REST API endpoint**
+
    - Documentación Swagger completa
    - Manejo de errores apropiado
 
 7. ✅ **Probar con Swagger UI**
+
    - Comparar resultados con Legacy (inputs idénticos)
 
 8. ✅ **Documentar en `LOTE_X_COMPLETADO.md`**
 
 **🚨 NUNCA:**
+
 - Inventar lógica nueva sin aprobación
 - "Mejorar" código Legacy durante migración
 - Cambiar códigos de retorno o estructuras de respuesta
@@ -566,17 +582,20 @@ dotnet build --no-restore
 **Estado:** Ejecutando PLAN 1 de 4 (EmailService - BLOCKER)
 
 **Completado:**
+
 - ✅ Gap Analysis (2 reportes, 5,700 líneas)
 - ✅ 4 Planes de Ejecución creados (3,300 líneas)
 - ✅ TODO List con 12 tareas priorizadas
 
 **En Ejecución (PLAN 1 - 6-8 horas):**
+
 - 🔄 Fase 1: Analysis & Configuration (30 min)
 - ⏳ Fase 2: Implementation (2 horas)
 - ⏳ Fase 3: DI Registration (15 min)
 - ⏳ Fase 4: Testing (2 horas)
 
 **Pendiente:**
+
 - ⏳ PLAN 2: LOTE 6 Calificaciones (16-24 horas)
 - ⏳ PLAN 3: JWT Implementation (8-16 horas)
 - ⏳ PLAN 4: Services Review (4-6 horas)
@@ -1429,7 +1448,146 @@ app.UseIpRateLimiting();
    - Integration tests for API endpoints
    - Security tests (OWASP validation)
 
+roject coding standards
+General C# Coding Standards
+Use var only when the type is obvious; otherwise, use explicit types.
+Keep line length under 120 characters.
+Use consistent indentation and always include braces ({}) even for single-line statements.
+Group using directives with System.\* first, then others in alphabetical order.
+Naming Conventions
+Use PascalCase for component names, classes, methods, and properties.
+Use camelCase for parameters and local variables.
+Prefix private fields with \_ (e.g., \_userService).
+Blazor component files must match the component class name (e.g., MyComponent.razor must contain MyComponent).
+Blazor-Specific Best Practices
+Split large components into smaller, reusable child components.
+Use @code { } instead of @functions { }.
+Keep UI markup and C# logic separate when complexity grows (e.g., use partial classes).
+Avoid directly mutating bound parameters ([Parameter]) in child components.
+Use EventCallback<T> instead of Action or custom delegates for parameter events.
+Use CascadingParameter for passing data like authentication state, theme, or culture.
+Prefer OnInitializedAsync() over OnInitialized() when using await.
+Component Architecture
+Organize components by domain/feature in folders (e.g., Pages/, Components/, Shared/).
+Follow the MVU or MVVM pattern when the state becomes complex.
+Use @inject for dependency injection rather than service locators.
+Prefer RenderFragment over MarkupString unless you need raw HTML rendering.
+Performance Best Practices
+Minimize re-rendering by using ShouldRender() or conditional UI logic.
+Use @key in @foreach loops to help Blazor track DOM elements.
+Avoid using async void; use async Task instead.
+Dispose components that use resources by implementing IDisposable.
+Security Guidelines
+Never trust client-side validation—always validate on the server.
+Avoid exposing sensitive logic or secrets in .razor files.
+Use Microsoft.AspNetCore.Components.Authorization for secure user authentication and role checking.
+Use proper encoding when injecting raw HTML or third-party content.
+Reusability and Maintainability
+Prefer RenderFragment parameters to allow child content injection (similar to slot in other frameworks).
+Isolate reusable logic in services or base classes.
+Use feature-based folders to group pages, components, and services.
+Testing & Tooling
+Use bUnit for unit testing Blazor components.
+Mock services using Moq, FakeItEasy, or NSubstitute in test projects.
+Use IJSRuntime abstraction for JavaScript interop, and mock it in tests.
+Validate components for accessibility (ARIA, keyboard navigation).
+Debugging and Diagnostics
+Use @ref cautiously to avoid tight coupling.
+Enable detailed error messages in development mode.
+Use browser dev tools and Blazor’s built-in error boundaries.
+General .NET Testability Guidelines
+Follow the Arrange-Act-Assert pattern in unit tests.
+Ensure all services are injected through interfaces.
+Avoid static classes unless stateless and pure utility.
+Keep logic out of the UI layer when possible for easier testing.
+
 ---
+
+Project coding standards
+General C# Coding Standards
+Use var only when the type is obvious from the right-hand side; otherwise, use explicit types.
+Use consistent indentation and always use braces, even for single-line blocks.
+Keep line length under 120 characters.
+Organize using directives alphabetically and group system namespaces first.
+Naming Conventions
+Use PascalCase for class names, methods, properties, and namespaces.
+Use camelCase for variables and method parameters.
+Prefix private fields with \_ and use camelCase (e.g., \_service).
+Avoid abbreviations; prefer descriptive and meaningful names.
+Design Patterns & Architecture
+Follow the SOLID principles.
+Prefer composition over inheritance.
+Use Dependency Injection for decoupling and testability.
+Apply appropriate design patterns such as Repository, Strategy, Factory, and Adapter where applicable.
+Follow Clean Architecture when structuring large applications.
+Code Quality and Maintainability
+Keep methods small and focused; one method should do one thing only.
+Avoid magic numbers and strings—use constants or enums.
+Prefer modern C# features such as:
+Pattern matching
+Null-coalescing operators (??, ??=)
+switch expressions
+Records and value types
+Expression-bodied members
+Performance and Memory Efficiency
+Avoid unnecessary allocations (e.g., avoid ToList() unless required).
+Use Span<T> and Memory<T> when working with slices of data.
+Prefer ValueTask over Task in performance-critical async methods.
+Avoid boxing/unboxing and excessive object creation in loops or hot paths.
+Error Handling and Logging
+Do not silently catch or suppress exceptions.
+Catch only specific exception types when possible.
+Use exception filters and when clauses to improve readability.
+Use logging frameworks (e.g., Serilog, Microsoft.Extensions.Logging) for structured logging.
+Security Best Practices
+Validate all input, especially data coming from clients or external sources.
+Avoid hardcoded credentials or API keys. Use secrets management or configuration files.
+Sanitize and encode output to prevent XSS or injection attacks.
+Use secure algorithms for hashing and encryption (e.g., SHA-256, AES-GCM).
+Testability
+Favor interfaces and abstractions over concrete types.
+Use dependency injection and mocking libraries for unit tests.
+Avoid static classes when testability is important.
+Write unit tests using xUnit, NUnit, or MSTest with clear Arrange/Act/Assert structure.
+
+Project coding standards
+General PowerShell Best Practices
+Always use PascalCase for function names (e.g., Get-UserInfo) and camelCase for variables.
+Follow the verb-noun convention in function names using approved verbs from Get-Verb.
+Write functions with CmdletBinding() and proper parameter blocks.
+Avoid aliases (e.g., use Get-ChildItem, not gci) for clarity and cross-platform compatibility.
+Use Write-Verbose, Write-Output, and Write-Error appropriately based on the context.
+Code Style and Structure
+Use Tabs for indentation—be consistent across scripts.
+Avoid one-liners for complex logic; prefer clarity over brevity.
+Use Begin, Process, End blocks when writing advanced functions.
+Prefer param() blocks with type constraints and default values.
+Security Best Practices
+Avoid hardcoding credentials; use Get-Credential or Windows Credential Manager.
+Always validate and sanitize input from users or external sources.
+Use -ErrorAction Stop when handling critical operations to catch and handle errors properly.
+Avoid invoking external executables without validating paths or input.
+Tooling & Modules
+Prefer using modules (.psm1) over large scripts when sharing functions.
+Group related functions into modules with a clear Export-ModuleMember section.
+Use comment-based help for all public functions (.SYNOPSIS, .DESCRIPTION, .EXAMPLE, .PARAMETER, .OUTPUTS).
+Testing and Validation
+Use Pester for testing PowerShell functions and scripts.
+Follow the Arrange-Act-Assert structure in Pester tests.
+Validate scripts with Invoke-ScriptAnalyzer and fix violations.
+Reusability and Maintainability
+Break large scripts into reusable functions or modules.
+Use Try/Catch/Finally for error handling instead of checking $? or $LASTEXITCODE.
+Comment and document non-trivial logic using inline comments.
+Avoid excessive pipeline chaining—use intermediate variables when needed.
+Clean Output
+Always return structured data (e.g., hashtables or custom objects), not raw strings.
+Avoid unnecessary Write-Host (use Write-Output or return values).
+Do not use Write-Output for logging—use Write-Verbose or Write-Information.
+Performance Considerations
+Use [ordered] and [hashtable] appropriately when working with key-value pairs.
+Avoid unnecessary loops; leverage the pipeline and built-in cmdlets like ForEach-Object.
+Use Where-Object and Select-Object efficiently to reduce memory and improve readability.
 
 _Last updated: 2025-10-12_
 _Based on Security Audit: September 2025_

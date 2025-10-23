@@ -1,0 +1,579 @@
+@model MiGenteEnLinea.Web.Controllers.EmpleadorController.FichaEmpleadoViewModel
+@{
+    ViewData["Title"] = "Ficha de Empleado";
+    var empleado = Model.Empleado;
+    var pagos = Model.Pagos;
+}
+
+<div class="pagetitle">
+    <h1>Gestión de Colaboradores</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Colaboradores", "Empleador")">Colaboradores</a></li>
+            <li class="breadcrumb-item active">Ficha de Colaborador</li>
+        </ol>
+    </nav>
+</div>
+
+<style>
+    .card-box {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="bg-white pt-5 pb-5">
+    <div class="container">
+        
+        @* Mensaje si el empleado está inactivo *@
+        @if (empleado != null && empleado.FechaSalida != null)
+        {
+            <div class="alert alert-danger">
+                <h4 class="alert-heading">Este empleado se encuentra desactivado</h4>
+                <p>El empleado está desactivado y no puede realizar tareas en este momento.</p>
+            </div>
+        }
+
+        <div class="row">
+            
+            @* Columna Izquierda: Foto y Nombre *@
+            <div class="col col-md-3 col-12 justify-content-center">
+                @if (!string.IsNullOrEmpty(empleado?.Foto))
+                {
+                    <img src="@empleado.Foto" alt="@empleado.Nombre" class="shadow mt-2" style="width: 280px;" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'" />
+                }
+                else
+                {
+                    <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Sin foto" class="shadow mt-2" style="width: 280px;" />
+                }
+                <hr />
+                <h3>@empleado?.Nombre @empleado?.Apellido</h3>
+            </div>
+
+            @* Columna Derecha: Información del Empleado *@
+            <div class="col col-md-9 col-12 mt-1">
+                <div class="card-box">
+                    <h4 class="card-title">Información del Empleado</h4>
+                    <hr>
+                    <div class="row">
+                        
+                        @* Columna 1: Datos Básicos *@
+                        <div class="col-md-4">
+                            <p><strong>Fecha de Registro:</strong> @empleado?.FechaRegistro?.ToString("dd-MMM-yyyy")</p>
+                            <p><strong>Fecha de Inicio:</strong> @empleado?.FechaInicio?.ToString("dd-MMM-yyyy")</p>
+                            <p><strong>Identificación:</strong> @empleado?.Identificacion</p>
+                            <p><strong>Nombre:</strong> @empleado?.Nombre @empleado?.Apellido</p>
+                            <p><strong>Salario:</strong> RD$ @empleado?.Salario?.ToString("N2")</p>
+                        </div>
+
+                        @* Columna 2: Dirección *@
+                        <div class="col-md-4">
+                            <p><strong>Dirección:</strong> @(string.IsNullOrEmpty(empleado?.Direccion) ? "N/A" : empleado.Direccion)</p>
+                            <p><strong>Provincia:</strong> @(string.IsNullOrEmpty(empleado?.Provincia) ? "N/A" : empleado.Provincia)</p>
+                            <p><strong>Municipio:</strong> @(string.IsNullOrEmpty(empleado?.Municipio) ? "N/A" : empleado.Municipio)</p>
+                            <p><strong>Contacto Emergencia:</strong> @(string.IsNullOrEmpty(empleado?.ContactoEmergencia) ? "N/A" : empleado.ContactoEmergencia)</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkTss" disabled @(empleado?.TSS == true ? "checked" : "")>
+                                <label class="form-check-label" for="chkTss">
+                                    Aplica para deducciones TSS
+                                </label>
+                            </div>
+                        </div>
+
+                        @* Columna 3: Contacto y Estado *@
+                        <div class="col-md-4">
+                            <p><strong>Teléfono 1:</strong> @empleado?.Telefono1</p>
+                            <p><strong>Teléfono 2:</strong> @empleado?.Telefono2</p>
+                            <p><strong>Período de Pago:</strong> @empleado?.PeriodoPago</p>
+                            <p><strong style="color: red">Contrato:</strong> 
+                                <button type="button" class="btn btn-primary btn-sm" onclick="generarContrato(@empleado?.EmpleadoID)">
+                                    Generar Contrato
+                                </button>
+                            </p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkActivo" disabled @(empleado?.FechaSalida == null ? "checked" : "")>
+                                <label class="form-check-label" for="chkActivo">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Botones de Acción *@
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <button type="button" class="mt-1 col-md-2 col-12 btn btn-primary me-2" onclick="editarPerfil(@empleado?.EmpleadoID)">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button type="button" class="mt-1 col-md-2 col-12 btn btn-danger me-2" onclick="darDeBaja(@empleado?.EmpleadoID)">
+                                <i class="bi bi-download"></i> Dar de Baja
+                            </button>
+                            <button type="button" class="mt-1 col-md-3 col-12 btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#agregarNotaModal">
+                                <i class="bi bi-book"></i> Agregar Nota
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Sección: Detalle de Pagos *@
+            <div class="col-md-12 mt-3">
+                <div class="card-box">
+                    <h4 class="card-title">Detalle de Pagos</h4>
+                    
+                    @* Botones de Pago *@
+                    <div class="row">
+                        <div class="col-md-3 mt-1">
+                            <button type="button" class="btn btn-primary w-100" onclick="realizarPago(@empleado?.EmpleadoID, 'Salario')">
+                                <i class="bi bi-cash"></i> Pago de Salario
+                            </button>
+                        </div>
+                        <div class="col-md-3 mt-1">
+                            <button type="button" class="btn btn-warning text-black w-100" onclick="realizarPago(@empleado?.EmpleadoID, 'Regalia')">
+                                <i class="bi bi-cash"></i> Regalía Pascual
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Historial de Pagos *@
+                    <h6 class="card-title mt-3">Historial</h6>
+                    <hr />
+                    
+                    @if (pagos != null && pagos.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha de Registro</th>
+                                        <th>Fecha de Pago</th>
+                                        <th>Tipo</th>
+                                        <th>Monto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pago in pagos)
+                                    {
+                                        <tr>
+                                            <td>@pago.FechaRegistro.ToString("dd-MMM-yyyy")</td>
+                                            <td>@pago.FechaPago.ToString("dd-MMM-yyyy")</td>
+                                            <td>@pago.Tipo</td>
+                                            <td>RD$ @pago.Total.ToString("N2")</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="imprimirRecibo(@pago.PagoID)">
+                                                    Imprimir
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarRecibo(@pago.PagoID)">
+                                                    Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay pagos registrados para este empleado.</p>
+                    }
+                </div>
+            </div>
+
+            @* Sección: Historial de Notas *@
+            <div class="col-md-12 mt-3">
+                <div class="card-box" style="min-height: 300px">
+                    <h4 class="card-title">Historial de Notas</h4>
+                    <p class="text-muted">Funcionalidad de notas pendiente de implementación.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Agregar Nota -->
+<div class="modal fade" id="agregarNotaModal" tabindex="-1" aria-labelledby="agregarNotaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarNotaModalLabel">Agregar Nota</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="txtNota" class="form-control" rows="4" maxlength="200" placeholder="Ingrese la nota (máximo 200 caracteres)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarNota()">Guardar Nota</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Procesar Pago (Nómina) -->
+<div class="modal fade" id="procesarPagoModal" tabindex="-1" aria-labelledby="procesarPagoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="procesarPagoModalLabel">Procesar Pago de Nómina</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información del Empleado -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Empleado:</strong></label>
+                        <p>@empleado?.Nombre @empleado?.Apellido</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Salario Base:</strong></label>
+                        <p>RD$ @empleado?.Salario?.ToString("N2")</p>
+                    </div>
+                </div>
+
+                <!-- Formulario de Pago -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="cbConcepto" class="form-label">Concepto</label>
+                        <select id="cbConcepto" class="form-select" onchange="calcularNomina()">
+                            <option value="Salario">Salario</option>
+                            <option value="Regalia">Regalía Pascual</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="fechaPago" class="form-label">Fecha de Pago</label>
+                        <input type="date" id="fechaPago" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cbPeriodo" class="form-label">Período</label>
+                        <select id="cbPeriodo" class="form-select" onchange="calcularNomina()">
+                            <option value="1">Período Completo</option>
+                            <option value="2">Fracción (días trabajados)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tabla: Detalle de Pago -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <strong>Detalle del Pago</strong>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-sm" id="gridDetallePago">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th class="text-end">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detalleTableBody">
+                                <!-- Se llena dinámicamente con JavaScript -->
+                            </tbody>
+                            <tfoot class="table-secondary">
+                                <tr>
+                                    <th>Total Neto</th>
+                                    <th class="text-end" id="totalNeto">RD$ 0.00</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Descuentos Personalizados -->
+                <div class="card mb-3">
+                    <div class="card-header bg-warning">
+                        <strong>Agregar Descuento Personalizado</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="descripcionDescuento" class="form-label">Descripción</label>
+                                <input type="text" id="descripcionDescuento" class="form-control" placeholder="Ej: Préstamo, Adelanto" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="montoDescuento" class="form-label">Monto</label>
+                                <input type="number" id="montoDescuento" class="form-control" placeholder="0.00" step="0.01" />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-success w-100" onclick="agregarDescuento()">
+                                    <i class="bi bi-plus-circle"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="generarPago()">
+                    <i class="bi bi-printer"></i> Generar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Función: Eliminar Recibo
+    function eliminarRecibo(pagoID) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Deseas eliminar este recibo?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EliminarRecibo", "Empleador")",
+                    data: JSON.stringify({ pagoID: pagoID }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire('Eliminado!', response.message, 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Error al eliminar el recibo', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    // Función: Imprimir Recibo (TODO: Implementar)
+    function imprimirRecibo(pagoID) {
+        Swal.fire('Información', 'Funcionalidad de impresión pendiente de implementación', 'info');
+    }
+
+    // Función: Realizar Pago (abre modal de nómina)
+    function realizarPago(empleadoID, tipo) {
+        // Configurar el concepto basado en el tipo
+        if (tipo === 'regalia') {
+            document.getElementById('cbConcepto').value = 'Regalia';
+        } else {
+            document.getElementById('cbConcepto').value = 'Salario';
+        }
+        
+        // Cargar datos de nómina
+        calcularNomina();
+        
+        // Abrir modal
+        var modal = new bootstrap.Modal(document.getElementById('procesarPagoModal'));
+        modal.show();
+    }
+
+    // Variables globales para la nómina
+    var detallesPago = [];
+    var empleadoData = {
+        empleadoID: @empleado?.EmpleadoID ?? 0,
+        salario: @empleado?.Salario ?? 0,
+        periodoPago: '@empleado?.PeriodoPago',
+        fechaInicio: '@empleado?.FechaInicio?.ToString("yyyy-MM-dd")',
+        aplicaTss: @(empleado?.TSS == true ? "true" : "false")
+    };
+
+    // Función: Calcular Nómina
+    function calcularNomina() {
+        detallesPago = [];
+        
+        var concepto = document.getElementById('cbConcepto').value;
+        var periodo = document.getElementById('cbPeriodo').value;
+        var fechaPago = document.getElementById('fechaPago').value;
+        
+        var salarioBase = empleadoData.salario;
+        var dividendo = 1;
+        var fraccion = (periodo === '2');
+        
+        // Calcular dividendo según período de pago
+        if (concepto === 'Salario') {
+            if (empleadoData.periodoPago === 'Semanal') dividendo = 4;
+            else if (empleadoData.periodoPago === 'Quincenal') dividendo = 2;
+            else dividendo = 1; // Mensual
+        }
+        
+        var salarioPagar = 0;
+        var conceptoTexto = '';
+        
+        if (fraccion) {
+            // Calcular días trabajados
+            var fechaInicio = new Date(empleadoData.fechaInicio);
+            var fechaFin = new Date(fechaPago);
+            var diasTrabajados = Math.floor((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
+            
+            salarioPagar = (salarioBase / 23.83) * diasTrabajados;
+            conceptoTexto = concepto === 'Regalia' ? 'Fracción de Regalía Pascual' : 'Fracción de Salario';
+        } else {
+            salarioPagar = salarioBase / dividendo;
+            conceptoTexto = concepto === 'Regalia' ? 'Regalía Pascual' : 'Salario Bruto';
+        }
+        
+        // Agregar salario bruto
+        detallesPago.push({ concepto: conceptoTexto, monto: salarioPagar });
+        
+        // Agregar deducciones TSS si aplica
+        if (empleadoData.aplicaTss && concepto === 'Salario') {
+            var deducciones = [
+                { nombre: 'Seguro Familiar de Salud (SFS)', porcentaje: 3.04 },
+                { nombre: 'Administradora de Fondos de Pensiones (AFP)', porcentaje: 2.87 },
+                { nombre: 'Administradora de Riesgos Laborales (ARL)', porcentaje: 1.20 }
+            ];
+            
+            deducciones.forEach(function(ded) {
+                var montoDeduccion = salarioPagar * (ded.porcentaje / 100) * -1;
+                if (fraccion) {
+                    detallesPago.push({ concepto: 'Fracción de ' + ded.nombre, monto: montoDeduccion });
+                } else {
+                    detallesPago.push({ concepto: ded.nombre, monto: montoDeduccion });
+                }
+            });
+        }
+        
+        // Renderizar tabla
+        renderizarDetallePago();
+    }
+
+    // Función: Renderizar Detalle de Pago
+    function renderizarDetallePago() {
+        var tbody = document.getElementById('detalleTableBody');
+        tbody.innerHTML = '';
+        
+        var totalNeto = 0;
+        
+        detallesPago.forEach(function(item) {
+            var row = '<tr>' +
+                      '<td>' + item.concepto + '</td>' +
+                      '<td class="text-end">' + (item.monto >= 0 ? '+' : '') + 'RD$ ' + item.monto.toFixed(2) + '</td>' +
+                      '</tr>';
+            tbody.innerHTML += row;
+            totalNeto += item.monto;
+        });
+        
+        document.getElementById('totalNeto').textContent = 'RD$ ' + totalNeto.toFixed(2);
+    }
+
+    // Función: Agregar Descuento Personalizado
+    function agregarDescuento() {
+        var descripcion = document.getElementById('descripcionDescuento').value;
+        var monto = parseFloat(document.getElementById('montoDescuento').value || 0);
+        
+        if (!descripcion || monto <= 0) {
+            Swal.fire('Error', 'Ingrese descripción y monto válidos', 'error');
+            return;
+        }
+        
+        detallesPago.push({ concepto: descripcion, monto: monto * -1 });
+        renderizarDetallePago();
+        
+        // Limpiar campos
+        document.getElementById('descripcionDescuento').value = '';
+        document.getElementById('montoDescuento').value = '';
+    }
+
+    // Función: Generar Pago (procesar nómina)
+    function generarPago() {
+        if (detallesPago.length === 0) {
+            Swal.fire('Error', 'No hay detalles de pago para procesar', 'error');
+            return;
+        }
+        
+        var requestData = {
+            empleadoID: empleadoData.empleadoID,
+            concepto: document.getElementById('cbConcepto').value,
+            fechaPago: document.getElementById('fechaPago').value,
+            periodo: parseInt(document.getElementById('cbPeriodo').value),
+            detalle: detallesPago
+        };
+        
+        Swal.fire({
+            title: 'Procesando...',
+            text: 'Generando pago de nómina',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ProcesarPago", "Empleador")',
+            data: JSON.stringify(requestData),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'Ver Recibo'
+                    }).then((result) => {
+                        if (result.isConfirmed && response.urlPdf) {
+                            window.open(response.urlPdf, '_blank');
+                        }
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Error al procesar el pago', 'error');
+            }
+        });
+    }
+
+    // Función: Generar Contrato (TODO: Implementar)
+    function generarContrato(empleadoID) {
+        Swal.fire('Información', 'Funcionalidad de generación de contrato pendiente de implementación', 'info');
+    }
+
+    // Función: Editar Perfil (TODO: Implementar formulario de edición)
+    function editarPerfil(empleadoID) {
+        Swal.fire('Información', 'Funcionalidad de edición pendiente de implementación', 'info');
+    }
+
+    // Función: Dar de Baja (TODO: Implementar)
+    function darDeBaja(empleadoID) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Deseas dar de baja a este empleado?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, dar de baja',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire('Información', 'Funcionalidad de baja pendiente de implementación', 'info');
+            }
+        });
+    }
+
+    // Función: Guardar Nota (TODO: Implementar)
+    function guardarNota() {
+        var nota = $('#txtNota').val();
+        if (nota.trim() === '') {
+            Swal.fire('Error', 'Debe ingresar una nota', 'error');
+            return;
+        }
+        Swal.fire('Información', 'Funcionalidad de notas pendiente de implementación', 'info');
+    }
+</script>
+}
