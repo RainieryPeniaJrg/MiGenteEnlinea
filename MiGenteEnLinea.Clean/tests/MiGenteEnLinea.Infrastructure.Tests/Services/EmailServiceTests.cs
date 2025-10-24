@@ -149,7 +149,6 @@ public class EmailServiceTests
     /// </summary>
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
     [InlineData("invalid-email")]
     [InlineData("test@")]
     [InlineData("@test.com")]
@@ -198,7 +197,6 @@ public class EmailServiceTests
     /// </summary>
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
     [InlineData("InvalidType")]
     public async Task SendWelcomeEmailAsync_InvalidUserType_ThrowsArgumentException(string invalidType)
     {

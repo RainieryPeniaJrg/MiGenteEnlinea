@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using MiGenteEnLinea.Web.Controllers;
 
 namespace MiGenteEnLinea.Web.Services
 {
@@ -13,6 +14,7 @@ namespace MiGenteEnLinea.Web.Services
         Task<ApiResponse<ValidateEmailResponse>> ValidateEmailAsync(string email);
         Task<ApiResponse<object>> RegisterAsync(RegisterRequest request);
         Task<ApiResponse<object>> ResendActivationEmailAsync(string userId, string email);
+        Task<ApiResponse<object>> ActivateAccountAsync(object request);
         Task<ApiResponse<List<EmpleadoDto>>> GetEmpleadosAsync(string userId, bool activo);
         Task<ApiResponse<List<ContratacionTemporalDto>>> GetContratacionesTemporalesAsync(string userId, int estatus);
         Task<ApiResponse<EmpleadoDto>> GetEmpleadoByIdAsync(string userId, int empleadoID);
@@ -35,6 +37,33 @@ namespace MiGenteEnLinea.Web.Services
         Task<bool> CancelarTrabajoAsync(int contratacionID, int detalleID);
         Task<bool> FinalizarTrabajoAsync(int contratacionID, int detalleID);
         Task<bool> CalificarContratacionAsync(string userId, object request);
+        Task<EmpleadorController.FichaColaboradorTemporalViewModel?> GetFichaColaboradorTemporalAsync(int contratacionID, string userId);
+        Task<List<TrabajoContratacionDto>> GetTrabajosContratacionAsync(int contratacionID, int estatus, string userId);
+        Task<bool> EliminarColaboradorTemporalAsync(int contratacionID, string userId);
+        Task<bool> CrearContratacionTemporalAsync(string userId, object request);
+        Task<List<PlanDto>> GetPlanesEmpleadorAsync();
+        Task<bool> ProcesarPagoSuscripcionAsync(string userId, object request);
+        Task<EmpleadorController.SuscripcionInfo?> GetMiSuscripcionAsync(string userId);
+        Task<List<EmpleadorController.VentaInfo>> GetHistorialVentasAsync(string userId);
+        Task<bool> CancelarSuscripcionAsync(string userId);
+
+        // Contratista methods
+        Task<dynamic?> GetPerfilContratistaAsync(string userId);
+        Task<ApiResponse<object>> ActualizarPerfilContratistaAsync(string userId, object request);
+        Task<ApiResponse<object>> UploadAvatarAsync(string userId, IFormFile avatarFile);
+        Task<List<ServicioContratistaDto>?> GetServiciosContratistaAsync(string userId);
+        Task<ApiResponse<object>> AddServicioAsync(string userId, string detalleServicio);
+        Task<ApiResponse<object>> DeleteServicioAsync(int servicioID);
+        Task<List<SectorDto>?> GetSectoresAsync();
+        Task<List<ProvinciaDto>?> GetProvinciasAsync();
+        Task<List<CalificacionContratistaDto>?> GetCalificacionesContratistaAsync(string userId);
+        Task<List<PlanDto>?> GetPlanesContratistaAsync();
+        Task<ApiResponse<object>> ToggleProfileStatusAsync(string userId, bool activate);
+
+        // Comunidad methods (búsqueda pública de contratistas)
+        Task<List<dynamic>?> GetUltimosContratistasAsync(int cantidad = 20);
+        Task<List<dynamic>?> BuscarContratistasAsync(string? criterio, string? ubicacion);
+        Task<dynamic?> GetPerfilContratistaPublicoAsync(string userId);
     }
 
     public class ApiService : IApiService
@@ -258,6 +287,47 @@ namespace MiGenteEnLinea.Web.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al reenviar correo de activación");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error de conexión con el servidor"
+                };
+            }
+        }
+
+        public async Task<ApiResponse<object>> ActivateAccountAsync(object request)
+        {
+            try
+            {
+                var content = new StringContent(
+                    JsonSerializer.Serialize(request),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var response = await _httpClient.PostAsync("/api/auth/activate", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse<object>
+                    {
+                        Success = true,
+                        Message = "Cuenta activada correctamente"
+                    };
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = errorContent ?? "Error al activar la cuenta"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al activar cuenta");
                 return new ApiResponse<object>
                 {
                     Success = false,
@@ -942,6 +1012,578 @@ namespace MiGenteEnLinea.Web.Services
                 return false;
             }
         }
+
+        public async Task<EmpleadorController.FichaColaboradorTemporalViewModel?> GetFichaColaboradorTemporalAsync(int contratacionID, string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/contrataciones/ficha/{contratacionID}?userId={userId}");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("No se encontró la ficha de colaborador temporal: {ContratacionID}", contratacionID);
+                    return null;
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<EmpleadorController.FichaColaboradorTemporalViewModel>(content, _jsonOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener ficha de colaborador temporal");
+                return null;
+            }
+        }
+
+        public async Task<List<TrabajoContratacionDto>> GetTrabajosContratacionAsync(int contratacionID, int estatus, string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/contrataciones/{contratacionID}/trabajos?estatus={estatus}&userId={userId}");
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("No se pudieron obtener trabajos de contratación");
+                    return new List<TrabajoContratacionDto>();
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var trabajos = JsonSerializer.Deserialize<List<TrabajoContratacionDto>>(content, _jsonOptions);
+                return trabajos ?? new List<TrabajoContratacionDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener trabajos de contratación");
+                return new List<TrabajoContratacionDto>();
+            }
+        }
+
+        public async Task<bool> EliminarColaboradorTemporalAsync(int contratacionID, string userId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"/api/contrataciones/{contratacionID}?userId={userId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar colaborador temporal");
+                return false;
+            }
+        }
+
+        public async Task<bool> CrearContratacionTemporalAsync(string userId, object request)
+        {
+            try
+            {
+                var jsonContent = JsonSerializer.Serialize(new { userId, contratacion = request }, _jsonOptions);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("/api/contrataciones/temporal", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear contratación temporal");
+                return false;
+            }
+        }
+
+        public async Task<List<PlanDto>> GetPlanesEmpleadorAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/planes/empleador");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var planes = JsonSerializer.Deserialize<List<PlanDto>>(content, _jsonOptions);
+                    return planes ?? new List<PlanDto>();
+                }
+
+                _logger.LogWarning("Error al obtener planes: {StatusCode}", response.StatusCode);
+                return new List<PlanDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener planes de empleador");
+                return new List<PlanDto>();
+            }
+        }
+
+        public async Task<bool> ProcesarPagoSuscripcionAsync(string userId, object request)
+        {
+            try
+            {
+                var jsonContent = JsonSerializer.Serialize(new { userId, pago = request }, _jsonOptions);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("/api/suscripciones/procesar-pago", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar pago de suscripción");
+                return false;
+            }
+        }
+
+        public async Task<EmpleadorController.SuscripcionInfo?> GetMiSuscripcionAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/suscripciones/mi-suscripcion?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var suscripcion = JsonSerializer.Deserialize<EmpleadorController.SuscripcionInfo>(content, _jsonOptions);
+                    return suscripcion;
+                }
+
+                _logger.LogWarning("No se encontró suscripción para usuario {UserId}", userId);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener suscripción del usuario");
+                return null;
+            }
+        }
+
+        public async Task<List<EmpleadorController.VentaInfo>> GetHistorialVentasAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/suscripciones/historial-ventas?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var ventas = JsonSerializer.Deserialize<List<EmpleadorController.VentaInfo>>(content, _jsonOptions);
+                    return ventas ?? new List<EmpleadorController.VentaInfo>();
+                }
+
+                _logger.LogWarning("No se encontró historial de ventas para usuario {UserId}", userId);
+                return new List<EmpleadorController.VentaInfo>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener historial de ventas");
+                return new List<EmpleadorController.VentaInfo>();
+            }
+        }
+
+        public async Task<bool> CancelarSuscripcionAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"/api/suscripciones/cancelar?userId={userId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cancelar suscripción");
+                return false;
+            }
+        }
+
+        #region Contratista Methods
+
+        public async Task<dynamic?> GetPerfilContratistaAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/contratistas/perfil?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<dynamic>(content, _jsonOptions);
+                    return perfil;
+                }
+
+                _logger.LogWarning("No se encontró perfil de contratista para usuario {UserId}", userId);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener perfil de contratista");
+                return null;
+            }
+        }
+
+        public async Task<ApiResponse<object>> ActualizarPerfilContratistaAsync(string userId, object request)
+        {
+            try
+            {
+                var jsonContent = JsonSerializer.Serialize(new { userId, perfil = request }, _jsonOptions);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync("/api/contratistas/perfil", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse<object> { Success = true };
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Error al actualizar perfil: {errorContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar perfil de contratista");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error al actualizar el perfil"
+                };
+            }
+        }
+
+        public async Task<ApiResponse<object>> UploadAvatarAsync(string userId, IFormFile avatarFile)
+        {
+            try
+            {
+                using var formData = new MultipartFormDataContent();
+                using var fileStream = avatarFile.OpenReadStream();
+                using var fileContent = new StreamContent(fileStream);
+
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(avatarFile.ContentType);
+                formData.Add(fileContent, "avatarFile", avatarFile.FileName);
+                formData.Add(new StringContent(userId), "userId");
+
+                var response = await _httpClient.PostAsync("/api/contratistas/avatar", formData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<dynamic>(content, _jsonOptions);
+                    return new ApiResponse<object>
+                    {
+                        Success = true,
+                        Data = result
+                    };
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Error al subir avatar: {errorContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al subir avatar de contratista");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error al subir la imagen"
+                };
+            }
+        }
+
+        public async Task<List<ServicioContratistaDto>?> GetServiciosContratistaAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/contratistas/servicios?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var servicios = JsonSerializer.Deserialize<List<ServicioContratistaDto>>(content, _jsonOptions);
+                    return servicios ?? new List<ServicioContratistaDto>();
+                }
+
+                _logger.LogWarning("No se encontraron servicios para contratista {UserId}", userId);
+                return new List<ServicioContratistaDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener servicios del contratista");
+                return new List<ServicioContratistaDto>();
+            }
+        }
+
+        public async Task<ApiResponse<object>> AddServicioAsync(string userId, string detalleServicio)
+        {
+            try
+            {
+                var jsonContent = JsonSerializer.Serialize(new { userId, detalleServicio }, _jsonOptions);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("/api/contratistas/servicios", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<dynamic>(responseContent, _jsonOptions);
+                    return new ApiResponse<object>
+                    {
+                        Success = true,
+                        Data = result
+                    };
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Error al agregar servicio: {errorContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al agregar servicio");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error al agregar el servicio"
+                };
+            }
+        }
+
+        public async Task<ApiResponse<object>> DeleteServicioAsync(int servicioID)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"/api/contratistas/servicios/{servicioID}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse<object> { Success = true };
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Error al eliminar servicio: {errorContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar servicio");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error al eliminar el servicio"
+                };
+            }
+        }
+
+        public async Task<List<SectorDto>?> GetSectoresAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/catalogos/sectores");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var sectores = JsonSerializer.Deserialize<List<SectorDto>>(content, _jsonOptions);
+                    return sectores ?? new List<SectorDto>();
+                }
+
+                _logger.LogWarning("No se encontraron sectores");
+                return new List<SectorDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener sectores");
+                return new List<SectorDto>();
+            }
+        }
+
+        public async Task<List<ProvinciaDto>?> GetProvinciasAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/catalogos/provincias");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var provincias = JsonSerializer.Deserialize<List<ProvinciaDto>>(content, _jsonOptions);
+                    return provincias ?? new List<ProvinciaDto>();
+                }
+
+                _logger.LogWarning("No se encontraron provincias");
+                return new List<ProvinciaDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener provincias");
+                return new List<ProvinciaDto>();
+            }
+        }
+
+        public async Task<List<CalificacionContratistaDto>?> GetCalificacionesContratistaAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/calificaciones/contratista?userId={userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var calificaciones = JsonSerializer.Deserialize<List<CalificacionContratistaDto>>(content, _jsonOptions);
+                    return calificaciones ?? new List<CalificacionContratistaDto>();
+                }
+
+                _logger.LogWarning("No se encontraron calificaciones para contratista {UserId}", userId);
+                return new List<CalificacionContratistaDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener calificaciones del contratista");
+                return new List<CalificacionContratistaDto>();
+            }
+        }
+
+        public async Task<List<PlanDto>?> GetPlanesContratistaAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/planes/contratista");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var planes = JsonSerializer.Deserialize<List<PlanDto>>(content, _jsonOptions);
+                    return planes ?? new List<PlanDto>();
+                }
+
+                _logger.LogWarning("No se encontraron planes para contratistas");
+                return new List<PlanDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener planes de contratista");
+                return new List<PlanDto>();
+            }
+        }
+
+        public async Task<ApiResponse<object>> ToggleProfileStatusAsync(string userId, bool activate)
+        {
+            try
+            {
+                var jsonContent = JsonSerializer.Serialize(new { userId, activate }, _jsonOptions);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("/api/contratistas/toggle-status", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse<object> { Success = true };
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Error al cambiar estado del perfil: {errorContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cambiar estado del perfil");
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Error al cambiar el estado del perfil"
+                };
+            }
+        }
+
+        #endregion
+
+        #region Comunidad Methods
+
+        public async Task<List<dynamic>?> GetUltimosContratistasAsync(int cantidad = 20)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/comunidad/ultimos?cantidad={cantidad}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var contratistas = JsonSerializer.Deserialize<List<dynamic>>(content, _jsonOptions);
+                    return contratistas;
+                }
+
+                _logger.LogWarning("No se encontraron contratistas");
+                return new List<dynamic>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener últimos contratistas");
+                return new List<dynamic>();
+            }
+        }
+
+        public async Task<List<dynamic>?> BuscarContratistasAsync(string? criterio, string? ubicacion)
+        {
+            try
+            {
+                var queryParams = new List<string>();
+                if (!string.IsNullOrEmpty(criterio))
+                    queryParams.Add($"criterio={Uri.EscapeDataString(criterio)}");
+                if (!string.IsNullOrEmpty(ubicacion))
+                    queryParams.Add($"ubicacion={Uri.EscapeDataString(ubicacion)}");
+
+                var query = queryParams.Count > 0 ? "?" + string.Join("&", queryParams) : "";
+                var response = await _httpClient.GetAsync($"/api/comunidad/buscar{query}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var contratistas = JsonSerializer.Deserialize<List<dynamic>>(content, _jsonOptions);
+                    return contratistas;
+                }
+
+                _logger.LogWarning("No se encontraron contratistas con los criterios proporcionados");
+                return new List<dynamic>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al buscar contratistas");
+                return new List<dynamic>();
+            }
+        }
+
+        public async Task<dynamic?> GetPerfilContratistaPublicoAsync(string userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/comunidad/perfil/{userId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var perfil = JsonSerializer.Deserialize<dynamic>(content, _jsonOptions);
+                    return perfil;
+                }
+
+                _logger.LogWarning("No se encontró el perfil del contratista {UserId}", userId);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener perfil público del contratista {UserId}", userId);
+                return null;
+            }
+        }
+
+        #endregion
     }
 
     // DTOs
@@ -1132,4 +1774,60 @@ namespace MiGenteEnLinea.Web.Services
         public int PagoID { get; set; }
         public string UrlPdf { get; set; } = string.Empty;
     }
+
+    public class TrabajoContratacionDto
+    {
+        public int DetalleID { get; set; }
+        public int ContratacionID { get; set; }
+        public string DescripcionCorta { get; set; } = string.Empty;
+        public string DescripcionAmpliada { get; set; } = string.Empty;
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFinal { get; set; }
+        public decimal MontoAcordado { get; set; }
+        public string EsquemaPagos { get; set; } = string.Empty;
+        public int Estatus { get; set; }
+    }
+
+    public class PlanDto
+    {
+        public int PlanID { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public decimal Precio { get; set; }
+        public int MaxEmpleados { get; set; }
+        public int MaxUsuarios { get; set; }
+        public string Caracteristicas { get; set; } = string.Empty; // Separadas por |
+        public int Duracion { get; set; } // En meses
+    }
+
+    // Contratista DTOs
+    public class ServicioContratistaDto
+    {
+        public int ServicioID { get; set; }
+        public string DetalleServicio { get; set; } = string.Empty;
+        public int ContratistaID { get; set; }
+    }
+
+    public class SectorDto
+    {
+        public int SectorID { get; set; }
+        public string Sector { get; set; } = string.Empty;
+    }
+
+    public class ProvinciaDto
+    {
+        public int ProvinciaID { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+    }
+
+    public class CalificacionContratistaDto
+    {
+        public int CalificacionID { get; set; }
+        public DateTime Fecha { get; set; }
+        public string? NombreCalificador { get; set; }
+        public int Puntualidad { get; set; }
+        public int Conocimientos { get; set; }
+        public int Cumplimiento { get; set; }
+        public int Recomendacion { get; set; }
+    }
 }
+

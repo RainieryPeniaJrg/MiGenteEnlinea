@@ -39,6 +39,6 @@ public class OpenAiConfigConfiguration : IEntityTypeConfiguration<OpenAiConfig>
             .IsRequired(false); // Legacy permite null
 
         // Comentarios de documentación (si tu SQL Server lo soporta)
-        builder.HasComment("Configuración del bot OpenAI para el 'abogado virtual'. ⚠️ Contiene información sensible.");
+        builder.ToTable(t => t.HasComment("Configuración del bot OpenAI para el 'abogado virtual'. ⚠️ Contiene información sensible."));
     }
 }

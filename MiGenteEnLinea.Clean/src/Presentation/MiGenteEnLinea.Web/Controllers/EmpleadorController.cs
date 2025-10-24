@@ -159,6 +159,283 @@ namespace MiGenteEnLinea.Web.Controllers
 
         #endregion
 
+        #region FichaColaboradorTemporal
+
+        /// <summary>
+        /// Página de Ficha de Colaborador Temporal
+        /// </summary>
+        public async Task<IActionResult> FichaColaboradorTemporal(int contratacionID)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                var ficha = await _apiService.GetFichaColaboradorTemporalAsync(contratacionID, userId);
+
+                if (ficha == null)
+                {
+                    _logger.LogWarning("Ficha de colaborador temporal no encontrada: {ContratacionID}", contratacionID);
+                    TempData["Error"] = "No se encontró el colaborador solicitado";
+                    return RedirectToAction("Colaboradores");
+                }
+
+                ViewBag.ContratacionID = contratacionID;
+
+                return View(ficha);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar ficha de colaborador temporal");
+                TempData["Error"] = "Error al cargar información del colaborador";
+                return RedirectToAction("Colaboradores");
+            }
+        }
+
+        /// <summary>
+        /// AJAX: Obtener trabajos de contratación por estatus
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetTrabajosContratacion(int contratacionID, int estatus)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
+
+                var trabajos = await _apiService.GetTrabajosContratacionAsync(contratacionID, estatus, userId);
+
+                return Json(new { success = true, data = trabajos });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener trabajos de contratación");
+                return Json(new { success = false, message = "Error al cargar trabajos" });
+            }
+        }
+
+        /// <summary>
+        /// AJAX: Eliminar colaborador temporal
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> EliminarColaborador([FromBody] EliminarColaboradorRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
+
+                var resultado = await _apiService.EliminarColaboradorTemporalAsync(request.ContratacionID, userId);
+
+                if (resultado)
+                {
+                    return Json(new { success = true, message = "Colaborador eliminado correctamente" });
+                }
+
+                return Json(new { success = false, message = "No se pudo eliminar el colaborador" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar colaborador temporal");
+                return Json(new { success = false, message = "Error al eliminar colaborador" });
+            }
+        }
+
+        /// <summary>
+        /// AJAX: Crear nueva contratación temporal
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> NuevaContratacion([FromBody] NuevaContratacionRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
+
+                var resultado = await _apiService.CrearContratacionTemporalAsync(userId, request);
+
+                if (resultado)
+                {
+                    return Json(new { success = true, message = "Contratación creada correctamente" });
+                }
+
+                return Json(new { success = false, message = "No se pudo crear la contratación" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear nueva contratación");
+                return Json(new { success = false, message = "Error al crear contratación" });
+            }
+        }
+
+        #endregion
+
+        #region AdquirirPlan
+
+        /// <summary>
+        /// GET: Mostrar planes disponibles para empleadores
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> AdquirirPlan()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                // Obtener planes desde API
+                var planes = await _apiService.GetPlanesEmpleadorAsync();
+
+                return View(planes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar planes");
+                TempData["Error"] = "Error al cargar los planes disponibles";
+                return View(new List<Services.PlanDto>());
+            }
+        }
+
+        /// <summary>
+        /// POST: Procesar pago de suscripción con Cardnet
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> ProcesarPago([FromBody] PagoSuscripcionRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
+
+                // Validaciones básicas
+                if (request.PlanID <= 0 || request.Monto <= 0)
+                {
+                    return Json(new { success = false, message = "Datos de plan inválidos" });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.NombreTitular) ||
+                    string.IsNullOrWhiteSpace(request.NumeroTarjeta) ||
+                    string.IsNullOrWhiteSpace(request.FechaVencimiento) ||
+                    string.IsNullOrWhiteSpace(request.CVV))
+                {
+                    return Json(new { success = false, message = "Complete todos los campos del formulario" });
+                }
+
+                // Procesar pago a través de API
+                var resultado = await _apiService.ProcesarPagoSuscripcionAsync(userId, request);
+
+                if (resultado)
+                {
+                    _logger.LogInformation("Pago procesado exitosamente para usuario {UserId}, plan {PlanID}", userId, request.PlanID);
+                    return Json(new { success = true, message = "Suscripción completada correctamente" });
+                }
+                else
+                {
+                    _logger.LogWarning("Falló procesamiento de pago para usuario {UserId}", userId);
+                    return Json(new { success = false, message = "Error al procesar el pago. Verifique los datos de su tarjeta." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al procesar pago de suscripción");
+                return Json(new { success = false, message = "Error al procesar el pago. Inténtelo nuevamente." });
+            }
+        }
+
+        #endregion
+
+        #region MiSuscripcion
+
+        /// <summary>
+        /// GET: Ver información de suscripción actual e historial de pagos
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> MiSuscripcion()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                // Obtener suscripción actual
+                var suscripcion = await _apiService.GetMiSuscripcionAsync(userId);
+
+                // Obtener historial de ventas
+                var ventas = await _apiService.GetHistorialVentasAsync(userId);
+
+                var viewModel = new MiSuscripcionViewModel
+                {
+                    Suscripcion = suscripcion,
+                    Ventas = ventas
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar suscripción");
+                TempData["Error"] = "Error al cargar información de suscripción";
+                return View(new MiSuscripcionViewModel());
+            }
+        }
+
+        /// <summary>
+        /// POST: Cancelar suscripción actual
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> CancelarSuscripcion()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Usuario no autenticado" });
+                }
+
+                var resultado = await _apiService.CancelarSuscripcionAsync(userId);
+
+                if (resultado)
+                {
+                    _logger.LogInformation("Suscripción cancelada para usuario {UserId}", userId);
+                    return Json(new { success = true, message = "Suscripción cancelada exitosamente" });
+                }
+                else
+                {
+                    _logger.LogWarning("Falló cancelación de suscripción para usuario {UserId}", userId);
+                    return Json(new { success = false, message = "No se pudo cancelar la suscripción" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cancelar suscripción");
+                return Json(new { success = false, message = "Error al procesar la solicitud" });
+            }
+        }
+
+        #endregion
+
         #region DetalleContratacion
 
         /// <summary>
@@ -714,7 +991,9 @@ namespace MiGenteEnLinea.Web.Controllers
             var viewModel = new FichaEmpleadoViewModel
             {
                 Empleado = response.Data,
-                Pagos = pagosResponse.Success ? pagosResponse.Data : new List<PagoEmpleadoDto>()
+                Pagos = pagosResponse.Success && pagosResponse.Data != null 
+                    ? pagosResponse.Data 
+                    : new List<PagoEmpleadoDto>()
             };
 
             return View(viewModel);
@@ -1082,6 +1361,32 @@ namespace MiGenteEnLinea.Web.Controllers
             public int Recomendacion { get; set; }
         }
 
+        public class EliminarColaboradorRequest
+        {
+            public int ContratacionID { get; set; }
+        }
+
+        public class NuevaContratacionRequest
+        {
+            public int ContratacionID { get; set; }
+            public string DescripcionCorta { get; set; } = string.Empty;
+            public string DescripcionAmpliada { get; set; } = string.Empty;
+            public DateTime FechaInicio { get; set; }
+            public DateTime FechaConclusion { get; set; }
+            public decimal MontoAcordado { get; set; }
+            public string EsquemaPagos { get; set; } = string.Empty;
+        }
+
+        public class PagoSuscripcionRequest
+        {
+            public int PlanID { get; set; }
+            public string NombreTitular { get; set; } = string.Empty;
+            public string NumeroTarjeta { get; set; } = string.Empty;
+            public string FechaVencimiento { get; set; } = string.Empty;
+            public string CVV { get; set; } = string.Empty;
+            public decimal Monto { get; set; }
+        }
+
         #endregion
 
         #region ViewModels
@@ -1096,6 +1401,27 @@ namespace MiGenteEnLinea.Web.Controllers
         {
             public PerfilEmpleadorDto? Perfil { get; set; }
             public int MaxUsuarios { get; set; }
+        }
+
+        public class FichaColaboradorTemporalViewModel
+        {
+            public int ContratacionID { get; set; }
+            public DateTime FechaRegistro { get; set; }
+            public int Tipo { get; set; } // 1 = Persona Física, 2 = Empresa
+            public string Identificacion { get; set; } = string.Empty;
+            public string RNC { get; set; } = string.Empty;
+            public string Nombre { get; set; } = string.Empty;
+            public string Apellido { get; set; } = string.Empty;
+            public string NombreComercial { get; set; } = string.Empty;
+            public string NombreCompleto { get; set; } = string.Empty;
+            public string Direccion { get; set; } = string.Empty;
+            public string Provincia { get; set; } = string.Empty;
+            public string Municipio { get; set; } = string.Empty;
+            public string Telefono1 { get; set; } = string.Empty;
+            public string? Telefono2 { get; set; }
+            public string? Foto { get; set; }
+            public string? NombreRepresentante { get; set; }
+            public string? CedulaRepresentante { get; set; }
         }
 
         public class DetalleContratacionViewModel
@@ -1118,6 +1444,30 @@ namespace MiGenteEnLinea.Web.Controllers
             public int Cumplimiento { get; set; }
             public int Conocimientos { get; set; }
             public int Recomendacion { get; set; }
+        }
+
+        public class MiSuscripcionViewModel
+        {
+            public SuscripcionInfo? Suscripcion { get; set; }
+            public List<VentaInfo> Ventas { get; set; } = new();
+        }
+
+        public class SuscripcionInfo
+        {
+            public string NombrePlan { get; set; } = string.Empty;
+            public DateTime FechaInicio { get; set; }
+            public DateTime ProximoPago { get; set; }
+            public bool EstaActiva { get; set; }
+        }
+
+        public class VentaInfo
+        {
+            public int VentaID { get; set; }
+            public DateTime Fecha { get; set; }
+            public string IdTransaccion { get; set; } = string.Empty;
+            public string NombrePlan { get; set; } = string.Empty;
+            public decimal Precio { get; set; }
+            public string TarjetaEnmascarada { get; set; } = string.Empty;
         }
 
         public class PagoContratacionInfo

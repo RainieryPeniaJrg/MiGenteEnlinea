@@ -1448,147 +1448,177 @@ app.UseIpRateLimiting();
    - Integration tests for API endpoints
    - Security tests (OWASP validation)
 
-roject coding standards
-General C# Coding Standards
-Use var only when the type is obvious; otherwise, use explicit types.
-Keep line length under 120 characters.
-Use consistent indentation and always include braces ({}) even for single-line statements.
-Group using directives with System.\* first, then others in alphabetical order.
-Naming Conventions
-Use PascalCase for component names, classes, methods, and properties.
-Use camelCase for parameters and local variables.
-Prefix private fields with \_ (e.g., \_userService).
-Blazor component files must match the component class name (e.g., MyComponent.razor must contain MyComponent).
-Blazor-Specific Best Practices
-Split large components into smaller, reusable child components.
-Use @code { } instead of @functions { }.
-Keep UI markup and C# logic separate when complexity grows (e.g., use partial classes).
-Avoid directly mutating bound parameters ([Parameter]) in child components.
-Use EventCallback<T> instead of Action or custom delegates for parameter events.
-Use CascadingParameter for passing data like authentication state, theme, or culture.
-Prefer OnInitializedAsync() over OnInitialized() when using await.
-Component Architecture
-Organize components by domain/feature in folders (e.g., Pages/, Components/, Shared/).
-Follow the MVU or MVVM pattern when the state becomes complex.
-Use @inject for dependency injection rather than service locators.
-Prefer RenderFragment over MarkupString unless you need raw HTML rendering.
-Performance Best Practices
-Minimize re-rendering by using ShouldRender() or conditional UI logic.
-Use @key in @foreach loops to help Blazor track DOM elements.
-Avoid using async void; use async Task instead.
-Dispose components that use resources by implementing IDisposable.
-Security Guidelines
-Never trust client-side validation—always validate on the server.
-Avoid exposing sensitive logic or secrets in .razor files.
-Use Microsoft.AspNetCore.Components.Authorization for secure user authentication and role checking.
-Use proper encoding when injecting raw HTML or third-party content.
-Reusability and Maintainability
-Prefer RenderFragment parameters to allow child content injection (similar to slot in other frameworks).
-Isolate reusable logic in services or base classes.
-Use feature-based folders to group pages, components, and services.
-Testing & Tooling
-Use bUnit for unit testing Blazor components.
-Mock services using Moq, FakeItEasy, or NSubstitute in test projects.
-Use IJSRuntime abstraction for JavaScript interop, and mock it in tests.
-Validate components for accessibility (ARIA, keyboard navigation).
-Debugging and Diagnostics
-Use @ref cautiously to avoid tight coupling.
-Enable detailed error messages in development mode.
-Use browser dev tools and Blazor’s built-in error boundaries.
-General .NET Testability Guidelines
-Follow the Arrange-Act-Assert pattern in unit tests.
-Ensure all services are injected through interfaces.
-Avoid static classes unless stateless and pure utility.
-Keep logic out of the UI layer when possible for easier testing.
 
----
+# Project coding standards
 
-Project coding standards
-General C# Coding Standards
-Use var only when the type is obvious from the right-hand side; otherwise, use explicit types.
-Use consistent indentation and always use braces, even for single-line blocks.
-Keep line length under 120 characters.
-Organize using directives alphabetically and group system namespaces first.
-Naming Conventions
-Use PascalCase for class names, methods, properties, and namespaces.
-Use camelCase for variables and method parameters.
-Prefix private fields with \_ and use camelCase (e.g., \_service).
-Avoid abbreviations; prefer descriptive and meaningful names.
-Design Patterns & Architecture
-Follow the SOLID principles.
-Prefer composition over inheritance.
-Use Dependency Injection for decoupling and testability.
-Apply appropriate design patterns such as Repository, Strategy, Factory, and Adapter where applicable.
-Follow Clean Architecture when structuring large applications.
-Code Quality and Maintainability
-Keep methods small and focused; one method should do one thing only.
-Avoid magic numbers and strings—use constants or enums.
-Prefer modern C# features such as:
-Pattern matching
-Null-coalescing operators (??, ??=)
-switch expressions
-Records and value types
-Expression-bodied members
-Performance and Memory Efficiency
-Avoid unnecessary allocations (e.g., avoid ToList() unless required).
-Use Span<T> and Memory<T> when working with slices of data.
-Prefer ValueTask over Task in performance-critical async methods.
-Avoid boxing/unboxing and excessive object creation in loops or hot paths.
-Error Handling and Logging
-Do not silently catch or suppress exceptions.
-Catch only specific exception types when possible.
-Use exception filters and when clauses to improve readability.
-Use logging frameworks (e.g., Serilog, Microsoft.Extensions.Logging) for structured logging.
-Security Best Practices
-Validate all input, especially data coming from clients or external sources.
-Avoid hardcoded credentials or API keys. Use secrets management or configuration files.
-Sanitize and encode output to prevent XSS or injection attacks.
-Use secure algorithms for hashing and encryption (e.g., SHA-256, AES-GCM).
-Testability
-Favor interfaces and abstractions over concrete types.
-Use dependency injection and mocking libraries for unit tests.
-Avoid static classes when testability is important.
-Write unit tests using xUnit, NUnit, or MSTest with clear Arrange/Act/Assert structure.
+## General C# Coding Standards
+- Use `var` only when the type is obvious; otherwise, use explicit types.
+- Keep line length under 120 characters.
+- Use consistent indentation and always include braces (`{}`) even for single-line statements.
+- Group `using` directives with `System.*` first, then others in alphabetical order.
 
-Project coding standards
-General PowerShell Best Practices
-Always use PascalCase for function names (e.g., Get-UserInfo) and camelCase for variables.
-Follow the verb-noun convention in function names using approved verbs from Get-Verb.
-Write functions with CmdletBinding() and proper parameter blocks.
-Avoid aliases (e.g., use Get-ChildItem, not gci) for clarity and cross-platform compatibility.
-Use Write-Verbose, Write-Output, and Write-Error appropriately based on the context.
-Code Style and Structure
-Use Tabs for indentation—be consistent across scripts.
-Avoid one-liners for complex logic; prefer clarity over brevity.
-Use Begin, Process, End blocks when writing advanced functions.
-Prefer param() blocks with type constraints and default values.
-Security Best Practices
-Avoid hardcoding credentials; use Get-Credential or Windows Credential Manager.
-Always validate and sanitize input from users or external sources.
-Use -ErrorAction Stop when handling critical operations to catch and handle errors properly.
-Avoid invoking external executables without validating paths or input.
-Tooling & Modules
-Prefer using modules (.psm1) over large scripts when sharing functions.
-Group related functions into modules with a clear Export-ModuleMember section.
-Use comment-based help for all public functions (.SYNOPSIS, .DESCRIPTION, .EXAMPLE, .PARAMETER, .OUTPUTS).
-Testing and Validation
-Use Pester for testing PowerShell functions and scripts.
-Follow the Arrange-Act-Assert structure in Pester tests.
-Validate scripts with Invoke-ScriptAnalyzer and fix violations.
-Reusability and Maintainability
-Break large scripts into reusable functions or modules.
-Use Try/Catch/Finally for error handling instead of checking $? or $LASTEXITCODE.
-Comment and document non-trivial logic using inline comments.
-Avoid excessive pipeline chaining—use intermediate variables when needed.
-Clean Output
-Always return structured data (e.g., hashtables or custom objects), not raw strings.
-Avoid unnecessary Write-Host (use Write-Output or return values).
-Do not use Write-Output for logging—use Write-Verbose or Write-Information.
-Performance Considerations
-Use [ordered] and [hashtable] appropriately when working with key-value pairs.
-Avoid unnecessary loops; leverage the pipeline and built-in cmdlets like ForEach-Object.
-Use Where-Object and Select-Object efficiently to reduce memory and improve readability.
+## Naming Conventions
+- Use `PascalCase` for component names, classes, methods, and properties.
+- Use `camelCase` for parameters and local variables.
+- Prefix private fields with `_` (e.g., `_userService`).
+- Blazor component files must match the component class name (e.g., `MyComponent.razor` must contain `MyComponent`).
 
-_Last updated: 2025-10-12_
+## Blazor-Specific Best Practices
+- Split large components into smaller, reusable child components.
+- Use `@code { }` instead of `@functions { }`.
+- Keep UI markup and C# logic separate when complexity grows (e.g., use partial classes).
+- Avoid directly mutating bound parameters (`[Parameter]`) in child components.
+- Use `EventCallback<T>` instead of `Action` or custom delegates for parameter events.
+- Use `CascadingParameter` for passing data like authentication state, theme, or culture.
+- Prefer `OnInitializedAsync()` over `OnInitialized()` when using `await`.
+
+## Component Architecture
+- Organize components by domain/feature in folders (e.g., `Pages/`, `Components/`, `Shared/`).
+- Follow the MVU or MVVM pattern when the state becomes complex.
+- Use `@inject` for dependency injection rather than service locators.
+- Prefer `RenderFragment` over `MarkupString` unless you need raw HTML rendering.
+
+##  Performance Best Practices
+- Minimize re-rendering by using `ShouldRender()` or conditional UI logic.
+- Use `@key` in `@foreach` loops to help Blazor track DOM elements.
+- Avoid using `async void`; use `async Task` instead.
+- Dispose components that use resources by implementing `IDisposable`.
+
+## Security Guidelines
+- Never trust client-side validation—always validate on the server.
+- Avoid exposing sensitive logic or secrets in `.razor` files.
+- Use `Microsoft.AspNetCore.Components.Authorization` for secure user authentication and role checking.
+- Use proper encoding when injecting raw HTML or third-party content.
+
+## Reusability and Maintainability
+- Prefer `RenderFragment` parameters to allow child content injection (similar to slot in other frameworks).
+- Isolate reusable logic in services or base classes.
+- Use feature-based folders to group pages, components, and services.
+
+## Testing & Tooling
+- Use `bUnit` for unit testing Blazor components.
+- Mock services using `Moq`, `FakeItEasy`, or `NSubstitute` in test projects.
+- Use `IJSRuntime` abstraction for JavaScript interop, and mock it in tests.
+- Validate components for accessibility (ARIA, keyboard navigation).
+
+## Debugging and Diagnostics
+- Use `@ref` cautiously to avoid tight coupling.
+- Enable detailed error messages in development mode.
+- Use browser dev tools and Blazor’s built-in error boundaries.
+
+## General .NET Testability Guidelines
+- Follow the Arrange-Act-Assert pattern in unit tests.
+- Ensure all services are injected through interfaces.
+- Avoid static classes unless stateless and pure utility.
+- Keep logic out of the UI layer when possible for easier testing.
+ 54 changes: 54 additions & 0 deletions54
+csharp.md
+Original file line number	Original file line	Diff line number	Diff line change
+@@ -0,0 +1,54 @@
+# Project coding standards
+
+## General C# Coding Standards
+- Use `var` only when the type is obvious from the right-hand side; otherwise, use explicit types.
+- Use consistent indentation and always use braces, even for single-line blocks.
+- Keep line length under 120 characters.
+- Organize `using` directives alphabetically and group system namespaces first.
+
+## Naming Conventions
+- Use `PascalCase` for class names, methods, properties, and namespaces.
+- Use `camelCase` for variables and method parameters.
+- Prefix private fields with `_` and use `camelCase` (e.g., `_service`).
+- Avoid abbreviations; prefer descriptive and meaningful names.
+
+## Design Patterns & Architecture
+- Follow the SOLID principles.
+- Prefer composition over inheritance.
+- Use Dependency Injection for decoupling and testability.
+- Apply appropriate design patterns such as Repository, Strategy, Factory, and Adapter where applicable.
+- Follow Clean Architecture when structuring large applications.
+
+## Code Quality and Maintainability
+- Keep methods small and focused; one method should do one thing only.
+- Avoid magic numbers and strings—use constants or enums.
+- Prefer modern C# features such as:
+  - Pattern matching
+  - Null-coalescing operators (`??`, `??=`)
+  - `switch` expressions
+  - Records and value types
+  - Expression-bodied members
+
+## Performance and Memory Efficiency
+- Avoid unnecessary allocations (e.g., avoid `ToList()` unless required).
+- Use `Span<T>` and `Memory<T>` when working with slices of data.
+- Prefer `ValueTask` over `Task` in performance-critical async methods.
+- Avoid boxing/unboxing and excessive object creation in loops or hot paths.
+
+## Error Handling and Logging
+- Do not silently catch or suppress exceptions.
+- Catch only specific exception types when possible.
+- Use exception filters and `when` clauses to improve readability.
+- Use logging frameworks (e.g., Serilog, Microsoft.Extensions.Logging) for structured logging.
+
+## Security Best Practices
+- Validate all input, especially data coming from clients or external sources.
+- Avoid hardcoded credentials or API keys. Use secrets management or configuration files.
+- Sanitize and encode output to prevent XSS or injection attacks.
+- Use secure algorithms for hashing and encryption (e.g., SHA-256, AES-GCM).
+
+## Testability
+- Favor interfaces and abstractions over concrete types.
+- Use dependency injection and mocking libraries for unit tests.
+- Avoid static classes when testability is important.
+- Write unit tests using xUnit, NUnit, or MSTest with clear Arrange/Act/Assert structure.
+ 46 changes: 46 additions & 0 deletions46
+powershell.md
+Original file line number	Original file line	Diff line number	Diff line change
+@@ -0,0 +1,46 @@
+# Project coding standards
+
+## General PowerShell Best Practices
+- Always use `PascalCase` for function names (e.g., `Get-UserInfo`) and `camelCase` for variables.
+- Follow the verb-noun convention in function names using approved verbs from `Get-Verb`.
+- Write functions with `CmdletBinding()` and proper parameter blocks.
+- Avoid aliases (e.g., use `Get-ChildItem`, not `gci`) for clarity and cross-platform compatibility.
+- Use `Write-Verbose`, `Write-Output`, and `Write-Error` appropriately based on the context.
+
+## Code Style and Structure
+- Use Tabs for indentation—be consistent across scripts.
+- Avoid one-liners for complex logic; prefer clarity over brevity.
+- Use `Begin`, `Process`, `End` blocks when writing advanced functions.
+- Prefer `param()` blocks with type constraints and default values.
+
+## Security Best Practices
+- Avoid hardcoding credentials; use `Get-Credential` or Windows Credential Manager.
+- Always validate and sanitize input from users or external sources.
+- Use `-ErrorAction Stop` when handling critical operations to catch and handle errors properly.
+- Avoid invoking external executables without validating paths or input.
+
+## Tooling & Modules
+- Prefer using modules (`.psm1`) over large scripts when sharing functions.
+- Group related functions into modules with a clear `Export-ModuleMember` section.
+- Use comment-based help for all public functions (`.SYNOPSIS`, `.DESCRIPTION`, `.EXAMPLE`, `.PARAMETER`, `.OUTPUTS`).
+
+## Testing and Validation
+- Use Pester for testing PowerShell functions and scripts.
+- Follow the Arrange-Act-Assert structure in Pester tests.
+- Validate scripts with `Invoke-ScriptAnalyzer` and fix violations.
+
+## Reusability and Maintainability
+- Break large scripts into reusable functions or modules.
+- Use `Try/Catch/Finally` for error handling instead of checking `$?` or `$LASTEXITCODE`.
+- Comment and document non-trivial logic using inline comments.
+- Avoid excessive pipeline chaining—use intermediate variables when needed.
+
+## Clean Output
+- Always return structured data (e.g., hashtables or custom objects), not raw strings.
+- Avoid unnecessary `Write-Host` (use `Write-Output` or return values).
+- Do not use `Write-Output` for logging—use `Write-Verbose` or `Write-Information`.
+
+## Performance Considerations
+- Use `[ordered]` and `[hashtable]` appropriately when working with key-value pairs.
+- Avoid unnecessary loops; leverage the pipeline and built-in cmdlets like `ForEach-Object`.
+- Use `Where-Object` and `Select-Object` efficiently to reduce memory and improve readability.
+_Last updated: 2025-10-22_
 _Based on Security Audit: September 2025_
 _For questions about business logic or specific features, consult the project owner before making assumptions._

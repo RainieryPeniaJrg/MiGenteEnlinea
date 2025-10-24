@@ -265,7 +265,7 @@
         // Mostrar errores desde TempData
         @if (TempData["ErrorType"] != null)
         {
-            var errorType = TempData["ErrorType"].ToString();
+            var errorType = TempData["ErrorType"]?.ToString() ?? "unknown";
             var errorMessage = TempData["ErrorMessage"]?.ToString() ?? "Error desconocido";
             var iconType = "error";
             var titleText = "Error";

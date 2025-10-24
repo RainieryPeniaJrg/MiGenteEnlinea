@@ -308,6 +308,79 @@ namespace MiGenteEnLinea.Web.Controllers
         }
 
         /// <summary>
+        /// GET: /Auth/Activate?userId={id}&email={email}&resetPass={bool}
+        /// </summary>
+        [HttpGet]
+        public IActionResult Activate(string? userId, string? email, bool? resetPass)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Enlace de activación inválido";
+                return RedirectToAction("Login");
+            }
+
+            var model = new ActivateViewModel
+            {
+                UserId = userId,
+                Email = email,
+                ResetPass = resetPass ?? false
+            };
+
+            return View(model);
+        }
+
+        /// <summary>
+        /// POST: /Auth/Activate
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(ActivateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("", "Las contraseñas no coinciden");
+                return View(model);
+            }
+
+            try
+            {
+                // Llamar al endpoint de activación en la API
+                var request = new
+                {
+                    userId = model.UserId,
+                    email = model.Email,
+                    password = model.Password,
+                    resetPass = model.ResetPass
+                };
+
+                var response = await _apiService.ActivateAccountAsync(request);
+
+                if (response.Success)
+                {
+                    // Redirigir a Login con mensaje de éxito
+                    TempData["SuccessMessage"] = "Usuario activado correctamente. Ya puede iniciar sesión.";
+                    return RedirectToAction("Login", new { email = model.Email });
+                }
+                else
+                {
+                    ModelState.AddModelError("", response.Message ?? "Error al activar la cuenta");
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al activar cuenta");
+                ModelState.AddModelError("", "Error al procesar la solicitud");
+                return View(model);
+            }
+        }
+
+        /// <summary>
         /// Redirige al dashboard apropiado según el tipo de usuario
         /// </summary>
         private IActionResult RedirectToDashboard()

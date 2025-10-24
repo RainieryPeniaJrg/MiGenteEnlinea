@@ -226,9 +226,9 @@
         // Mostrar errores desde TempData
         @if (TempData["ErrorType"] != null)
         {
-            var errorType = TempData["ErrorType"].ToString();
+            var errorType = TempData["ErrorType"]?.ToString() ?? "unknown";
             var errorMessage = TempData["ErrorMessage"]?.ToString() ?? "Error desconocido";
-            var showResend = TempData["ShowResend"] != null && (bool)TempData["ShowResend"];
+            var showResend = TempData["ShowResend"] != null && (TempData["ShowResend"] as bool? ?? false);
             var userId = TempData["UserId"]?.ToString() ?? "";
             var email = TempData["Email"]?.ToString() ?? "";
 
