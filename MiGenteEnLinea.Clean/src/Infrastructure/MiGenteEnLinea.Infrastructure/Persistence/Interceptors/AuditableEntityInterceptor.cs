@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using MiGenteEnLinea.Domain.Common;
+using MiGenteEnLinea.Application.Common.Interfaces;
 
 namespace MiGenteEnLinea.Infrastructure.Persistence.Interceptors;
 
@@ -58,25 +59,4 @@ public sealed class AuditableEntityInterceptor : SaveChangesInterceptor
             }
         }
     }
-}
-
-/// <summary>
-/// Servicio para obtener el usuario actual del contexto HTTP
-/// </summary>
-public interface ICurrentUserService
-{
-    /// <summary>
-    /// ID del usuario autenticado (null si no está autenticado)
-    /// </summary>
-    string? UserId { get; }
-
-    /// <summary>
-    /// Email del usuario autenticado
-    /// </summary>
-    string? Email { get; }
-
-    /// <summary>
-    /// Indica si hay un usuario autenticado
-    /// </summary>
-    bool IsAuthenticated { get; }
 }

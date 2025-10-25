@@ -6,14 +6,14 @@ namespace MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProf
 /// Command para actualizar el perfil de un usuario
 /// </summary>
 /// <remarks>
-/// Réplica de LoginService.actualizarPerfil() del Legacy
+/// Réplica simplificada de LoginService.actualizarPerfil() del Legacy
 /// </remarks>
 public sealed record UpdateProfileCommand : IRequest<bool>
 {
     /// <summary>
     /// ID del usuario (GUID)
     /// </summary>
-    public required string UserId { get; init; }
+    public required string UserID { get; init; }
     
     /// <summary>
     /// Nombre del usuario
@@ -26,22 +26,7 @@ public sealed record UpdateProfileCommand : IRequest<bool>
     public required string Apellido { get; init; }
     
     /// <summary>
-    /// Email del usuario
+    /// Email del usuario (opcional)
     /// </summary>
-    public required string Email { get; init; }
-    
-    /// <summary>
-    /// Teléfono 1 (opcional)
-    /// </summary>
-    public string? Telefono1 { get; init; }
-    
-    /// <summary>
-    /// Teléfono 2 (opcional)
-    /// </summary>
-    public string? Telefono2 { get; init; }
-    
-    /// <summary>
-    /// Nombre de usuario para login (opcional)
-    /// </summary>
-    public string? Usuario { get; init; }
+    public string? Email { get; init; }
 }

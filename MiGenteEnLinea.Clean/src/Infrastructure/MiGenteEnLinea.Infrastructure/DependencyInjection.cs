@@ -24,6 +24,7 @@ using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Empleados;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Pagos;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories.Suscripciones;
 using MiGenteEnLinea.Infrastructure.Services;
+using MiGenteEnLinea.Infrastructure.Services.Documents;
 using Polly;
 using Polly.Extensions.Http;
 using Microsoft.AspNetCore.Identity;
@@ -232,6 +233,13 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
 
         // =====================================================================
+        // CURRENT USER SERVICE (LOTE 2)
+        // Servicio para obtener información del usuario autenticado desde JWT
+        // =====================================================================
+        services.AddHttpContextAccessor();
+        services.AddScoped<MiGenteEnLinea.Application.Common.Interfaces.ICurrentUserService, Identity.CurrentUserService>();
+
+        // =====================================================================
         // PDF SERVICE (PLAN 5 - LOTE 5.3)
         // Generación de PDFs desde HTML (contratos, recibos, autorizaciones TSS)
         // =====================================================================
@@ -244,8 +252,13 @@ public static class DependencyInjection
         services.AddScoped<IImageService, ImageService>();
 
         // =====================================================================
-        // NUMBER TO WORDS CONVERTER (PLAN 5 - LOTE 5.3)
-        // Nota: Es una clase estática (extension method), no requiere registro DI
+        // NUMBER TO WORDS CONVERTER SERVICE (GAP-020 - COMPLETADO)
+        // Conversión de números a letras en español para PDFs legales
+        // ✅ Migrado de Legacy NumeroEnLetras.cs (extension method → Service pattern)
+        // ✅ Usado en: Contratos, Recibos, Autorizaciones TSS
+        // =====================================================================
+        services.AddScoped<INumeroEnLetrasService, NumeroEnLetrasService>();
+
         // Uso: decimal salario = 5250.50m; string texto = salario.ConvertirALetras();
         // =====================================================================
 
@@ -253,7 +266,10 @@ public static class DependencyInjection
         // MOCK SERVICES (TEMPORAL - API Startup Fix)
         // ⚠️ TODO: Reemplazar con implementaciones reales cuando estén disponibles
         // =====================================================================
-        services.AddScoped<IPaymentService, MockPaymentService>();
+        
+        // ✅ LOTE 1 COMPLETADO: CardnetPaymentService implementado
+        services.AddScoped<IPaymentService, CardnetPaymentService>();
+        
         services.AddScoped<INominaCalculatorService, MockNominaCalculatorService>();
 
         // TODO: Agregar cuando se migren del legacy

@@ -478,7 +478,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> UpdateProfile(string userId, [FromBody] UpdateProfileCommand command)
     {
-        if (userId != command.UserId)
+        if (userId != command.UserID)
         {
             return BadRequest(new { message = "El UserId del path no coincide con el del body" });
         }

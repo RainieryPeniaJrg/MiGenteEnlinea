@@ -4,6 +4,7 @@ using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MiGenteEnLinea.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(MiGenteDbContext))]
-    partial class MiGenteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024231511_ConfigurePersonalPC_IgnoreLegacyEntities")]
+    partial class ConfigurePersonalPC_IgnoreLegacyEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,75 +111,6 @@ namespace MiGenteEnLinea.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("IX_Credenciales_UserID");
 
                     b.ToTable("Credenciales", (string)null);
-                });
-
-            modelBuilder.Entity("MiGenteEnLinea.Domain.Entities.Authentication.PasswordResetToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("createdAt")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("createdBy");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("email");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("expiresAt");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasColumnName("token");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updatedAt");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("updatedBy");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("usedAt");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("userId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .HasDatabaseName("IX_PasswordResetTokens_Email");
-
-                    b.HasIndex("Token")
-                        .HasDatabaseName("IX_PasswordResetTokens_Token");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_PasswordResetTokens_UserId");
-
-                    b.ToTable("PasswordResetTokens", (string)null);
                 });
 
             modelBuilder.Entity("MiGenteEnLinea.Domain.Entities.Calificaciones.Calificacion", b =>

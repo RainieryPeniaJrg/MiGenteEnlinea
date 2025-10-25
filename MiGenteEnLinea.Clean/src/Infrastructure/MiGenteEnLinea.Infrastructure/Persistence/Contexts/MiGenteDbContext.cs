@@ -39,6 +39,7 @@ public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApp
     // ========================================
     // Expone propiedades DbContext con nombres de interfaz para Application Layer
     DbSet<Credencial> IApplicationDbContext.Credenciales => CredencialesRefactored;
+    DbSet<PasswordResetToken> IApplicationDbContext.PasswordResetTokens => PasswordResetTokens;
     DbSet<VistaPerfil> IApplicationDbContext.VPerfiles => VistasPerfil;
     DbSet<Domain.Entities.Seguridad.Perfile> IApplicationDbContext.Perfiles => Perfiles;
     DbSet<Domain.Entities.Contratistas.Contratista> IApplicationDbContext.Contratistas => Contratistas;
@@ -101,6 +102,9 @@ public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApp
 
     // DDD Refactored entity (replaces Credenciale)
     public virtual DbSet<Credencial> CredencialesRefactored { get; set; }
+    
+    // Password Reset Tokens (nueva tabla para seguridad)
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     // Legacy scaffolded entity (kept for reference)
     // public virtual DbSet<DeduccionesTss> DeduccionesTsses { get; set; }
@@ -363,6 +367,50 @@ public partial class MiGenteDbContext : IdentityDbContext<ApplicationUser>, IApp
         
         // Ignore domain events - they should NOT be persisted to database
         modelBuilder.Ignore<MiGenteEnLinea.Domain.Common.DomainEvent>();
+        
+        // ========================================
+        // IGNORE LEGACY SCAFFOLDED ENTITIES
+        // ========================================
+        // These entities were generated from the database scaffold but have been
+        // replaced by DDD-refactored entities. We explicitly ignore them to prevent
+        // EF Core from attempting to map them to the same tables as their replacements.
+        
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Calificacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.ConfigCorreo>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Contratista>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.ContratistasFoto>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.ContratistasServicio>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Credenciale>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.DeduccionesTss>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.DetalleContratacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Empleado>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosDetalle>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosDetalleContratacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosHeader>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadorRecibosHeaderContratacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadosNota>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.EmpleadosTemporale>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Ofertante>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.PaymentGateway>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Perfile>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.PerfilesInfo>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Permiso>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.PlanesContratista>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.PlanesEmpleadore>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Provincia>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Sectore>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Servicio>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Suscripcione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vcalificacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.VcontratacionesTemporale>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vcontratista>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vempleado>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vpago>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.VpagosContratacione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vperfile>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.VpromedioCalificacion>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Vsuscripcione>();
+        modelBuilder.Ignore<Infrastructure.Persistence.Entities.Generated.Venta>();
         
         // Apply all configurations from assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MiGenteDbContext).Assembly);

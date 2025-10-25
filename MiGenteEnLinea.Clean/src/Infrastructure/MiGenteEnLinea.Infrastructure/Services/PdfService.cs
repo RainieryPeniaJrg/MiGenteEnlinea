@@ -15,10 +15,14 @@ namespace MiGenteEnLinea.Infrastructure.Services;
 public class PdfService : IPdfService
 {
     private readonly ILogger<PdfService> _logger;
+    private readonly INumeroEnLetrasService _numeroEnLetrasService;
 
-    public PdfService(ILogger<PdfService> logger)
+    public PdfService(
+        ILogger<PdfService> logger,
+        INumeroEnLetrasService numeroEnLetrasService)
     {
         _logger = logger;
+        _numeroEnLetrasService = numeroEnLetrasService;
     }
 
     /// <summary>
@@ -204,6 +208,8 @@ public class PdfService : IPdfService
         DateTime fechaInicio)
     {
         var salarioTexto = $"RD$ {salario:N2}";
+        // ✅ GAP-020: Convertir salario a letras para documentos legales
+        var salarioEnLetras = _numeroEnLetrasService.ConvertirALetras(salario, incluirMoneda: true);
         var fechaTexto = fechaInicio.ToString("dd/MM/yyyy");
 
         return $@"
@@ -249,7 +255,7 @@ public class PdfService : IPdfService
 
         <p><strong>TERCERA:</strong> 
             EL EMPLEADOR se obliga a pagar a EL EMPLEADO un salario mensual de 
-            <strong>{salarioTexto}</strong>, pagadero en la forma y periodicidad establecida 
+            <strong>{salarioTexto}</strong> ({salarioEnLetras}), pagadero en la forma y periodicidad establecida 
             por la empresa.
         </p>
 
@@ -304,6 +310,9 @@ public class PdfService : IPdfService
         decimal deducciones,
         decimal salarioNeto)
     {
+        // ✅ GAP-020: Convertir salario neto a letras para documentos legales
+        var salarioNetoEnLetras = _numeroEnLetrasService.ConvertirALetras(salarioNeto, incluirMoneda: true);
+
         return $@"
 <!DOCTYPE html>
 <html>
@@ -359,6 +368,12 @@ public class PdfService : IPdfService
             </tr>
         </tbody>
     </table>
+
+    <div style='margin-top: 20px; padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;'>
+        <p style='margin: 0; text-align: center;'>
+            <strong>MONTO EN LETRAS:</strong> {salarioNetoEnLetras}
+        </p>
+    </div>
 
     <div class='footer'>
         <p>Este recibo fue generado electrónicamente por MiGente En Línea</p>
