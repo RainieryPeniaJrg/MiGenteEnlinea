@@ -4,11 +4,15 @@ using MiGenteEnLinea.Application.Common.Exceptions;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ActivateAccount;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.AddProfileInfo;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePassword;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.ChangePasswordById;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.DeleteUserCredential;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Login;
+using MiGenteEnLinea.Application.Features.Seguridad.Credenciales.Commands.DeleteUser;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.RefreshToken;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.Register;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.ResendActivationEmail;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.RevokeToken;
+using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateCredencial;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfile;
 using MiGenteEnLinea.Application.Features.Authentication.Commands.UpdateProfileExtended;
 using MiGenteEnLinea.Application.Features.Authentication.DTOs;
@@ -18,6 +22,7 @@ using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfil;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.GetPerfilByEmail;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreo;
 using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidarCorreoCuentaActual;
+using MiGenteEnLinea.Application.Features.Authentication.Queries.ValidateEmailBelongsToUser;
 
 namespace MiGenteEnLinea.API.Controllers;
 
@@ -243,6 +248,176 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Cambiar contraseña por ID de credencial (GAP-014)
+    /// </summary>
+    /// <param name="credencialId">ID de la credencial</param>
+    /// <param name="command">Nueva contraseña</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Contraseña actualizada exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Credencial no encontrada</response>
+    /// <remarks>
+    /// Réplica de SuscripcionesService.actualizarPassByID() del Legacy
+    /// GAP-014: Cambia password usando credential ID (no userID ni email)
+    /// 
+    /// DIFERENCIA CON /api/auth/change-password:
+    /// - /api/auth/change-password: Usa email + userId para identificar
+    /// - /api/auth/credenciales/{id}/password: Usa ID de credencial directamente
+    /// 
+    /// USO TÍPICO:
+    /// - Admin cambiando password de usuario
+    /// - Reset password desde panel de administración
+    /// 
+    /// Sample request:
+    /// 
+    ///     PUT /api/auth/credenciales/123/password
+    ///     {
+    ///        "credencialId": 123,
+    ///        "newPassword": "NuevaPassword123"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPut("credenciales/{credencialId}/password")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ChangePasswordById(
+        int credencialId,
+        [FromBody] ChangePasswordByIdCommand command)
+    {
+        // Validar que el ID de la ruta coincida con el del comando
+        if (credencialId != command.CredencialId)
+        {
+            return BadRequest(new
+            {
+                message = "El ID de credencial en la ruta no coincide con el del comando"
+            });
+        }
+
+        _logger.LogInformation(
+            "PUT /api/auth/credenciales/{CredencialId}/password",
+            credencialId);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning(
+                    "Cambio de contraseña por ID fallido - Credencial no encontrada: {CredencialId}",
+                    credencialId);
+                return NotFound(new
+                {
+                    message = $"No se encontró la credencial con ID {credencialId}"
+                });
+            }
+
+            _logger.LogInformation(
+                "Contraseña actualizada exitosamente por ID - CredencialId: {CredencialId}",
+                credencialId);
+            return Ok(new
+            {
+                message = "Contraseña actualizada exitosamente",
+                credencialId
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al cambiar contraseña por ID - CredencialId: {CredencialId}",
+                credencialId);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Actualizar credencial completa (password + email + activo) - GAP-012
+    /// </summary>
+    /// <param name="command">Datos de credencial a actualizar</param>
+    /// <returns>Resultado de la operación</returns>
+    /// <response code="200">Credencial actualizada exitosamente</response>
+    /// <response code="400">Datos inválidos o email ya existe</response>
+    /// <response code="404">Credencial no encontrada</response>
+    /// <remarks>
+    /// Réplica de SuscripcionesService.actualizarCredenciales() del Legacy
+    /// GAP-012: Permite actualizar password, email y estado activo en una sola operación
+    /// 
+    /// IMPORTANTE:
+    /// - Password es opcional (si se omite, no se actualiza)
+    /// - Password se hashea automáticamente con BCrypt
+    /// - Valida que el nuevo email no exista en otra credencial
+    /// 
+    /// Sample request:
+    /// 
+    ///     PUT /api/auth/credenciales
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "email": "nuevoemail@example.com",
+    ///        "password": "NuevaPassword123",
+    ///        "activo": true
+    ///     }
+    /// 
+    /// Sample request (sin cambiar password):
+    /// 
+    ///     PUT /api/auth/credenciales
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "email": "nuevoemail@example.com",
+    ///        "activo": false
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPut("credenciales")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateCredencial([FromBody] UpdateCredencialCommand command)
+    {
+        _logger.LogInformation(
+            "PUT /api/auth/credenciales - UserId: {UserId}, Email: {Email}, Activo: {Activo}",
+            command.UserId,
+            command.Email,
+            command.Activo);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning(
+                    "Actualización de credencial fallida - Usuario no encontrado o email duplicado. UserId: {UserId}",
+                    command.UserId);
+                return NotFound(new
+                {
+                    message = "No se pudo actualizar la credencial. El usuario no existe o el email ya está registrado."
+                });
+            }
+
+            _logger.LogInformation(
+                "Credencial actualizada exitosamente - UserId: {UserId}",
+                command.UserId);
+            return Ok(new
+            {
+                message = "Credencial actualizada exitosamente.",
+                userId = command.UserId,
+                email = command.Email,
+                activo = command.Activo
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al actualizar credencial - UserId: {UserId}",
+                command.UserId);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Registrar nuevo usuario en el sistema
     /// </summary>
     /// <param name="command">Datos de registro</param>
@@ -347,6 +522,81 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error al activar cuenta - UserId: {UserId}", command.UserId);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Reenviar email de activación de cuenta (GAP-011)
+    /// </summary>
+    /// <param name="command">Datos para reenvío (UserId o Email)</param>
+    /// <returns>Confirmación de envío</returns>
+    /// <response code="200">Email reenviado exitosamente</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Usuario no encontrado o ya activo</response>
+    /// <remarks>
+    /// Réplica de SuscripcionesService.enviarCorreoActivacion() y Registrar.aspx.cs EnviarCorreoActivacion()
+    /// GAP-011: Implementación completa con soporte para userID o email
+    /// 
+    /// Sample request (con userId):
+    /// 
+    ///     POST /api/auth/resend-activation
+    ///     {
+    ///        "userId": "550e8400-e29b-41d4-a716-446655440000",
+    ///        "email": "usuario@example.com",
+    ///        "host": "https://migente.com"
+    ///     }
+    /// 
+    /// Sample request (solo email):
+    /// 
+    ///     POST /api/auth/resend-activation
+    ///     {
+    ///        "email": "usuario@example.com",
+    ///        "host": "https://migente.com"
+    ///     }
+    /// 
+    /// </remarks>
+    [HttpPost("resend-activation")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ResendActivationEmail([FromBody] ResendActivationEmailCommand command)
+    {
+        _logger.LogInformation(
+            "POST /api/auth/resend-activation - UserId: {UserId}, Email: {Email}",
+            command.UserId ?? "NULL",
+            command.Email);
+
+        try
+        {
+            var success = await _mediator.Send(command);
+
+            if (!success)
+            {
+                _logger.LogWarning(
+                    "Reenvío de activación fallido - Usuario no encontrado o ya activo. UserId: {UserId}, Email: {Email}",
+                    command.UserId ?? "NULL",
+                    command.Email);
+                return NotFound(new
+                {
+                    message = "No se pudo reenviar el email. El usuario no existe o la cuenta ya está activa."
+                });
+            }
+
+            _logger.LogInformation(
+                "Email de activación reenviado exitosamente - Email: {Email}",
+                command.Email);
+            return Ok(new
+            {
+                message = "Email de activación reenviado exitosamente. Por favor revisa tu correo."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al reenviar email de activación - Email: {Email}",
+                command.Email);
             return BadRequest(new { message = ex.Message });
         }
     }
@@ -896,6 +1146,231 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error al validar correo-cuenta: Email={Email}, UserId={UserId}", email, userId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
+
+    /// <summary>
+    /// Validar si un correo electrónico pertenece a un usuario específico (userID)
+    /// </summary>
+    /// <param name="email">Correo electrónico a validar</param>
+    /// <param name="userId">ID del usuario propietario de la suscripción</param>
+    /// <returns>Resultado de validación con flag booleano</returns>
+    /// <response code="200">Validación exitosa con resultado (true/false)</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <response code="500">Error interno del servidor</response>
+    /// <remarks>
+    /// Migrado desde: SuscripcionesService.validarCorreoCuentaActual(string correo, string userID) - línea 220
+    /// 
+    /// **LÓGICA LEGACY EXACTA:**
+    /// ```csharp
+    /// public Cuentas validarCorreoCuentaActual(string correo, string userID)
+    /// {
+    ///     using (var db = new migenteEntities())
+    ///     {
+    ///         var result = db.Cuentas.Where(x => x.Email == correo && x.userID==userID)
+    ///                                .Include(a => a.perfilesInfo)
+    ///                                .FirstOrDefault();
+    ///         if (result != null) { return result; }
+    ///     };
+    ///     return null;
+    /// }
+    /// ```
+    /// 
+    /// **CASO DE USO REAL (MiPerfilEmpleador.aspx.cs línea 250):**
+    /// - Usuario intenta crear nueva credencial en su suscripción
+    /// - Sistema valida si el email YA EXISTE en esa suscripción (userID)
+    /// - Si `result != null` → Error: "Este Correo ya Existe en esta Suscripcion"
+    /// - Si `result == null` → Permite crear credencial con ese email
+    /// 
+    /// **⚠️ NOTA IMPORTANTE SOBRE NOMBRE DEL MÉTODO:**
+    /// 
+    /// El nombre Legacy "validarCorreoCuentaActual" es CONFUSO:
+    /// - Sugiere "excluir cuenta actual" (validar en OTRAS cuentas)
+    /// - Pero la implementación valida INCLUSIÓN (email pertenece a userID)
+    /// 
+    /// La lógica real es: **"¿Este email ya está registrado en la suscripción de este usuario?"**
+    /// - `true` = Email YA EXISTE en esa suscripción → NO permitir crear otra credencial
+    /// - `false` = Email NO EXISTE en esa suscripción → Permitir crear credencial
+    /// 
+    /// **DIFERENCIA CON ValidarCorreoCuentaActual (línea 1090):**
+    /// - **ValidarCorreoCuentaActual (línea 1090):** DEPRECADO - query sin lógica útil
+    /// - **ValidateEmailBelongsToUser (este método):** Implementación correcta con nombre clarificado
+    /// 
+    /// **EJEMPLOS DE USO:**
+    /// 
+    /// **Ejemplo 1: Email ya existe en la suscripción**
+    /// ```
+    /// GET /api/auth/validate-email-belongs-to-user?email=admin@migente.com&userId=123
+    /// 
+    /// Response 200 OK:
+    /// {
+    ///   "pertenece": true,
+    ///   "message": "El correo pertenece al usuario"
+    /// }
+    /// 
+    /// → Interpretación: No se puede crear otra credencial con ese email
+    /// ```
+    /// 
+    /// **Ejemplo 2: Email disponible en la suscripción**
+    /// ```
+    /// GET /api/auth/validate-email-belongs-to-user?email=nuevo@ejemplo.com&userId=123
+    /// 
+    /// Response 200 OK:
+    /// {
+    ///   "pertenece": false,
+    ///   "message": "El correo no pertenece al usuario o no existe"
+    /// }
+    /// 
+    /// → Interpretación: Se puede crear credencial con ese email
+    /// ```
+    /// 
+    /// **VALIDACIONES:**
+    /// - Email: requerido, formato válido, máximo 100 caracteres
+    /// - UserId: requerido, no vacío
+    /// 
+    /// **HISTORIA:**
+    /// - GAP-015 identificado en audit de Legacy
+    /// - Implementado como ValidateEmailBelongsToUserQuery con nombre clarificado
+    /// - Mantiene comportamiento Legacy pero con mejor semántica
+    /// </remarks>
+    [HttpGet("validate-email-belongs-to-user")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ValidateEmailBelongsToUser(
+        [FromQuery] string email,
+        [FromQuery] string userId)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(userId))
+        {
+            return BadRequest(new { message = "Email y userId son requeridos" });
+        }
+
+        try
+        {
+            var query = new ValidateEmailBelongsToUserQuery 
+            { 
+                Email = email, 
+                UserID = userId 
+            };
+
+            var pertenece = await _mediator.Send(query);
+
+            _logger.LogInformation(
+                "GAP-015: Email {Email} validado para userID {UserId}: {Resultado}",
+                email,
+                userId,
+                pertenece ? "PERTENECE" : "NO PERTENECE");
+
+            return Ok(new 
+            { 
+                pertenece, 
+                message = pertenece 
+                    ? "El correo pertenece al usuario" 
+                    : "El correo no pertenece al usuario o no existe" 
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex, 
+                "Error al validar email-belongs-to-user: Email={Email}, UserId={UserId}", 
+                email, 
+                userId);
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error interno al procesar la solicitud" });
+        }
+    }
+
+    /// <summary>
+    /// Eliminar usuario del sistema (hard delete)
+    /// </summary>
+    /// <param name="userId">ID del usuario (GUID)</param>
+    /// <param name="credencialId">ID de la credencial a eliminar</param>
+    /// <returns>204 No Content si se eliminó exitosamente</returns>
+    /// <response code="204">Usuario eliminado exitosamente</response>
+    /// <response code="404">Usuario no encontrado</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <remarks>
+    /// Migrado desde: LoginService.borrarUsuario(string userID, int credencialID) (línea 131-138)
+    /// 
+    /// **LÓGICA LEGACY EXACTA:**
+    /// ```csharp
+    /// public void borrarUsuario(string userID, int credencialID)
+    /// {
+    ///     using (var db = new migenteEntities())
+    ///     {
+    ///         var result = db.Credenciales.Where(a => a.userID == userID && a.id==credencialID).FirstOrDefault();
+    ///         db.Credenciales.Remove(result);
+    ///         db.SaveChanges();
+    ///     }
+    /// }
+    /// ```
+    /// 
+    /// **COMPORTAMIENTO:**
+    /// - Hard delete (no soft delete)
+    /// - Busca por userID + credencialID (doble clave)
+    /// - Confía en FK constraints de base de datos para cascada
+    /// - NO valida última credencial activa (puede dejar usuario sin acceso)
+    /// 
+    /// **⚠️ DIFERENCIA CON DeleteUserCredential:**
+    /// - **DeleteUserCredential (línea 654):** Endpoint moderno, valida última credencial, NO permite eliminar última activa
+    /// - **DeleteUser (este):** Réplica exacta del Legacy, NO valida, permite eliminar cualquier credencial
+    /// 
+    /// **USO:**
+    /// - Migración desde Legacy (paridad 100%)
+    /// - Compatibilidad con código existente
+    /// - ⚠️ Para nuevos desarrollos, preferir `DELETE /api/auth/users/{userId}/credentials/{credentialId}`
+    /// 
+    /// **GAP-001 COMPLETADO:** ✅
+    /// 
+    /// Sample request:
+    /// 
+    ///     DELETE /api/auth/users/550e8400-e29b-41d4-a716-446655440000?credencialId=5
+    /// 
+    /// </remarks>
+    [HttpDelete("users/{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteUser(
+        string userId,
+        [FromQuery] int credencialId)
+    {
+        _logger.LogInformation(
+            "DELETE /api/auth/users/{UserId}?credencialId={CredencialId}",
+            userId,
+            credencialId);
+
+        if (string.IsNullOrWhiteSpace(userId) || credencialId <= 0)
+        {
+            return BadRequest(new { message = "UserId y credencialId son requeridos" });
+        }
+
+        try
+        {
+            var command = new DeleteUserCommand(userId, credencialId);
+            await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Usuario eliminado exitosamente - UserId: {UserId}, CredencialId: {CredencialId}",
+                userId,
+                credencialId);
+
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            _logger.LogWarning("Usuario no encontrado: {Message}", ex.Message);
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar usuario - UserId: {UserId}", userId);
             return StatusCode(
                 StatusCodes.Status500InternalServerError,
                 new { message = "Error interno al procesar la solicitud" });

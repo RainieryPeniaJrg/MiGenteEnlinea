@@ -814,7 +814,13 @@ public class EmpleadosController : ControllerBase
     {
         _logger.LogInformation("Creando {Count} remuneraciones para empleado: {EmpleadoId}", remuneraciones.Count, empleadoId);
 
-        var command = new CreateRemuneracionesCommand(GetUserId(), empleadoId, remuneraciones);
+        var command = new CreateRemuneracionesCommand
+        {
+            UserId = GetUserId(),
+            EmpleadoId = empleadoId,
+            Remuneraciones = remuneraciones
+        };
+        
         var result = await _mediator.Send(command);
 
         _logger.LogInformation("Remuneraciones creadas exitosamente para empleado: {EmpleadoId}", empleadoId);
@@ -840,7 +846,13 @@ public class EmpleadosController : ControllerBase
     {
         _logger.LogInformation("Actualizando remuneraciones para empleado: {EmpleadoId} (creará {Count} nuevas)", empleadoId, remuneraciones.Count);
 
-        var command = new UpdateRemuneracionesCommand(GetUserId(), empleadoId, remuneraciones);
+        var command = new UpdateRemuneracionesCommand
+        {
+            UserId = GetUserId(),
+            EmpleadoId = empleadoId,
+            Remuneraciones = remuneraciones
+        };
+        
         var result = await _mediator.Send(command);
 
         _logger.LogInformation("Remuneraciones actualizadas exitosamente para empleado: {EmpleadoId}", empleadoId);

@@ -101,21 +101,32 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, Re
         await _unitOfWork.Credenciales.AddAsync(credencial, cancellationToken);
 
         // ================================================================================
-        // PASO 4: CREAR CONTRATISTA SI ES TIPO 2
+        // PASO 4: CREAR CONTRATISTA AUTOMÁTICAMENTE (GAP-010)
         // ================================================================================
-        // Legacy: if (tipo == 2) → guardarNuevoContratista(c)
-        if (request.Tipo == 2)
-        {
-            var contratista = Contratista.Create(
-                userId: userId,
-                nombre: request.Nombre,
-                apellido: request.Apellido,
-                tipo: 1, // ⚠️ IMPORTANTE: tipo=1 por defecto (Persona Física) - igual que Legacy
-                telefono1: request.Telefono1
-            );
+        // ⚠️ LEGACY BUG: GuardarPerfil() SIEMPRE crea Contratista, independiente del tipo
+        // Legacy líneas 20-35: Crea Contratistas sin validar tipo de usuario
+        // 
+        // ✅ FIX GAP-010: Replicar comportamiento Legacy - SIEMPRE crear Contratista
+        // 
+        // Razón: En el sistema Legacy, todo usuario registrado es potencial proveedor de servicios.
+        // - Si es Empleador (tipo=1): Puede contratar, pero también ofrecer servicios
+        // - Si es Contratista (tipo=2): Puede ofrecer servicios y también contratar
+        // 
+        // Campos Legacy copiados:
+        // - userID: ID del usuario (PK)
+        // - Nombre, Apellido, email, telefono1, telefono2: Datos personales
+        // - tipo: SIEMPRE 1 (Persona Física) - valor hardcoded en Legacy línea 30
+        // - activo: SIEMPRE false - requiere aprobación/activación manual
+        // - fechaIngreso: Fecha de creación del perfil
+        var contratista = Contratista.Create(
+            userId: userId,
+            nombre: request.Nombre,
+            apellido: request.Apellido,
+            tipo: 1,  // ⚠️ HARDCODED: tipo=1 (Persona Física) - igual que Legacy línea 30
+            telefono1: request.Telefono1
+        );
 
-            await _unitOfWork.Contratistas.AddAsync(contratista, cancellationToken);
-        }
+        await _unitOfWork.Contratistas.AddAsync(contratista, cancellationToken);
 
         // ================================================================================
         // PASO 5: CREAR SUSCRIPCIÓN INICIAL CON PLANID=0

@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiGenteEnLinea.Application.Features.Pagos.Queries.GenerateIdempotencyKey;
 using MiGenteEnLinea.Application.Features.Suscripciones.Commands.ProcesarVenta;
 using MiGenteEnLinea.Application.Features.Suscripciones.Commands.ProcesarVentaSinPago;
 using MiGenteEnLinea.Application.Features.Suscripciones.DTOs;
@@ -34,6 +35,109 @@ public class PagosController : ControllerBase
         _mediator = mediator;
         _mapper = mapper;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Genera una clave de idempotencia para prevenir transacciones duplicadas.
+    /// </summary>
+    /// <returns>Clave de idempotencia GUID generada por Cardnet.</returns>
+    /// <response code="200">Clave generada exitosamente.</response>
+    /// <response code="401">No autorizado.</response>
+    /// <response code="500">Error al comunicarse con Cardnet.</response>
+    /// <remarks>
+    /// Migrado desde: PaymentService.consultarIdempotency(url) - línea 17
+    /// 
+    /// **PROPÓSITO:**
+    /// - Prevenir cobros duplicados si el usuario refresca la página de pago
+    /// - Cardnet rechaza automáticamente transacciones con mismo idempotency_key
+    /// - Esencial para UX: Usuario puede reintentar sin miedo a doble cargo
+    /// 
+    /// **FLUJO DE USO:**
+    /// 1. Cliente llama GET /api/pagos/idempotency antes de mostrar formulario de pago
+    /// 2. Cliente almacena la clave recibida
+    /// 3. Cliente envía la clave en POST /api/pagos/procesar junto con datos de tarjeta
+    /// 4. Si el usuario recarga la página, se debe generar NUEVA clave
+    /// 
+    /// **LÓGICA LEGACY (PaymentService.cs línea 17-49):**
+    /// ```csharp
+    /// public async Task<dynamic> consultarIdempotency(string url)
+    /// {
+    ///     var client = new RestClient(url); // Cardnet idempotency endpoint
+    ///     var request = new RestRequest();
+    ///     request.Method = Method.Get;
+    ///     request.AddHeader("Content-Type", "text/plain");
+    ///     var response = await client.ExecuteAsync(request);
+    ///     
+    ///     if (response.IsSuccessful)
+    ///     {
+    ///         // Response format: "ikey:a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    ///         var result = response.Content.Substring(5); // Remove "ikey:"
+    ///         return result;
+    ///     }
+    ///     throw new Exception(response.ErrorMessage);
+    /// }
+    /// ```
+    /// 
+    /// **CARDNET API:**
+    /// - URL: https://ecommerce.cardnet.com.do/api/payment/idenpotency-keys
+    /// - Método: GET
+    /// - Headers: Content-Type: text/plain
+    /// - Response: "ikey:{GUID}" (ej: "ikey:a1b2c3d4-e5f6-7890-abcd-ef1234567890")
+    /// - Validez: 30 minutos (aprox)
+    /// 
+    /// **USO EN LEGACY:**
+    /// - AdquirirPlanEmpleador.aspx.cs (línea 150-180)
+    /// - AdquirirPlanContratista.aspx.cs (línea 150-180)
+    /// - Se almacena en Ventas.idempotencyKey para auditoría
+    /// 
+    /// **EJEMPLO:**
+    /// ```
+    /// GET /api/pagos/idempotency
+    /// 
+    /// Response 200 OK:
+    /// {
+    ///   "idempotencyKey": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    ///   "generatedAt": "2025-10-24T15:30:00Z"
+    /// }
+    /// ```
+    /// 
+    /// **BENEFICIO:**
+    /// - Transacción idempotente: Mismo idempotency_key + mismos datos = mismo resultado
+    /// - Previene doble cargo accidental
+    /// - Mejora experiencia de usuario en páginas de pago
+    /// </remarks>
+    [HttpGet("idempotency")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GenerateIdempotencyKey()
+    {
+        _logger.LogInformation("GAP-018: GET /api/pagos/idempotency - Generating Cardnet idempotency key");
+
+        try
+        {
+            var query = new GenerateIdempotencyKeyQuery();
+            var idempotencyKey = await _mediator.Send(query);
+
+            _logger.LogInformation(
+                "Idempotency key generated successfully: {Key}",
+                idempotencyKey);
+
+            return Ok(new
+            {
+                idempotencyKey,
+                generatedAt = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error generating idempotency key from Cardnet");
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new { message = "Error al generar clave de idempotencia desde Cardnet" });
+        }
     }
 
     /// <summary>

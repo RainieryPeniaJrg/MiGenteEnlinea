@@ -5,6 +5,7 @@ using MiGenteEnLinea.Application.Features.Nominas.Commands.EnviarRecibosEmailLot
 using MiGenteEnLinea.Application.Features.Nominas.Commands.ExportarNominaCsv;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.GenerarRecibosPdfLote;
 using MiGenteEnLinea.Application.Features.Nominas.Commands.ProcesarNominaLote;
+using MiGenteEnLinea.Application.Features.Nominas.Commands.ProcessContractPayment;
 using MiGenteEnLinea.Application.Features.Nominas.DTOs;
 using MiGenteEnLinea.Application.Features.Nominas.Queries.GetNominaResumen;
 using System.Security.Claims;
@@ -470,6 +471,97 @@ public class NominasController : ControllerBase
         {
             _logger.LogWarning(ex, "Validation error exporting CSV");
             return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Procesa el pago de una contratación de servicio temporal (GAP-005).
+    /// </summary>
+    /// <param name="command">Datos del pago (header y detalles)</param>
+    /// <returns>ID del pago generado</returns>
+    /// <response code="200">Pago procesado exitosamente, retorna pagoID</response>
+    /// <response code="400">Datos inválidos</response>
+    /// <response code="404">Contratación no encontrada</response>
+    /// <remarks>
+    /// Endpoint implementado para GAP-005: ProcessContractPayment
+    /// 
+    /// LÓGICA LEGACY: EmpleadosService.procesarPagoContratacion() (líneas 168-204)
+    /// 
+    /// COMPORTAMIENTO:
+    /// 1. Valida que la contratación exista y esté activa
+    /// 2. Crea header de recibo (Empleador_Recibos_Header_Contrataciones)
+    /// 3. Crea detalles de recibo (Empleador_Recibos_Detalle_Contrataciones)
+    /// 4. Si primer detalle tiene Concepto == "Pago Final":
+    ///    - Actualiza DetalleContrataciones.estatus = 2 (Completada)
+    ///    - Usa método DDD DetalleContratacion.Completar()
+    /// 5. Retorna pagoID generado
+    /// 
+    /// EJEMPLO REQUEST:
+    /// 
+    ///     POST /api/nominas/contrataciones/procesar-pago
+    ///     {
+    ///       "userId": "123",
+    ///       "contratacionId": 45,
+    ///       "detalleId": 12,
+    ///       "fechaRegistro": "2025-01-15T10:00:00Z",
+    ///       "fechaPago": "2025-01-15T10:00:00Z",
+    ///       "conceptoPago": "Pago por servicios profesionales",
+    ///       "tipo": 1,
+    ///       "detalles": [
+    ///         {
+    ///           "concepto": "Horas trabajadas",
+    ///           "monto": 5000.00
+    ///         },
+    ///         {
+    ///           "concepto": "Materiales",
+    ///           "monto": 500.00
+    ///         }
+    ///       ]
+    ///     }
+    /// 
+    /// TIPOS DE PAGO:
+    /// - 1 = Pago único / Adelanto
+    /// - 2 = Pago Final (actualiza estatus a Completada)
+    /// 
+    /// NOTAS:
+    /// - Si Concepto del primer detalle == "Pago Final" → estatus 2 (Legacy behavior)
+    /// - Usa métodos factory DDD: EmpleadorRecibosHeaderContratacione.Crear()
+    /// - Usa comportamiento DDD: DetalleContratacion.Completar()
+    /// </remarks>
+    [HttpPost("contrataciones/procesar-pago")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ProcesarPagoContratacion([FromBody] ProcessContractPaymentCommand command)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        _logger.LogInformation(
+            "Processing contract payment - User: {UserId}, ContractID: {ContratacionId}, Type: {Tipo}",
+            userId,
+            command.ContratacionId,
+            command.Tipo);
+
+        try
+        {
+            var pagoId = await _mediator.Send(command);
+
+            _logger.LogInformation(
+                "Contract payment processed successfully - PagoID: {PagoId}, ContractID: {ContratacionId}",
+                pagoId,
+                command.ContratacionId);
+
+            return Ok(new { pagoId });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid contract payment data");
+            return BadRequest(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Contract not found or inactive");
+            return NotFound(ex.Message);
         }
     }
 }

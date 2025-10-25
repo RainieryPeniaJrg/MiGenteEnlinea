@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.AcceptContratacion;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.CancelContratacion;
+using MiGenteEnLinea.Application.Features.Contrataciones.Commands.CancelarTrabajo;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.CompleteContratacion;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.CreateContratacion;
+using MiGenteEnLinea.Application.Features.Contrataciones.Commands.EliminarEmpleadoTemporal;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.RejectContratacion;
 using MiGenteEnLinea.Application.Features.Contrataciones.Commands.StartContratacion;
 using MiGenteEnLinea.Application.Features.Contrataciones.Queries.GetContratacionById;
@@ -334,5 +336,147 @@ public class ContratacionesController : ControllerBase
 
         var result = await _mediator.Send(query);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Cancela un trabajo/contratación (GAP-006).
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación</param>
+    /// <param name="detalleId">ID del detalle de contratación</param>
+    /// <returns>Resultado de la cancelación (siempre true por paridad Legacy)</returns>
+    /// <response code="200">Trabajo cancelado exitosamente</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <remarks>
+    /// Endpoint implementado para GAP-006: CancelarTrabajo
+    /// 
+    /// LÓGICA LEGACY: EmpleadosService.cancelarTrabajo() (líneas 233-245)
+    /// 
+    /// COMPORTAMIENTO:
+    /// - Busca DetalleContratacion por contratacionID + detalleID
+    /// - Si existe: actualiza estatus (DDD usa estatus = 5 "Cancelada")
+    /// - Si NO existe: no hace nada pero retorna true igual (paridad Legacy)
+    /// - Siempre retorna true (no lanza excepción si no encuentra)
+    /// 
+    /// NOTA ARQUITECTURAL:
+    /// - Legacy usaba estatus = 3 para "Cancelada"
+    /// - DDD usa estatus = 5 (ESTADO_CANCELADA) mediante método Cancelar()
+    /// - Ambos representan el mismo estado semántico: "Trabajo cancelado"
+    /// 
+    /// EJEMPLO REQUEST:
+    /// 
+    ///     POST /api/contrataciones/cancelar-trabajo?contratacionId=45&amp;detalleId=12
+    /// 
+    /// EJEMPLO RESPONSE:
+    /// 
+    ///     {
+    ///       "success": true,
+    ///       "message": "Trabajo cancelado exitosamente"
+    ///     }
+    /// 
+    /// USO TÍPICO:
+    /// - Empleador decide no continuar con un trabajo iniciado
+    /// - Problemas durante ejecución que impiden completar
+    /// - Cambios en requerimientos que invalidan el contrato
+    /// </remarks>
+    [HttpPost("cancelar-trabajo")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CancelarTrabajo(
+        [FromQuery] int contratacionId,
+        [FromQuery] int detalleId)
+    {
+        _logger.LogInformation(
+            "Canceling work - ContractID: {ContratacionId}, DetailID: {DetalleId}",
+            contratacionId,
+            detalleId);
+
+        var command = new CancelarTrabajoCommand
+        {
+            ContratacionId = contratacionId,
+            DetalleId = detalleId
+        };
+
+        var success = await _mediator.Send(command);
+
+        return Ok(new 
+        { 
+            success, 
+            message = "Trabajo cancelado exitosamente" 
+        });
+    }
+
+    /// <summary>
+    /// Elimina un empleado temporal y sus datos relacionados (GAP-007).
+    /// </summary>
+    /// <param name="contratacionId">ID de la contratación temporal a eliminar</param>
+    /// <returns>Resultado de la eliminación (siempre true por paridad Legacy)</returns>
+    /// <response code="200">Empleado temporal eliminado exitosamente</response>
+    /// <response code="400">Parámetros inválidos</response>
+    /// <remarks>
+    /// Endpoint implementado para GAP-007: EliminarEmpleadoTemporal
+    /// 
+    /// LÓGICA LEGACY: EmpleadosService.eliminarEmpleadoTemporal() (líneas 299-357)
+    /// 
+    /// COMPORTAMIENTO:
+    /// - Busca EmpleadoTemporal por contratacionID
+    /// - Si existe: elimina en cascada (recibos detalles → headers → empleado)
+    /// - Si NO existe: no hace nada pero retorna true igual (paridad Legacy)
+    /// - Siempre retorna true (no lanza excepción si no encuentra)
+    /// 
+    /// OPERACIONES DE ELIMINACIÓN (orden crítico):
+    /// 1. Empleador_Recibos_Detalle_Contrataciones (nietos - detalles de recibos)
+    /// 2. Empleador_Recibos_Header_Contrataciones (hijos - headers de recibos)
+    /// 3. EmpleadosTemporales (root - empleado temporal)
+    /// 
+    /// NOTA ARQUITECTURAL:
+    /// - Legacy: Múltiples DbContext con SaveChanges() separados (anti-pattern)
+    /// - Clean: Transacción única con SaveChanges() al final (mejor práctica)
+    /// - EF Core: DeleteBehavior.Restrict requiere cascade manual
+    /// - DDD: No hay método Eliminar() en entidad → operación de infraestructura
+    /// 
+    /// EJEMPLO REQUEST:
+    /// 
+    ///     DELETE /api/contrataciones/empleado-temporal?contratacionId=123
+    /// 
+    /// EJEMPLO RESPONSE:
+    /// 
+    ///     {
+    ///       "success": true,
+    ///       "message": "Empleado temporal eliminado exitosamente"
+    ///     }
+    /// 
+    /// USO TÍPICO:
+    /// - Empleador decide eliminar una contratación temporal completa
+    /// - Limpieza de registros temporales no utilizados
+    /// - Cancelación total de una contratación con eliminación de historial
+    /// 
+    /// ADVERTENCIA:
+    /// - Esta es una operación destructiva (hard delete, no soft delete)
+    /// - Se eliminan TODOS los recibos asociados a la contratación
+    /// - No se puede deshacer la operación
+    /// - Usar con precaución en producción
+    /// </remarks>
+    [HttpDelete("empleado-temporal")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> EliminarEmpleadoTemporal(
+        [FromQuery] int contratacionId)
+    {
+        _logger.LogInformation(
+            "Deleting EmpleadoTemporal - ContratacionId: {ContratacionId}",
+            contratacionId);
+
+        var command = new EliminarEmpleadoTemporalCommand
+        {
+            ContratacionId = contratacionId
+        };
+
+        var success = await _mediator.Send(command);
+
+        return Ok(new 
+        { 
+            success, 
+            message = "Empleado temporal eliminado exitosamente" 
+        });
     }
 }

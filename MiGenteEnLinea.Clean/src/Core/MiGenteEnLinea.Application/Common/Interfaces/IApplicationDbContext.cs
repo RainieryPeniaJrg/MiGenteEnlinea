@@ -33,6 +33,10 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Calificaciones.Calificacion> Calificaciones { get; }
     DbSet<Domain.Entities.Contrataciones.DetalleContratacion> DetalleContrataciones { get; }
     
+    // Entidades de recibos de contrataciones (DDD refactored from Legacy)
+    DbSet<Domain.Entities.Pagos.EmpleadorRecibosHeaderContratacione> EmpleadorRecibosHeaderContrataciones { get; }
+    DbSet<Domain.Entities.Pagos.EmpleadorRecibosDetalleContratacione> EmpleadorRecibosDetalleContrataciones { get; }
+    
     /// <summary>
     /// Configuración del bot OpenAI (tabla: OpenAi_Config)
     /// ⚠️ SECURITY WARNING: Contiene API keys sensibles

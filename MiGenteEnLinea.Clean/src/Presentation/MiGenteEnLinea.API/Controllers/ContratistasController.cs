@@ -9,6 +9,7 @@ using MiGenteEnLinea.Application.Features.Contratistas.Commands.UpdateContratist
 using MiGenteEnLinea.Application.Features.Contratistas.Commands.UpdateContratistaImagen;
 using MiGenteEnLinea.Application.Features.Contratistas.Queries.GetContratistaById;
 using MiGenteEnLinea.Application.Features.Contratistas.Queries.GetContratistaByUserId;
+using MiGenteEnLinea.Application.Features.Contratistas.Queries.GetCedulaByUserId;
 using MiGenteEnLinea.Application.Features.Contratistas.Queries.GetServiciosContratista;
 using MiGenteEnLinea.Application.Features.Contratistas.Queries.SearchContratistas;
 
@@ -107,6 +108,45 @@ public class ContratistasController : ControllerBase
             return NotFound(new { error = $"No existe un perfil de contratista para el usuario {userId}" });
 
         return Ok(contratista);
+    }
+
+    /// <summary>
+    /// Obtiene la cédula/identificación de un contratista por userId (GAP-013)
+    /// </summary>
+    /// <param name="userId">ID del usuario</param>
+    /// <returns>Cédula/identificación del contratista</returns>
+    /// <response code="200">Cédula encontrada</response>
+    /// <response code="404">No existe contratista para este usuario o no tiene cédula</response>
+    /// <remarks>
+    /// Réplica de SuscripcionesService.obtenerCedula() del Legacy
+    /// GAP-013: Endpoint simple para obtener identificación
+    /// 
+    /// Sample request:
+    /// 
+    ///     GET /api/contratistas/cedula/{userId}
+    /// 
+    /// Sample response:
+    /// 
+    ///     "00112345678"
+    /// 
+    /// </remarks>
+    [HttpGet("cedula/{userId}")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCedulaByUserId(string userId)
+    {
+        var query = new GetCedulaByUserIdQuery { UserId = userId };
+        var cedula = await _mediator.Send(query);
+
+        if (string.IsNullOrWhiteSpace(cedula))
+        {
+            return NotFound(new
+            {
+                error = $"No se encontró cédula para el contratista con userId {userId}"
+            });
+        }
+
+        return Ok(cedula);
     }
 
     /// <summary>
