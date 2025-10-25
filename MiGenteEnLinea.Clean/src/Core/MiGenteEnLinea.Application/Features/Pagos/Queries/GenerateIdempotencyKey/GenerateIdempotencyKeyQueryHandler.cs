@@ -49,14 +49,14 @@ namespace MiGenteEnLinea.Application.Features.Pagos.Queries.GenerateIdempotencyK
 public sealed class GenerateIdempotencyKeyQueryHandler 
     : IRequestHandler<GenerateIdempotencyKeyQuery, string>
 {
-    private readonly ICardnetPaymentService _cardnetPaymentService;
+    private readonly IPaymentService _paymentService;
     private readonly ILogger<GenerateIdempotencyKeyQueryHandler> _logger;
 
     public GenerateIdempotencyKeyQueryHandler(
-        ICardnetPaymentService cardnetPaymentService,
+        IPaymentService paymentService,
         ILogger<GenerateIdempotencyKeyQueryHandler> logger)
     {
-        _cardnetPaymentService = cardnetPaymentService;
+        _paymentService = paymentService;
         _logger = logger;
     }
 
@@ -68,8 +68,8 @@ public sealed class GenerateIdempotencyKeyQueryHandler
 
         try
         {
-            // Delegar a ICardnetPaymentService (ya implementado)
-            var idempotencyKey = await _cardnetPaymentService.GenerateIdempotencyKeyAsync(cancellationToken);
+            // Delegar a IPaymentService (ya implementado)
+            var idempotencyKey = await _paymentService.GenerateIdempotencyKeyAsync(cancellationToken);
 
             _logger.LogInformation(
                 "Idempotency key generada exitosamente: {Key}",

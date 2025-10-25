@@ -13,6 +13,7 @@ using MiGenteEnLinea.Domain.Interfaces.Repositories.Pagos;
 using MiGenteEnLinea.Domain.Interfaces.Repositories.Suscripciones;
 using MiGenteEnLinea.Infrastructure.Identity;
 using MiGenteEnLinea.Infrastructure.Identity.Services;
+using MiGenteEnLinea.Infrastructure.Options;
 using MiGenteEnLinea.Infrastructure.Persistence.Contexts;
 using MiGenteEnLinea.Infrastructure.Persistence.Interceptors;
 using MiGenteEnLinea.Infrastructure.Persistence.Repositories;
@@ -227,9 +228,10 @@ public static class DependencyInjection
         .AddPolicyHandler(GetCircuitBreakerPolicy()); // Circuit breaker después de 5 fallos
 
         // =====================================================================
-        // EMAIL SERVICE (PLAN 5 - LOTE 5.1)
+        // EMAIL SERVICE (GAP-021 - CRITICAL BLOCKER)
+        // Servicio para envío de emails vía SMTP usando MailKit
         // =====================================================================
-        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddScoped<IEmailService, EmailService>();
 
         // =====================================================================

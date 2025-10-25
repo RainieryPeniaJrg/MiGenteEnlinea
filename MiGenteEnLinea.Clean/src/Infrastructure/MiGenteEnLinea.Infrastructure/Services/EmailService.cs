@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MiGenteEnLinea.Application.Common.Interfaces;
+using MiGenteEnLinea.Infrastructure.Options;
 using System;
 using System.Threading.Tasks;
 

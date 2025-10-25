@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using MiGenteEnLinea.Infrastructure.Options;
 using MiGenteEnLinea.Infrastructure.Services;
 using Xunit;
 
@@ -35,7 +36,7 @@ public class EmailServiceTests
             RetryDelayMilliseconds = 2000
         };
         
-        _emailSettingsOptions = Options.Create(_emailSettings);
+        _emailSettingsOptions = Microsoft.Extensions.Options.Options.Create(_emailSettings);
     }
 
     /// <summary>
@@ -227,7 +228,7 @@ public class EmailServiceTests
             SmtpServer = "", // Inválido
             SmtpPort = 587
         };
-        var invalidOptions = Options.Create(invalidSettings);
+        var invalidOptions = Microsoft.Extensions.Options.Options.Create(invalidSettings);
 
         // Act
         Action act = () => new EmailService(invalidOptions, _mockLogger.Object);
